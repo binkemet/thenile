@@ -1572,7 +1572,9 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/binkemet/thenile")))
+                                }
                             ) {
                                 Surface(
                                     shape = androidx.compose.foundation.shape.CircleShape,
@@ -1587,6 +1589,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text("Developed by", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                     Text("binkemet", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                    Text("github.com/binkemet/thenile", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                                 }
                             }
 
