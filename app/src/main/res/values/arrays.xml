@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Xposed module scope: system framework + any package we want to hook in-process. -->
+    <string-array name="xposed_scope">
+        <item>android</item>
+        <item>com.android.settings</item>
+        <item>com.android.shell</item>
+    </string-array>
+</resources>

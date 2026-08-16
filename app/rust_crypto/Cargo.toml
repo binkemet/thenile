@@ -1,0 +1,15 @@
+[package]
+name = "rust_crypto"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+jni = "0.21.1"
+argon2 = "0.5.3"
+aes-gcm = "0.10.3"
+rand_core = { version = "0.6", features = ["getrandom"] }
+libc = "0.2"
+

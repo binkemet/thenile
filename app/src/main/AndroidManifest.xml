@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:windowSoftInputMode="adjustResize"
+        android:theme="@style/Theme.TheNile">
+        
+        <meta-data
+            android:name="xposedmodule"
+            android:value="true" />
+        <meta-data
+            android:name="xposeddescription"
+            android:value="The Nile Stealth Engine" />
+        <meta-data
+            android:name="xposedminversion"
+            android:value="100" />
+            
+        <activity
+            android:name=".ui.PromptActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true">
+        </activity>
+
+        <activity
+            android:name=".ui.AdminActivity"
+            android:exported="true"
+            android:theme="@style/Theme.TheNile"
+            android:excludeFromRecents="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Separate alias (not a second intent-filter on AdminActivity itself) so the
+             "Browser Deep Link" toggle can disable just this entry point via
+             setComponentEnabledSetting without touching the launcher entry. -->
+        <activity-alias
+            android:name=".ui.AdminActivityDeepLink"
+            android:targetActivity=".ui.AdminActivity"
+            android:exported="true"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="nile" android:host="admin" />
+                <data android:scheme="nile" android:host="open" />
+            </intent-filter>
+        </activity-alias>
+
+        <service
+            android:name=".services.NileTileService"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:label="The Nile"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".services.NileAccessibilityService"
+            android:exported="true"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <receiver
+            android:name=".receivers.SecretCodeReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
+                <data android:scheme="android_secret_code" android:host="1234" />
+                <data android:scheme="android_secret_code" android:host="9876" />
+                <data android:scheme="android_secret_code" android:host="1111" />
+                <data android:scheme="android_secret_code" android:host="3333" />
+            </intent-filter>
+        </receiver>
+
+    </application>
+</manifest>

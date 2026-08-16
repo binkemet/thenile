@@ -1,0 +1,47 @@
+# ==================================
+# Android / Gradle
+# ==================================
+*.iml
+.gradle
+.kotlin
+/docs/superpowers/
+
+# SSH keypair(s) — never commit private key material
+/mysshkey
+/mysshkey.pub
+/local.properties
+/build
+/app/build
+/captures
+.externalNativeBuild
+.cxx
+*.apk
+*.ap_
+*.aab
+*.dex
+*.class
+bin/
+gen/
+out/
+*.hprof
+
+# ==================================
+# Rust (Cargo)
+# ==================================
+/app/rust_crypto/target/
+
+# ==================================
+# IDE / OS
+# ==================================
+.idea/
+.DS_Store
+
+# ==================================
+# AI / Dev Assistants
+# ==================================
+.codex/
+.cursor/
+.superpowers/
+graphify-out/
+scratchpad/
+BUILD_PROGRESS.md

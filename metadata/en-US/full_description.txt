@@ -1,0 +1,20 @@
+The Nile is a root-enabled Android stealth deniability engine providing true plausible deniability through encrypted storage, app hiding via LSPosed, and multiple vault states.
+
+Features:
+• Multi-state vault (Locked, Unlocked, Decoy)
+• Dial code activation via phone dialer (*#*#CODE#*#*)
+• Calculator decoy app disguise
+• Fake crash screen disguise (long-press bypass)
+• Multi-profile support with per-profile decoy PINs
+• AES-256-GCM encrypted backups (Rust native crypto)
+• App hiding via LSPosed/Xposed
+• Directory hiding with LUKS containers
+• Trace cleaning (logs, recent tasks)
+• Material You / Dynamic theming
+• Quick Settings tile, deep links, volume key shortcuts
+• Launcher icon hiding
+
+Requirements:
+• Root access via KernelSU, Magisk, or APatch
+• LSPosed / ZygiskNext for app hiding capabilities
+• Android 7.0+

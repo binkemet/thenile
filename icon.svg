@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <clipPath id="app-icon">
+      <rect width="512" height="512" rx="112" />
+    </clipPath>
+  </defs>
+
+  <g clip-path="url(#app-icon)">
+    <!-- Canvas -->
+    <rect width="512" height="512" fill="#FAF6F0" />
+
+    <!-- S-Curve Nile River -->
+    <path d="M -20 -20 
+             C -20 280, 300 240, 300 532 
+             L 420 532 
+             C 420 180, 100 220, 100 -20 Z" 
+          fill="#2A9D8F" />
+
+    <!-- Minimalist Felucca Boat (Centered on River Curve) -->
+    <g transform="translate(35, 18)">
+      <!-- Main Sail -->
+      <path d="M 230 160 
+               C 280 220, 275 270, 255 280 
+               L 205 280 Z" 
+            fill="#E76F51" />
+
+      <!-- Boat Hull -->
+      <path d="M 180 280 
+               C 185 302, 270 302, 275 280 Z" 
+            fill="#1D3557" />
+    </g>
+  </g>
+</svg>
