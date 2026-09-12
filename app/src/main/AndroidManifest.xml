@@ -17,6 +17,10 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
     <!-- Device Tamper Lockdown: SIM-change detection reads the SIM serial number. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <!-- Geofence Lockdown: the safe-zone proximity alert. Background location is what lets the
+         alert still fire when Nile isn't open — without it the geofence only works in-app. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
 
     <application
         android:allowBackup="false"
@@ -171,6 +175,25 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.thenile.vault.action.SCHEDULED_LOCK_CHECK" />
+            </intent-filter>
+        </receiver>
+
+        <!-- The screen-off delay alarm. SCREEN_OFF/SCREEN_ON themselves can't be declared in a
+             manifest at all — ScreenReceiver handles those, registered in AppContextProvider. -->
+        <receiver
+            android:name=".receivers.ScreenOffCheckReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.thenile.vault.action.SCREEN_OFF_CHECK" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.GeofenceReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.thenile.vault.action.GEOFENCE_PROXIMITY" />
             </intent-filter>
         </receiver>
 

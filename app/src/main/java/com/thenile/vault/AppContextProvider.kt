@@ -37,6 +37,13 @@ class AppContextProvider : ContentProvider() {
             addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
             addAction("android.intent.action.SIM_STATE_CHANGED")
         })
+
+        // SCREEN_OFF/SCREEN_ON are registered-only broadcasts — a manifest receiver can never get
+        // them, so this is the only way to start/cancel the screen-off countdown.
+        register(com.thenile.vault.receivers.ScreenReceiver(), IntentFilter().apply {
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(Intent.ACTION_SCREEN_ON)
+        })
         return true
     }
 

@@ -1911,6 +1911,13 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var tamperSwitchVaultIds by remember { mutableStateOf(settings.tamperSwitchVaultIds) }
                 var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
                 var isAuditLogOpen by remember { mutableStateOf(false) }
+                var screenOffSwitchEnabled by remember { mutableStateOf(settings.screenOffSwitchEnabled) }
+                var screenOffTimeoutText by remember { mutableStateOf(settings.screenOffTimeoutMinutes.toString()) }
+                var screenOffVaultIds by remember { mutableStateOf(settings.screenOffVaultIds) }
+                var geofenceSwitchEnabled by remember { mutableStateOf(settings.geofenceSwitchEnabled) }
+                var geofenceHasLocation by remember { mutableStateOf(settings.geofenceHasLocation) }
+                var geofenceRadiusText by remember { mutableStateOf(settings.geofenceRadiusMeters.toString()) }
+                var geofenceVaultIds by remember { mutableStateOf(settings.geofenceVaultIds) }
 
                 var androidUsers by remember { mutableStateOf<List<AndroidUser>>(emptyList()) }
                 var showCreateUserDialog by remember { mutableStateOf(false) }
@@ -2963,6 +2970,154 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                     }
 
                     SectionHeaderCard(
+                        title = "Screen-Off Lockdown",
+                        subtitle = "Auto-hides selected vaults after the screen stays off a while",
+                        icon = Icons.Filled.Bedtime,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Enable Screen-Off Lockdown",
+                            subtitle = "Once the screen has been off for the number of minutes below, the vaults checked here get hidden — so an unlocked vault doesn't stay open after you set the phone down. Turning the screen back on before then cancels it.",
+                            icon = Icons.Filled.Bedtime,
+                            checked = screenOffSwitchEnabled,
+                            onCheckedChange = { screenOffSwitchEnabled = it }
+                        )
+                        OutlinedTextField(
+                            value = screenOffTimeoutText,
+                            onValueChange = { screenOffTimeoutText = it.filter(Char::isDigit) },
+                            label = { Text("Minutes of screen-off before triggering") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        Text(
+                            "Vaults to hide when triggered:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    screenOffVaultIds = if (v.id in screenOffVaultIds)
+                                        screenOffVaultIds - v.id else screenOffVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in screenOffVaultIds,
+                                    onCheckedChange = { checked ->
+                                        screenOffVaultIds = if (checked) screenOffVaultIds + v.id else screenOffVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Geofence Lockdown",
+                        subtitle = "Auto-hides selected vaults when you leave a saved safe zone",
+                        icon = Icons.Filled.LocationOn,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        var hasLocationPermission by remember(privilegeTick) {
+                            mutableStateOf(
+                                androidx.core.content.ContextCompat.checkSelfPermission(
+                                    context, android.Manifest.permission.ACCESS_FINE_LOCATION
+                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            )
+                        }
+                        val requestLocation = rememberLauncherForActivityResult(
+                            ActivityResultContracts.RequestMultiplePermissions()
+                        ) { result -> hasLocationPermission = result[android.Manifest.permission.ACCESS_FINE_LOCATION] == true }
+
+                        PreferenceSwitchRow(
+                            title = "Enable Geofence Lockdown",
+                            subtitle = "Hides the vaults checked below the moment the phone leaves the safe zone you set — e.g. home or work. Uses Android's built-in proximity alerts (no Google Play Services).",
+                            icon = Icons.Filled.LocationOn,
+                            checked = geofenceSwitchEnabled,
+                            onCheckedChange = { geofenceSwitchEnabled = it }
+                        )
+                        if (!hasLocationPermission) {
+                            OutlinedButton(
+                                onClick = {
+                                    requestLocation.launch(arrayOf(
+                                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                        android.Manifest.permission.ACCESS_BACKGROUND_LOCATION
+                                    ))
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.LocationOn, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Grant Location Permission")
+                            }
+                            Text(
+                                "Allow all the time (background) for the geofence to work while Nile is closed.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            OutlinedButton(
+                                onClick = {
+                                    val loc = com.thenile.vault.root.GeofenceSwitch.lastKnownLocation(context)
+                                    if (loc != null) {
+                                        settings.geofenceLatitude = loc.latitude
+                                        settings.geofenceLongitude = loc.longitude
+                                        settings.geofenceHasLocation = true
+                                        geofenceHasLocation = true
+                                        Toast.makeText(context, "Safe zone set to current location", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "No location fix yet — open a maps app briefly, then retry", Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.MyLocation, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(if (geofenceHasLocation) "Update Safe Zone to Here" else "Set Safe Zone to Here")
+                            }
+                            Text(
+                                if (geofenceHasLocation) "Safe zone is set." else "No safe zone set yet — the geofence won't arm until you set one.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = if (geofenceHasLocation) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        OutlinedTextField(
+                            value = geofenceRadiusText,
+                            onValueChange = { geofenceRadiusText = it.filter(Char::isDigit) },
+                            label = { Text("Safe zone radius (metres)") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        Text(
+                            "Vaults to hide when you leave:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    geofenceVaultIds = if (v.id in geofenceVaultIds)
+                                        geofenceVaultIds - v.id else geofenceVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in geofenceVaultIds,
+                                    onCheckedChange = { checked ->
+                                        geofenceVaultIds = if (checked) geofenceVaultIds + v.id else geofenceVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
                         title = "Device Tamper Lockdown",
                         subtitle = "Auto-hides selected vaults on airplane mode or a SIM swap/removal",
                         icon = Icons.Filled.SimCard,
@@ -3300,6 +3455,13 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.tamperSwitchVaultIds = tamperSwitchVaultIds
                         settings.blockScreenshots = blockScreenshots
                         applySecureFlag(context)
+                        settings.screenOffSwitchEnabled = screenOffSwitchEnabled
+                        settings.screenOffTimeoutMinutes = screenOffTimeoutText.toIntOrNull()?.coerceAtLeast(1) ?: 5
+                        settings.screenOffVaultIds = screenOffVaultIds
+                        settings.geofenceSwitchEnabled = geofenceSwitchEnabled
+                        settings.geofenceRadiusMeters = geofenceRadiusText.toIntOrNull()?.coerceAtLeast(50) ?: 200
+                        settings.geofenceVaultIds = geofenceVaultIds
+                        com.thenile.vault.root.GeofenceSwitch.reschedule(context)
                         Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),

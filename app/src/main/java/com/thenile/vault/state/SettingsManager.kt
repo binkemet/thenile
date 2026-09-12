@@ -406,6 +406,47 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getStringSet("tamperSwitchVaultIds", emptySet()) ?: emptySet()
         set(value) { prefs.edit().putStringSet("tamperSwitchVaultIds", value).commit() }
 
+    /** Screen-off lock: hides the selected vaults once the screen has stayed off for
+     *  [screenOffTimeoutMinutes] — see ScreenOffSwitch.kt. */
+    var screenOffSwitchEnabled: Boolean
+        get() = prefs.getBoolean("screenOffSwitchEnabled", false)
+        set(value) { prefs.edit().putBoolean("screenOffSwitchEnabled", value).commit() }
+
+    var screenOffTimeoutMinutes: Int
+        get() = prefs.getInt("screenOffTimeoutMinutes", 5)
+        set(value) { prefs.edit().putInt("screenOffTimeoutMinutes", value).commit() }
+
+    var screenOffVaultIds: Set<String>
+        get() = prefs.getStringSet("screenOffVaultIds", emptySet()) ?: emptySet()
+        set(value) { prefs.edit().putStringSet("screenOffVaultIds", value).commit() }
+
+    /** Geofence lock: hides the selected vaults when the phone leaves a saved safe zone —
+     *  see GeofenceSwitch.kt. Center is stored as a lat/long pair with a radius in metres;
+     *  geofenceHasLocation is false until the user captures one. */
+    var geofenceSwitchEnabled: Boolean
+        get() = prefs.getBoolean("geofenceSwitchEnabled", false)
+        set(value) { prefs.edit().putBoolean("geofenceSwitchEnabled", value).commit() }
+
+    var geofenceHasLocation: Boolean
+        get() = prefs.getBoolean("geofenceHasLocation", false)
+        set(value) { prefs.edit().putBoolean("geofenceHasLocation", value).commit() }
+
+    var geofenceLatitude: Double
+        get() = Double.fromBits(prefs.getLong("geofenceLatitude", 0L))
+        set(value) { prefs.edit().putLong("geofenceLatitude", value.toRawBits()).commit() }
+
+    var geofenceLongitude: Double
+        get() = Double.fromBits(prefs.getLong("geofenceLongitude", 0L))
+        set(value) { prefs.edit().putLong("geofenceLongitude", value.toRawBits()).commit() }
+
+    var geofenceRadiusMeters: Int
+        get() = prefs.getInt("geofenceRadiusMeters", 200)
+        set(value) { prefs.edit().putInt("geofenceRadiusMeters", value).commit() }
+
+    var geofenceVaultIds: Set<String>
+        get() = prefs.getStringSet("geofenceVaultIds", emptySet()) ?: emptySet()
+        set(value) { prefs.edit().putStringSet("geofenceVaultIds", value).commit() }
+
     var tamperSimSerialBaseline: String
         get() = prefs.getString("tamperSimSerialBaseline", "") ?: ""
         set(value) { prefs.edit().putString("tamperSimSerialBaseline", value).commit() }
