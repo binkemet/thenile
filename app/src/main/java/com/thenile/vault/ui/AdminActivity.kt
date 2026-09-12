@@ -1911,6 +1911,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var tamperSwitchVaultIds by remember { mutableStateOf(settings.tamperSwitchVaultIds) }
                 var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
                 var isAuditLogOpen by remember { mutableStateOf(false) }
+                var auditLogEnabled by remember { mutableStateOf(settings.auditLogEnabled) }
                 var screenOffSwitchEnabled by remember { mutableStateOf(settings.screenOffSwitchEnabled) }
                 var screenOffTimeoutText by remember { mutableStateOf(settings.screenOffTimeoutMinutes.toString()) }
                 var screenOffVaultIds by remember { mutableStateOf(settings.screenOffVaultIds) }
@@ -2779,6 +2780,13 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
+                        PreferenceSwitchRow(
+                            title = "Enable Audit Log",
+                            subtitle = "Off by default for deniability: while off, nothing is recorded and no log file exists, so there's no on-disk proof that vaults were hidden. Turn on only if the tripwire is worth leaving that trace.",
+                            icon = Icons.Filled.History,
+                            checked = auditLogEnabled,
+                            onCheckedChange = { auditLogEnabled = it }
+                        )
                         OutlinedButton(
                             onClick = { isAuditLogOpen = true },
                             shape = RoundedCornerShape(16.dp),
@@ -3455,6 +3463,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.tamperSwitchVaultIds = tamperSwitchVaultIds
                         settings.blockScreenshots = blockScreenshots
                         applySecureFlag(context)
+                        settings.auditLogEnabled = auditLogEnabled
+                        if (!auditLogEnabled) com.thenile.vault.root.AuditLog.clear(context)
                         settings.screenOffSwitchEnabled = screenOffSwitchEnabled
                         settings.screenOffTimeoutMinutes = screenOffTimeoutText.toIntOrNull()?.coerceAtLeast(1) ?: 5
                         settings.screenOffVaultIds = screenOffVaultIds

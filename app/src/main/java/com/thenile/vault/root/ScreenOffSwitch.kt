@@ -56,7 +56,7 @@ object ScreenOffSwitch {
 
         val targetIds = settings.screenOffVaultIds
         if (targetIds.isEmpty()) return
-        Log.w(TAG, "screen-off switch fired after ${settings.screenOffTimeoutMinutes}min: hiding $targetIds")
+        SecureLog.w(TAG, "screen-off switch fired after ${settings.screenOffTimeoutMinutes}min: hiding $targetIds")
         AuditLog.record(context, "Screen off ${settings.screenOffTimeoutMinutes}min — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)

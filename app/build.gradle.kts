@@ -132,6 +132,9 @@ dependencies {
   // Xposed API only compiles into the xposed flavor; the aosp flavor has no hook source to build.
   "xposedCompileOnly"("io.github.libxposed:api:102.0.0")
   implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+  // Encrypts vault_settings.xml at rest (Keystore-backed) — keeps the admin password, geofence
+  // coordinates, and trigger topology out of a plaintext SharedPreferences file. See SettingsManager.
+  implementation("androidx.security:security-crypto:1.1.0-alpha06")
   // Shell-UID (ADB/wireless-debugging) privilege tier for devices without root, e.g. GrapheneOS.
   implementation("dev.rikka.shizuku:api:13.1.5")
   implementation("dev.rikka.shizuku:provider:13.1.5")

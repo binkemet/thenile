@@ -240,7 +240,7 @@ class StorageMountManager {
          *  CAP_SYS_ADMIN there's no way to swap in a substitute directory, only to remove the real
          *  one, so under Shizuku/none `dummy` entries are silently skipped rather than half-applied. */
         fun mountDecoyDirectory(packages: List<String>, directories: List<String>, dummyDirectories: List<DummyDir>, files: List<String> = emptyList(), context: Context? = null): Boolean {
-            Log.d(TAG, "Mounting decoy directories")
+            SecureLog.d(TAG, "Mounting decoy directories")
             val tier = PrivilegeManager.currentTier()
             for (pkg in packages) sh("pm hide $pkg")
 
@@ -295,7 +295,7 @@ class StorageMountManager {
             salt: String = "",
             context: Context? = null
         ) {
-            Log.d(TAG, "Unmounting and locking container")
+            SecureLog.d(TAG, "Unmounting and locking container")
             val tier = PrivilegeManager.currentTier()
             val users = getUsers()
 
@@ -327,20 +327,20 @@ class StorageMountManager {
             }
 
             // Encrypt and remove each individual custom file
-            Log.d(TAG, "unmountAndLock processing ${files.size} files: $files")
+            SecureLog.d(TAG, "unmountAndLock processing ${files.size} files: $files")
             sh("mkdir -p /data/system/thenile_vault_files")
             for (file in files) {
                 val safeName = file.replace("/", "_") + ".enc"
                 val encFile = "/data/system/thenile_vault_files/$safeName"
                 val mediaPath = file.replace("/sdcard/", "/data/media/0/").replace("/storage/emulated/0/", "/data/media/0/")
                 val fileExists = exists(file) || exists(mediaPath)
-                Log.d(TAG, "File $file (or $mediaPath) exists: $fileExists")
+                SecureLog.d(TAG, "File $file (or $mediaPath) exists: $fileExists")
                 if (fileExists) {
                     val realSrc = if (exists(file)) file else mediaPath
                     if (pin.isNotEmpty()) {
                         try {
                             val ok = encryptFileNative(pin, salt, realSrc, encFile)
-                            Log.d(TAG, "encryptFileNative ok=$ok")
+                            SecureLog.d(TAG, "encryptFileNative ok=$ok")
                         } catch (e: Throwable) {
                             Log.e(TAG, "encryptFileNative error: ${e.message}")
                             sh("cp -p '$realSrc' '$encFile'")
@@ -352,7 +352,7 @@ class StorageMountManager {
                 sh("$NS umount -l '$file'")
                 sh("rm -f '$mediaPath'")
                 sh("rm -f '$file' 2>/dev/null || true")
-                Log.d(TAG, "After rm -f $file, exists: ${exists(file)}")
+                SecureLog.d(TAG, "After rm -f $file, exists: ${exists(file)}")
             }
             sh("sync; echo 3 > /proc/sys/vm/drop_caches")
             

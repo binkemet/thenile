@@ -27,9 +27,14 @@ object GeofenceSwitch {
 
     private fun pendingIntent(context: Context): PendingIntent {
         val intent = Intent(ACTION_PROXIMITY).setPackage(context.packageName)
+        // addProximityAlert fills in KEY_PROXIMITY_ENTERING at delivery, so the PendingIntent MUST
+        // be mutable — an immutable one throws "pending intent must be mutable" on arm. FLAG_MUTABLE
+        // only exists on API 31+; pre-31 PendingIntents are mutable by default.
+        val mutableFlag = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+            PendingIntent.FLAG_MUTABLE else 0
         return PendingIntent.getBroadcast(
             context, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or mutableFlag
         )
     }
 
@@ -68,7 +73,7 @@ object GeofenceSwitch {
                 -1L, // never expires
                 pi
             )
-            Log.i(TAG, "proximity alert armed: r=${settings.geofenceRadiusMeters}m")
+            SecureLog.i(TAG, "proximity alert armed: r=${settings.geofenceRadiusMeters}m")
         } catch (e: SecurityException) {
             Log.w(TAG, "location permission missing — geofence not armed", e)
         }
@@ -89,13 +94,13 @@ object GeofenceSwitch {
                 settings.geofenceRadiusMeters
             )
         ) {
-            Log.i(TAG, "exit alert contradicted by last known fix — ignoring")
+            SecureLog.i(TAG, "exit alert contradicted by last known fix — ignoring")
             return
         }
 
         val targetIds = settings.geofenceVaultIds
         if (targetIds.isEmpty()) return
-        Log.w(TAG, "geofence exit: hiding $targetIds")
+        SecureLog.w(TAG, "geofence exit: hiding $targetIds")
         AuditLog.record(context, "Left the safe zone — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)

@@ -16,7 +16,7 @@ class TraceCleaner {
             directories: List<String> = emptyList(),
             files: List<String> = emptyList()
         ) {
-            Log.d(TAG, "Scrubbing forensic traces safely (packages=${packages.size}, dirs=${directories.size}, files=${files.size})")
+            SecureLog.d(TAG, "Scrubbing forensic traces safely (packages=${packages.size}, dirs=${directories.size}, files=${files.size})")
 
             val cmdList = mutableListOf<String>()
 
@@ -67,7 +67,7 @@ class TraceCleaner {
             cmdList.add("sync; echo 3 > /proc/sys/vm/drop_caches")
 
             Shell.cmd(*cmdList.toTypedArray()).exec()
-            Log.d(TAG, "Trace scrubbing complete")
+            SecureLog.d(TAG, "Trace scrubbing complete")
         }
     }
 }

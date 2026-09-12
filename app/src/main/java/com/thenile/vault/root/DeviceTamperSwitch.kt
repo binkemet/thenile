@@ -54,7 +54,7 @@ object DeviceTamperSwitch {
         if (!settings.tamperSwitchEnabled) return
         val targetIds = settings.tamperSwitchVaultIds
         if (targetIds.isEmpty()) return
-        Log.w(TAG, "device tamper switch fired ($reason): hiding $targetIds")
+        SecureLog.w(TAG, "device tamper switch fired ($reason): hiding $targetIds")
         AuditLog.record(context, "Device tamper: $reason — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)

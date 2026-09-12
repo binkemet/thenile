@@ -37,9 +37,7 @@ data class Vault(
 )
 
 open class SettingsManager(private val context: Context) {
-    private val prefs: SharedPreferences by lazy {
-        context.getSharedPreferences("vault_settings", Context.MODE_PRIVATE)
-    }
+    private val prefs: SharedPreferences by lazy { openPrefs(context) }
 
     private var _cachedVaults: List<Vault>? = null
 
@@ -458,6 +456,14 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getBoolean("blockScreenshots", true)
         set(value) { prefs.edit().putBoolean("blockScreenshots", value).commit() }
 
+    /** Audit log: OFF by default for deniability. When off, nothing is recorded and no .audit file
+     *  is created — so there's no on-disk proof that hidden vaults exist or that triggers fired.
+     *  Turn it on only if the tripwire (knowing what happened while you were away) is worth leaving
+     *  that trace. See AuditLog.kt. */
+    var auditLogEnabled: Boolean
+        get() = prefs.getBoolean("auditLogEnabled", false)
+        set(value) { prefs.edit().putBoolean("auditLogEnabled", value).commit() }
+
     /** "off" | "fake_wrong_pin" | "one_time_unlock" | "switch_user". Default off: this hooks the real Android
      *  keyguard, so it stays inert until explicitly enabled. */
     var decoyLockScreenMode: String
@@ -711,6 +717,57 @@ open class SettingsManager(private val context: Context) {
             return instance ?: synchronized(this) {
                 instance ?: SettingsManager(context.applicationContext).also { instance = it }
             }
+        }
+
+        private const val PLAINTEXT_PREFS = "vault_settings"
+        private const val SECURE_PREFS = "vault_settings_secure"
+
+        /** Settings live in a Keystore-encrypted file so the admin password, geofence coordinates,
+         *  and trigger topology aren't sitting in a plaintext XML anyone with root or a backup can
+         *  read. A pre-existing plaintext "vault_settings" is migrated once, then deleted. If the
+         *  Keystore is somehow unavailable we fall back to plaintext so the app still functions —
+         *  availability wins over a bricked vault, and it's a rare edge on modern devices. */
+        private fun openPrefs(context: Context): SharedPreferences {
+            val secure = try {
+                val masterKey = androidx.security.crypto.MasterKey.Builder(context)
+                    .setKeyScheme(androidx.security.crypto.MasterKey.KeyScheme.AES256_GCM)
+                    .build()
+                androidx.security.crypto.EncryptedSharedPreferences.create(
+                    context,
+                    SECURE_PREFS,
+                    masterKey,
+                    androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                    androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+                )
+            } catch (e: Exception) {
+                android.util.Log.w("SettingsManager", "encrypted prefs unavailable, falling back to plaintext", e)
+                return context.getSharedPreferences(PLAINTEXT_PREFS, Context.MODE_PRIVATE)
+            }
+            migratePlaintextIfPresent(context, secure)
+            return secure
+        }
+
+        private fun migratePlaintextIfPresent(context: Context, secure: SharedPreferences) {
+            val oldFile = java.io.File(context.applicationInfo.dataDir, "shared_prefs/$PLAINTEXT_PREFS.xml")
+            if (!oldFile.exists()) return
+            val old = context.getSharedPreferences(PLAINTEXT_PREFS, Context.MODE_PRIVATE)
+            val editor = secure.edit()
+            for ((key, value) in old.all) {
+                when (value) {
+                    is Boolean -> editor.putBoolean(key, value)
+                    is Int -> editor.putInt(key, value)
+                    is Long -> editor.putLong(key, value)
+                    is Float -> editor.putFloat(key, value)
+                    is String -> editor.putString(key, value)
+                    is Set<*> -> {
+                        @Suppress("UNCHECKED_CAST")
+                        editor.putStringSet(key, value as Set<String>)
+                    }
+                }
+            }
+            editor.commit()
+            old.edit().clear().commit()
+            oldFile.delete()
         }
     }
 }

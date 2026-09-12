@@ -2,6 +2,7 @@ package com.thenile.vault.root
 
 import android.content.Context
 import android.util.Log
+import com.thenile.vault.state.SettingsManager
 import com.thenile.vault.state.VaultStateManager
 import java.io.File
 import java.security.MessageDigest
@@ -32,8 +33,10 @@ object AuditLog {
 
     private fun file(context: Context) = File(context.filesDir, FILE)
 
-    /** Fire-and-forget; never throws (logging must not break the thing it's logging). */
+    /** Fire-and-forget; never throws (logging must not break the thing it's logging). No-op unless
+     *  the user opted in — see SettingsManager.auditLogEnabled. */
     fun record(context: Context, event: String) {
+        if (!SettingsManager.getInstance(context).auditLogEnabled) return
         try {
             val iv = ByteArray(12).also { SecureRandom().nextBytes(it) }
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")

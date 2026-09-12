@@ -18,7 +18,7 @@ object UsbPluggedSwitch {
 
         val targetIds = settings.usbSwitchVaultIds
         if (targetIds.isEmpty()) return
-        Log.w(TAG, "USB-plugged switch fired: hiding $targetIds")
+        SecureLog.w(TAG, "USB-plugged switch fired: hiding $targetIds")
         AuditLog.record(context, "USB plugged in — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)

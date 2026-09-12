@@ -64,7 +64,7 @@ object ScheduledLockSwitch {
 
         val targetIds = settings.scheduledLockVaultIds
         if (targetIds.isEmpty()) return
-        Log.w(TAG, "scheduled lock fired: hiding $targetIds")
+        SecureLog.w(TAG, "scheduled lock fired: hiding $targetIds")
         AuditLog.record(context, "Scheduled lockdown fired (in daily window) — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)
