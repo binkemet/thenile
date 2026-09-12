@@ -689,10 +689,15 @@ open class SettingsManager(private val context: Context) {
 
             val temp = "/data/local/tmp/thenile_cfg.tmp"
             val path = "/data/system/thenile_config.json"
+            // Encrypted so the decoy PINs and vault layout aren't sitting in a world-readable
+            // plaintext file — the hook decrypts with the same shared key (see ConfigCrypto). The
+            // hex output is also quote-free, so `echo` can't be broken by an apostrophe in a vault
+            // name the way the raw JSON could.
+            val payload = com.thenile.vault.root.ConfigCrypto.encrypt(json.toString())
             // Run asynchronously so it doesn't block UI
             Thread {
                 try {
-                    Shell.cmd("echo '${json.toString()}' > $temp").exec()
+                    Shell.cmd("echo '$payload' > $temp").exec()
                     Shell.cmd("mv $temp $path").exec()
                     Shell.cmd("chmod 644 $path").exec()
                     // mv preserves the source's SELinux label (shell_data_file, from /data/local/tmp) instead

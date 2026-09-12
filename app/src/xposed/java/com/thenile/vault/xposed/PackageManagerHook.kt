@@ -31,7 +31,7 @@ class PackageManagerHook : XposedModule() {
         try {
             val file = java.io.File("/data/system/thenile_config.json")
             if (file.exists()) {
-                val json = org.json.JSONObject(file.readText())
+                val json = org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(file.readText()))
                 val pkgs = json.optJSONArray("targetPackages")
                 val self = json.optString("SELF_PACKAGE", "com.thenile.vault")
                 val list = mutableListOf(self)
@@ -650,7 +650,7 @@ class PackageManagerHook : XposedModule() {
             Log.w("NileHook", "decoyLockConfig: file does not exist")
             null
         } else {
-            val json = org.json.JSONObject(file.readText())
+            val json = org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(file.readText()))
             val mode = json.optString("decoyLockScreenMode", "off")
             val arr = json.optJSONArray("decoyCodes")
             val codes = mutableSetOf<String>()
@@ -679,7 +679,7 @@ class PackageManagerHook : XposedModule() {
     )
 
     private fun allVaultsFromConfig(): List<VaultEntry> = try {
-        val json = readConfigJsonObject() ?: org.json.JSONObject(java.io.File("/data/system/thenile_config.json").readText())
+        val json = readConfigJsonObject() ?: org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(java.io.File("/data/system/thenile_config.json").readText()))
         val arr = json.optJSONArray("vaults") ?: return emptyList()
         val list = mutableListOf<VaultEntry>()
         for (i in 0 until arr.length()) {
@@ -748,7 +748,7 @@ class PackageManagerHook : XposedModule() {
         if (prof != null) {
             DecoyHidePayload(prof.packages, prof.directories, prof.dummies, prof.files)
         } else {
-            val json = org.json.JSONObject(java.io.File("/data/system/thenile_config.json").readText())
+            val json = org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(java.io.File("/data/system/thenile_config.json").readText()))
             val entries = json.optJSONArray("decoyHideData") ?: return null
             var found: org.json.JSONObject? = null
             for (i in 0 until entries.length()) {
@@ -1338,7 +1338,7 @@ class PackageManagerHook : XposedModule() {
 
     private fun readConfigJsonObject(): org.json.JSONObject? = try {
         val f = java.io.File("/data/system/thenile_config.json")
-        if (f.exists()) org.json.JSONObject(f.readText()) else null
+        if (f.exists()) org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(f.readText())) else null
     } catch (e: Exception) {
         null
     }
@@ -2088,7 +2088,7 @@ class PackageManagerHook : XposedModule() {
     private fun hiddenDirectoriesAndFiles(): Set<String> {
         val dirs = mutableSetOf<String>()
         try {
-            val json = readConfigJsonObject() ?: org.json.JSONObject(java.io.File("/data/system/thenile_config.json").readText())
+            val json = readConfigJsonObject() ?: org.json.JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(java.io.File("/data/system/thenile_config.json").readText()))
             val targetDirs = json.optJSONArray("targetDirectories")
             if (targetDirs != null) {
                 for (i in 0 until targetDirs.length()) dirs.add(targetDirs.getString(i))

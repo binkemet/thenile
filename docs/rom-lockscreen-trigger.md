@@ -23,13 +23,35 @@ the ROM's choice; the hide/switch happens regardless because the broadcast fires
 In the password-check path — e.g. `KeyguardSecurityContainerController#reportSuccessfulUnlock` or
 `KeyguardUpdateMonitor`, wherever the entered credential is available as a string — add:
 
+Since v1.1 the config file is **encrypted at rest** (so the decoy PINs and vault layout aren't
+sitting in a world-readable plaintext file). The blob is `NILEC1:` + hex(`iv‖ciphertext‖tag`),
+AES-256/GCM, with a key of `SHA-256("th3n1l3::cfg::v1::keyguard-hook-shared-secret")` (12-byte IV,
+128-bit tag). Decrypt before parsing; treat a blob that does *not* start with `NILEC1:` as legacy
+plaintext JSON. This is obfuscation-grade (the key ships in the code) — its job is to defeat file
+inspection / `adb pull` / backup extraction, not a reverse-engineer.
+
 ```java
 // The Nile: decoy-PIN interception. entered = the PIN/password the user just typed.
 try {
     java.io.File cfg = new java.io.File("/data/system/thenile_config.json");
     if (cfg.exists()) {
-        org.json.JSONObject j = new org.json.JSONObject(
-            new String(java.nio.file.Files.readAllBytes(cfg.toPath())));
+        String blob = new String(java.nio.file.Files.readAllBytes(cfg.toPath())).trim();
+        String plain;
+        if (blob.startsWith("NILEC1:")) {
+            String hex = blob.substring(7);
+            byte[] buf = new byte[hex.length() / 2];
+            for (int i = 0; i < buf.length; i++)
+                buf[i] = (byte) Integer.parseInt(hex.substring(i * 2, i * 2 + 2), 16);
+            byte[] key = java.security.MessageDigest.getInstance("SHA-256")
+                .digest("th3n1l3::cfg::v1::keyguard-hook-shared-secret".getBytes("UTF-8"));
+            javax.crypto.Cipher c = javax.crypto.Cipher.getInstance("AES/GCM/NoPadding");
+            c.init(javax.crypto.Cipher.DECRYPT_MODE, new javax.crypto.spec.SecretKeySpec(key, "AES"),
+                new javax.crypto.spec.GCMParameterSpec(128, buf, 0, 12)); // first 12 bytes = IV
+            plain = new String(c.doFinal(buf, 12, buf.length - 12), "UTF-8");
+        } else {
+            plain = blob; // legacy plaintext
+        }
+        org.json.JSONObject j = new org.json.JSONObject(plain);
         org.json.JSONArray codes = j.optJSONArray("decoyCodes");
         boolean isDecoy = false;
         for (int i = 0; codes != null && i < codes.length(); i++) {
