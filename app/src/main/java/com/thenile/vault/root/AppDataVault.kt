@@ -15,6 +15,16 @@ import android.util.Log
  *  upgrade path if a target app stores secrets there — add more dirs to snapshot/restore then. */
 object AppDataVault {
     private const val TAG = "AppDataVault"
+    // Every app process (including one our root shell was forked from) gets its own private mount
+    // namespace for storage sandboxing, and that namespace does NOT see other apps' CE data —
+    // confirmed on-device: cat/ls/stat/tar all fail identically (silently, no stderr) against
+    // another app's /data/user/<id>/<pkg>, from the SAME root shell that reads/writes our own data
+    // fine, while the identical commands succeed via `adb shell su -c` (adbd isn't sandboxed like
+    // an app process). Not a permissions/capability/SELinux-category issue — verified CapEff is
+    // identical to adb's su, and relabeling the target to our own SELinux category didn't help
+    // either. Fix: run in PID 1's (init's) mount namespace instead, same trick HiddenVolume already
+    // uses for its own mount() call.
+    private const val NS = "nsenter -t 1 -m --"
 
     /** Regenerated or symlinked subdirs — excluded so a snapshot stays small and restore is clean. */
     private val EXCLUDES = listOf("cache", "code_cache", "no_backup", "lib")
@@ -22,15 +32,18 @@ object AppDataVault {
     private fun ceDir(userId: Int) = "/data/user/$userId"
 
     /** Pure/testable: the tar command that packs <pkg>'s CE data dir into [outTar], relative to the
-     *  user dir so it restores back to the same place, minus the throwaway subdirs. */
+     *  user dir so it restores back to the same place, minus the throwaway subdirs. Runs in PID 1's
+     *  mount namespace (see NS) — this reads another app's data, which our own sandboxed namespace
+     *  can't see. */
     fun tarCreateCmd(pkg: String, userId: Int, outTar: String): String {
         val excludes = EXCLUDES.joinToString(" ") { "--exclude=$pkg/$it" }
-        return "tar $excludes -cf '$outTar' -C '${ceDir(userId)}' '$pkg'"
+        return "$NS tar $excludes -cf '$outTar' -C '${ceDir(userId)}' '$pkg'"
     }
 
-    /** Pure/testable: extract a snapshot back into the user dir (paths inside are <pkg>/...). */
+    /** Pure/testable: extract a snapshot back into the user dir (paths inside are <pkg>/...). Same
+     *  cross-namespace need as tarCreateCmd, just writing instead of reading. */
     fun tarExtractCmd(inTar: String, userId: Int): String =
-        "tar -xf '$inTar' -C '${ceDir(userId)}'"
+        "$NS tar -xf '$inTar' -C '${ceDir(userId)}'"
 
     /** Pure/testable: turn `pm path <pkg>` output ("package:/data/app/.../base.apk" lines, one per
      *  split) into the APK file paths to back up. */
@@ -63,14 +76,6 @@ object AppDataVault {
         val tarRes = PrivilegedShell.exec(tarCreateCmd(pkg, userId, tmp))
         if (!tarRes.isSuccess) {
             PrivilegedShell.exec("rm -f '$tmp'")
-            // KNOWN OPEN ISSUE (confirmed on-device, aospDebug + Magisk-rooted emulator): this tar
-            // invocation can fail here — exit 1, empty stdout AND stderr — even though the identical
-            // command run via `adb shell su -c` succeeds. Ruled out: not a timing race (retries with
-            // delay still fail identically), not the destination path (fails writing to /dev/null
-            // too), not the --exclude flags (a bare `tar -cf dst -C /data/user/0 pkg` fails the same
-            // way), not general root-shell breakage (plain `echo`/`ls`/`touch` via the same
-            // PrivilegedShell right before all succeed). Needs testing on a real rooted device — this
-            // may be specific to this emulator's Magisk/toybox combination rather than the app logic.
             Log.e(TAG, "snapshot: tar failed for $pkg code=${tarRes.code} out=${tarRes.out} err=${tarRes.err}")
             return false
         }
@@ -90,8 +95,9 @@ object AppDataVault {
             // pm clear's "Success" is not synchronous with the actual unlink — confirmed on-device
             // (Magisk root): the plaintext can still be sitting there long after pm clear returns.
             // The whole point of wipeAfter is "nothing real left on disk", so force it directly
-            // rather than trust that signal.
-            PrivilegedShell.exec("rm -rf '${ceDir(userId)}/$pkg'")
+            // rather than trust that signal. Needs NS: another app's data, invisible in our own
+            // sandboxed mount namespace.
+            PrivilegedShell.exec("$NS rm -rf '${ceDir(userId)}/$pkg'")
         }
         return true
     }
@@ -125,11 +131,20 @@ object AppDataVault {
         PrivilegedShell.exec("am force-stop '$pkg'")
         PrivilegedShell.exec("pm clear '$pkg'")
         val dir = "${ceDir(userId)}/$pkg"
-        // uid the freshly-cleared dir belongs to → what the restored tree must be chown'd to.
-        val ok = PrivilegedShell.exec(
-            tarExtractCmd(tmp, userId),
-            "uid=\$(stat -c %u '$dir'); chown -R \$uid:\$uid '$dir'",
-            "restorecon -R '$dir'"
+        // pm clear's "Success" isn't synchronous with the actual unlink (same issue as snapshot()'s
+        // wipeAfter) — without forcing it, the delayed real wipe can land AFTER our tar extract
+        // below and destroy the just-restored files. Force it complete before extracting into $dir.
+        PrivilegedShell.exec("$NS rm -rf '$dir'")
+        val extracted = PrivilegedShell.exec(tarExtractCmd(tmp, userId)).isSuccess
+        // uid the freshly-cleared dir belongs to → what the restored tree must be chown'd to. Each
+        // command needs its own NS wrapper — nsenter only affects the process it directly execs
+        // into, and every one of these touches another app's data (invisible in our sandboxed
+        // namespace). Computed as a separate step rather than a shell variable inside the nsentered
+        // process, to avoid three-deep quoting (outer shell -> nsenter -> inner sh -c) for one line.
+        val uid = if (extracted) PrivilegedShell.exec("$NS stat -c %u '$dir'").out.firstOrNull()?.trim() else null
+        val ok = uid != null && PrivilegedShell.exec(
+            "$NS chown -R $uid:$uid '$dir'",
+            "$NS restorecon -R '$dir'"
         ).isSuccess
         PrivilegedShell.exec("rm -f '$tmp'")
         if (!ok) Log.e(TAG, "restore: extract/chown/relabel failed for $pkg")
