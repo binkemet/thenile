@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.thenile.vault.AppDataVaultTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-12T17:09:33.480Z" hostname="GOAT" time="0.053">
+  <properties/>
+  <testcase name="tarExtract_restoresToSameUserDir" classname="com.thenile.vault.AppDataVaultTest" time="0.044"/>
+  <testcase name="tarCreate_anchorsToUserDirAndExcludesThrowaways" classname="com.thenile.vault.AppDataVaultTest" time="0.007"/>
+  <testcase name="parseApkPaths_keepsBaseAndSplitsDropsNoise" classname="com.thenile.vault.AppDataVaultTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.2109375"
+        android:scaleY="0.2109375">
+        <!-- S-Curve Nile River -->
+        <path
+            android:pathData="M -20,-20 C -20,280 300,240 300,532 L 420,532 C 420,180 100,220 100,-20 Z"
+            android:fillColor="#2A9D8F" />
+
+        <!-- Minimalist Felucca Boat (Centered) -->
+        <group
+            android:translateX="35"
+            android:translateY="18">
+            <!-- Main Sail -->
+            <path
+                android:pathData="M 230,160 C 280,220 275,270 255,280 L 205,280 Z"
+                android:fillColor="#E76F51" />
+
+            <!-- Boat Hull -->
+            <path
+                android:pathData="M 180,280 C 185,302 270,302 275,280 Z"
+                android:fillColor="#1D3557" />
+        </group>
+    </group>
+</vector>

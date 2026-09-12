@@ -1,0 +1,14 @@
+com.thenile.vault
+drawable ic_launcher_background
+drawable ic_launcher_foreground
+drawable ic_launcher_monochrome
+drawable ic_nile_river
+drawable ic_nile_river_transparent
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+style Theme_TheNile
+xml accessibility_service_config
+xml backup_rules
+xml data_extraction_rules
+xml device_admin_policies

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="com.thenile.vault.HiddenVolumeDeviceTest" tests="2" failures="0" errors="0" skipped="2" time="5.402" timestamp="2026-09-12T11:20:39" hostname="localhost">
+  <properties>
+    <property name="device" value="root_test35(AVD) - 15" />
+    <property name="flavor" value="aosp" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected" classname="com.thenile.vault.HiddenVolumeDeviceTest" time="0.201">
+    <skipped />
+  </testcase>
+  <testcase name="jniEncryptDecryptRoundTrip" classname="com.thenile.vault.HiddenVolumeDeviceTest" time="0.013">
+    <skipped />
+  </testcase>
+</testsuite>

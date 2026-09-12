@@ -1,0 +1,133 @@
+# proto-message: google.testing.platform.proto.api.core.TestSuiteResult
+# 2026-09-11T21:32:22.080577400Z:
+test_suite_meta_data {
+  scheduled_test_case_count: 2
+  device {
+    id: "emulator-5554"
+    friendly_name: "primary"
+  }
+}
+test_status: PASSED
+test_result {
+  test_case {
+    test_class: "HiddenVolumeDeviceTest"
+    test_package: "com.thenile.vault"
+    test_method: "hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected"
+    start_time {
+      seconds: 1789162331
+      nanos: 389000000
+    }
+    end_time {
+      seconds: 1789162337
+      nanos: 243000000
+    }
+    device {
+      id: "emulator-5554"
+      friendly_name: "primary"
+    }
+  }
+  test_status: PASSED
+  output_artifact {
+    label {
+      label: "logcat"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\logcat-com.thenile.vault.HiddenVolumeDeviceTest-hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected.txt"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\device-info.pb"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.meminfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\meminfo"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.cpuinfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\cpuinfo"
+    }
+  }
+}
+test_result {
+  test_case {
+    test_class: "HiddenVolumeDeviceTest"
+    test_package: "com.thenile.vault"
+    test_method: "jniEncryptDecryptRoundTrip"
+    start_time {
+      seconds: 1789162337
+      nanos: 267000000
+    }
+    end_time {
+      seconds: 1789162337
+      nanos: 998000000
+    }
+    device {
+      id: "emulator-5554"
+      friendly_name: "primary"
+    }
+  }
+  test_status: PASSED
+  output_artifact {
+    label {
+      label: "logcat"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\logcat-com.thenile.vault.HiddenVolumeDeviceTest-jniEncryptDecryptRoundTrip.txt"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\device-info.pb"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.meminfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\meminfo"
+    }
+  }
+  output_artifact {
+    label {
+      label: "device-info.cpuinfo"
+      namespace: "android"
+    }
+    source_path {
+      path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\cpuinfo"
+    }
+  }
+}
+output_artifact {
+  label {
+    label: "test-results.log"
+    namespace: "com.google.testing.platform.runtime.android.driver.AndroidInstrumentationDriver"
+  }
+  source_path {
+    path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\xposed\\root_test35(AVD) - 15\\testlog\\test-results.log"
+  }
+  type: TEST_DATA
+  mime_type: "text/plain"
+}

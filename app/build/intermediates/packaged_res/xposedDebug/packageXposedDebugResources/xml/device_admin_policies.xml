@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- watch-login is the one policy this needs: it's what makes the system call
+     onPasswordFailed()/onPasswordSucceeded() on the device lock screen. No lock/wipe/reset
+     policies requested — Nile never controls the device screen lock itself, only observes it. -->
+<device-admin xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-policies>
+        <watch-login />
+    </uses-policies>
+</device-admin>

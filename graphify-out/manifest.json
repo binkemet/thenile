@@ -1,0 +1,382 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1788990534.7921968,
+    "ast_hash": "5782b7b91ea25e3c497667210426ed1f",
+    "semantic_hash": "5782b7b91ea25e3c497667210426ed1f"
+  },
+  "app/rust_crypto/examples/dmcrypt.rs": {
+    "mtime": 1786406116.409865,
+    "ast_hash": "a51c3d4ea545b2041299e53bb334001d",
+    "semantic_hash": "a51c3d4ea545b2041299e53bb334001d"
+  },
+  "app/rust_crypto/src/dm.rs": {
+    "mtime": 1786406112.2834961,
+    "ast_hash": "83317aa84c7e8ff04a649931448cb237",
+    "semantic_hash": "83317aa84c7e8ff04a649931448cb237"
+  },
+  "app/rust_crypto/src/lib.rs": {
+    "mtime": 1786923185.6381934,
+    "ast_hash": "2e8417b1622fa65809eaf222d2e7ed1a",
+    "semantic_hash": "2e8417b1622fa65809eaf222d2e7ed1a"
+  },
+  "app/src/main/java/com/thenile/vault/Config.kt": {
+    "mtime": 1786419824.7989628,
+    "ast_hash": "03134f2fff300a35c8cceb2d3928d40b",
+    "semantic_hash": "03134f2fff300a35c8cceb2d3928d40b"
+  },
+  "app/src/main/java/com/thenile/vault/backup/BackupManager.kt": {
+    "mtime": 1789162967.2102654,
+    "ast_hash": "42f2ffa335642829adad06f77242f734",
+    "semantic_hash": "42f2ffa335642829adad06f77242f734"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/SecretCodeReceiver.kt": {
+    "mtime": 1789162967.637867,
+    "ast_hash": "d0b2c7fac95b1730705d644e9d9e3dce",
+    "semantic_hash": "d0b2c7fac95b1730705d644e9d9e3dce"
+  },
+  "app/src/main/java/com/thenile/vault/root/StorageMountManager.kt": {
+    "mtime": 1789162967.8213868,
+    "ast_hash": "0ab701fd728aae7022d2dedf2f0bb9b6",
+    "semantic_hash": "0ab701fd728aae7022d2dedf2f0bb9b6"
+  },
+  "app/src/main/java/com/thenile/vault/root/TraceCleaner.kt": {
+    "mtime": 1786975218.2044873,
+    "ast_hash": "2ff6fd67518cedc7d5b37cf22629fff0",
+    "semantic_hash": "2ff6fd67518cedc7d5b37cf22629fff0"
+  },
+  "app/src/main/java/com/thenile/vault/services/NileAccessibilityService.kt": {
+    "mtime": 1786757348.5844867,
+    "ast_hash": "974e17c73f994f83ffdd87bd48104e93",
+    "semantic_hash": "974e17c73f994f83ffdd87bd48104e93"
+  },
+  "app/src/main/java/com/thenile/vault/services/NileTileService.kt": {
+    "mtime": 1786420425.1070008,
+    "ast_hash": "e29fb57d823e7db85990c332cb5f84d2",
+    "semantic_hash": "e29fb57d823e7db85990c332cb5f84d2"
+  },
+  "app/src/main/java/com/thenile/vault/state/SettingsManager.kt": {
+    "mtime": 1789235052.4452252,
+    "ast_hash": "c9730e132315d93ec106c1e207fbbe78",
+    "semantic_hash": "c9730e132315d93ec106c1e207fbbe78"
+  },
+  "app/src/main/java/com/thenile/vault/state/VaultStateManager.kt": {
+    "mtime": 1789225624.050383,
+    "ast_hash": "19db6d58e88a5cf8b30cd21e6ac99be1",
+    "semantic_hash": "19db6d58e88a5cf8b30cd21e6ac99be1"
+  },
+  "app/src/main/java/com/thenile/vault/ui/AdminActivity.kt": {
+    "mtime": 1789235106.4737537,
+    "ast_hash": "ddf6f7b2823111383571315b4bd011be",
+    "semantic_hash": "ddf6f7b2823111383571315b4bd011be"
+  },
+  "app/src/main/java/com/thenile/vault/ui/FakeCrashScreen.kt": {
+    "mtime": 1786457247.0901966,
+    "ast_hash": "d8fef28d457124b20ed1aea923628e85",
+    "semantic_hash": "d8fef28d457124b20ed1aea923628e85"
+  },
+  "app/src/main/java/com/thenile/vault/ui/PromptActivity.kt": {
+    "mtime": 1789225638.2192683,
+    "ast_hash": "072cc0482c2ce506c7111e55bab01485",
+    "semantic_hash": "072cc0482c2ce506c7111e55bab01485"
+  },
+  "app/src/test/java/com/thenile/vault/BackupTest.kt": {
+    "mtime": 1789162967.9944267,
+    "ast_hash": "002a9cf16ed1c45c15a83f6d24915cf9",
+    "semantic_hash": "002a9cf16ed1c45c15a83f6d24915cf9"
+  },
+  "app/src/test/java/com/thenile/vault/ConfigTest.kt": {
+    "mtime": 1786419847.9194095,
+    "ast_hash": "e52bd1f82c53b9cba6d794a609865382",
+    "semantic_hash": "e52bd1f82c53b9cba6d794a609865382"
+  },
+  "build.gradle.kts": {
+    "mtime": 1786384058.8474212,
+    "ast_hash": "aa88c6c665b41d3ab89c3cd8b0c7d128",
+    "semantic_hash": "aa88c6c665b41d3ab89c3cd8b0c7d128"
+  },
+  "gradlew": {
+    "mtime": 1786384058.8599002,
+    "ast_hash": "857faf4b42fc9e324fb40b7223f2a94a",
+    "semantic_hash": "857faf4b42fc9e324fb40b7223f2a94a"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1786667320.152985,
+    "ast_hash": "8bcf93892bb8280d7a6af44d6b109deb",
+    "semantic_hash": "8bcf93892bb8280d7a6af44d6b109deb"
+  },
+  "AGENTS.md": {
+    "mtime": 1786400886.8266623,
+    "ast_hash": "21ceb6533048be51308e69e7b74a35cf",
+    "semantic_hash": "21ceb6533048be51308e69e7b74a35cf"
+  },
+  "CHANGELOG.md": {
+    "mtime": 1786546351.4073572,
+    "ast_hash": "1c46d15e0deeee7daf6906383961e6a2",
+    "semantic_hash": "1c46d15e0deeee7daf6906383961e6a2"
+  },
+  "README.md": {
+    "mtime": 1786843817.536914,
+    "ast_hash": "c43e5addb4bd106266212034ba45ee79",
+    "semantic_hash": "c43e5addb4bd106266212034ba45ee79"
+  },
+  "metadata/en-US/changelogs/1.txt": {
+    "mtime": 1786546362.5128524,
+    "ast_hash": "27d53e2359a774f8c49e45658a5a45e0",
+    "semantic_hash": "27d53e2359a774f8c49e45658a5a45e0"
+  },
+  "metadata/en-US/full_description.txt": {
+    "mtime": 1786546357.2390723,
+    "ast_hash": "97a2acdef535ce1c598930f70d7c395f",
+    "semantic_hash": "97a2acdef535ce1c598930f70d7c395f"
+  },
+  "metadata/en-US/short_description.txt": {
+    "mtime": 1786457241.451095,
+    "ast_hash": "019fb2ec9d103178547d4e0978d20be9",
+    "semantic_hash": "019fb2ec9d103178547d4e0978d20be9"
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher.webp": {
+    "mtime": 1786384058.990469,
+    "ast_hash": "39d9bb21eb48f128a71c3f01ad3cd427",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.99159,
+    "ast_hash": "70d6f58af3c76ee221c829b1ce9daa04",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher.webp": {
+    "mtime": 1786384058.9941041,
+    "ast_hash": "d2acce71c7b46e5e9540d23a9f7b2166",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.9956195,
+    "ast_hash": "6376acb48f96a855ee95c113cd7fd616",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher.webp": {
+    "mtime": 1786384058.9978402,
+    "ast_hash": "bd087d80b70bec05a43c745f29dc3ffc",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.9988513,
+    "ast_hash": "7479edd56ab712609f030054bffd7263",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": {
+    "mtime": 1786384059.0009034,
+    "ast_hash": "ea180e8d1a2e8300cc998b987266b736",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384059.0029972,
+    "ast_hash": "947842742b29eeda80ee0805e1600366",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": {
+    "mtime": 1786384059.0056665,
+    "ast_hash": "54ab624970c86c2146e76b93f27586f7",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384059.007519,
+    "ast_hash": "9ee591be72fb336861a8044086054daa",
+    "semantic_hash": ""
+  },
+  "icon.svg": {
+    "mtime": 1786423432.3010793,
+    "ast_hash": "c4d5d24ca4ff35368a81ac3d7958088d",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/root/DecoyAction.kt": {
+    "mtime": 1789163157.177132,
+    "ast_hash": "42680e40b2d012442e40cf7bffa4e35c",
+    "semantic_hash": "42680e40b2d012442e40cf7bffa4e35c"
+  },
+  "metadata/en-US/images/phoneScreenshots/1.png": {
+    "mtime": 1786843066.235642,
+    "ast_hash": "4ba10867a071974391a38d7b2cb644ef",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/images/phoneScreenshots/2.png": {
+    "mtime": 1786843124.0126877,
+    "ast_hash": "c681112fed54d2131c9dac647dba41d4",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/images/phoneScreenshots/3.png": {
+    "mtime": 1786843224.65948,
+    "ast_hash": "67c60056352d88c94f48064ba9ba8a53",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck.png": {
+    "mtime": 1786855880.510594,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck3.png": {
+    "mtime": 1786855961.0992665,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck4.png": {
+    "mtime": 1786856126.1244996,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  },
+  "app/src/androidTest/java/com/thenile/vault/AppDataVaultAfterMountTest.kt": {
+    "mtime": 1789228445.7061222,
+    "ast_hash": "dd4418503fa3c9b206e52ed844a1eae5",
+    "semantic_hash": "dd4418503fa3c9b206e52ed844a1eae5"
+  },
+  "app/src/androidTest/java/com/thenile/vault/AppDataVaultDeviceTest.kt": {
+    "mtime": 1789229362.469312,
+    "ast_hash": "745bf22108b1cd597344161eba767acc",
+    "semantic_hash": "745bf22108b1cd597344161eba767acc"
+  },
+  "app/src/androidTest/java/com/thenile/vault/HiddenAppManagerDeviceTest.kt": {
+    "mtime": 1789232893.4494605,
+    "ast_hash": "0b3bacd568ae36a6b16e4fcd02bc5f2e",
+    "semantic_hash": "0b3bacd568ae36a6b16e4fcd02bc5f2e"
+  },
+  "app/src/androidTest/java/com/thenile/vault/HiddenVolumeDeviceTest.kt": {
+    "mtime": 1789162281.764822,
+    "ast_hash": "832b4fcb848c27fe2a99e3760af04778",
+    "semantic_hash": "832b4fcb848c27fe2a99e3760af04778"
+  },
+  "app/src/androidTest/java/com/thenile/vault/SoftVaultDeviceTest.kt": {
+    "mtime": 1789212252.8524954,
+    "ast_hash": "211766b9a19d0633a8de20926b512d74",
+    "semantic_hash": "211766b9a19d0633a8de20926b512d74"
+  },
+  "app/src/main/java/com/thenile/vault/AppContextProvider.kt": {
+    "mtime": 1789234117.0927155,
+    "ast_hash": "854e3b6731b329164718d73c9d6554cc",
+    "semantic_hash": "854e3b6731b329164718d73c9d6554cc"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/DeadManSwitchReceiver.kt": {
+    "mtime": 1789224277.3180468,
+    "ast_hash": "15348e2820b327f266feb5fb92b38133",
+    "semantic_hash": "15348e2820b327f266feb5fb92b38133"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/LockscreenDecoyReceiver.kt": {
+    "mtime": 1788990773.5856514,
+    "ast_hash": "0616d9416286b3ad60b80bba215acb66",
+    "semantic_hash": "0616d9416286b3ad60b80bba215acb66"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/NileDeviceAdminReceiver.kt": {
+    "mtime": 1789225602.4187849,
+    "ast_hash": "a2550ec565d560d5f5d9b3e856abdb3d",
+    "semantic_hash": "a2550ec565d560d5f5d9b3e856abdb3d"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/UsbPluggedReceiver.kt": {
+    "mtime": 1789233703.8946655,
+    "ast_hash": "f057a6f45e38e3378e77c4ae792991df",
+    "semantic_hash": "f057a6f45e38e3378e77c4ae792991df"
+  },
+  "app/src/main/java/com/thenile/vault/root/AppDataVault.kt": {
+    "mtime": 1789232049.046857,
+    "ast_hash": "7ac09b4dc5bf042662d3007839eac4ad",
+    "semantic_hash": "7ac09b4dc5bf042662d3007839eac4ad"
+  },
+  "app/src/main/java/com/thenile/vault/root/DeadManSwitch.kt": {
+    "mtime": 1789224503.6933,
+    "ast_hash": "53e49e32b416d1a8c6c5a7659a5d19c5",
+    "semantic_hash": "53e49e32b416d1a8c6c5a7659a5d19c5"
+  },
+  "app/src/main/java/com/thenile/vault/root/HiddenAppManager.kt": {
+    "mtime": 1789214083.7505882,
+    "ast_hash": "7f5b5efe92449cff5207a037e80ca602",
+    "semantic_hash": "7f5b5efe92449cff5207a037e80ca602"
+  },
+  "app/src/main/java/com/thenile/vault/root/HiddenVolume.kt": {
+    "mtime": 1789163180.817072,
+    "ast_hash": "3d3387dac6ef748d150e19deb476af08",
+    "semantic_hash": "3d3387dac6ef748d150e19deb476af08"
+  },
+  "app/src/main/java/com/thenile/vault/root/PrivilegeManager.kt": {
+    "mtime": 1789162967.7612574,
+    "ast_hash": "5e5d31d86c1213c6ffea92ba9f24f6b3",
+    "semantic_hash": "5e5d31d86c1213c6ffea92ba9f24f6b3"
+  },
+  "app/src/main/java/com/thenile/vault/root/PrivilegedShell.kt": {
+    "mtime": 1788050653.97082,
+    "ast_hash": "89eb2243921566630a5444a29b16e3b9",
+    "semantic_hash": "89eb2243921566630a5444a29b16e3b9"
+  },
+  "app/src/main/java/com/thenile/vault/root/SafBlobStore.kt": {
+    "mtime": 1788051066.7991872,
+    "ast_hash": "127d2c9df14d3460ef91a2d5922f2087",
+    "semantic_hash": "127d2c9df14d3460ef91a2d5922f2087"
+  },
+  "app/src/main/java/com/thenile/vault/root/SoftVault.kt": {
+    "mtime": 1789212326.6762838,
+    "ast_hash": "cad5f31a70a484d82529f756b83bc951",
+    "semantic_hash": "cad5f31a70a484d82529f756b83bc951"
+  },
+  "app/src/main/java/com/thenile/vault/root/UsbPluggedSwitch.kt": {
+    "mtime": 1789233684.2263584,
+    "ast_hash": "8147f5b4fb1843b1d3c2e91e2910bc92",
+    "semantic_hash": "8147f5b4fb1843b1d3c2e91e2910bc92"
+  },
+  "app/src/main/java/com/thenile/vault/root/WrongPinSwitch.kt": {
+    "mtime": 1789225305.7675776,
+    "ast_hash": "02ca985d7af7a85281a8d57792bacc5d",
+    "semantic_hash": "02ca985d7af7a85281a8d57792bacc5d"
+  },
+  "app/src/main/java/com/thenile/vault/shizuku/ShellUserService.kt": {
+    "mtime": 1788050617.2028556,
+    "ast_hash": "7d0c23d2af450723f23191bb07a1d6b4",
+    "semantic_hash": "7d0c23d2af450723f23191bb07a1d6b4"
+  },
+  "app/src/main/java/com/thenile/vault/shizuku/ShizukuShell.kt": {
+    "mtime": 1788054987.840776,
+    "ast_hash": "2d7e0256a517b1fa7228c27f39400ccf",
+    "semantic_hash": "2d7e0256a517b1fa7228c27f39400ccf"
+  },
+  "app/src/test/java/com/thenile/vault/AppDataVaultTest.kt": {
+    "mtime": 1789149402.391201,
+    "ast_hash": "88bfc5a04c18a2ef4b2c327ff916375a",
+    "semantic_hash": "88bfc5a04c18a2ef4b2c327ff916375a"
+  },
+  "app/src/test/java/com/thenile/vault/DeadManSwitchTest.kt": {
+    "mtime": 1789224550.7995737,
+    "ast_hash": "51b4d3f9973904a70381b6e34df56eef",
+    "semantic_hash": "51b4d3f9973904a70381b6e34df56eef"
+  },
+  "app/src/test/java/com/thenile/vault/HiddenVolumeTest.kt": {
+    "mtime": 1789150044.916429,
+    "ast_hash": "8eb1363c79eeb3b6dbf7e62d4f363c29",
+    "semantic_hash": "8eb1363c79eeb3b6dbf7e62d4f363c29"
+  },
+  "app/src/test/java/com/thenile/vault/SoftVaultTest.kt": {
+    "mtime": 1788050753.4427774,
+    "ast_hash": "e5f6930df6c1d0ae9509d701bd65771a",
+    "semantic_hash": "e5f6930df6c1d0ae9509d701bd65771a"
+  },
+  "app/src/test/java/com/thenile/vault/VaultDecoyTest.kt": {
+    "mtime": 1789162968.0286672,
+    "ast_hash": "6d4b5381c1e076ede253ad55b1582267",
+    "semantic_hash": "6d4b5381c1e076ede253ad55b1582267"
+  },
+  "app/src/test/java/com/thenile/vault/WrongPinSwitchTest.kt": {
+    "mtime": 1789225383.1253605,
+    "ast_hash": "9ef1feca52cc868d51e44c9a6b33de30",
+    "semantic_hash": "9ef1feca52cc868d51e44c9a6b33de30"
+  },
+  "app/src/xposed/assets/xposed.json": {
+    "mtime": 1786857933.1856902,
+    "ast_hash": "a1548e6492f675be801bd37c72e98fdc",
+    "semantic_hash": "a1548e6492f675be801bd37c72e98fdc"
+  },
+  "app/src/xposed/java/com/thenile/vault/xposed/PackageManagerHook.kt": {
+    "mtime": 1789163277.5404859,
+    "ast_hash": "ff271734e6d13c9525106b30dcea6a57",
+    "semantic_hash": "ff271734e6d13c9525106b30dcea6a57"
+  },
+  "docs/rom-lockscreen-trigger.md": {
+    "mtime": 1788990810.498269,
+    "ast_hash": "f3f9c6d9601f1519e9e41d04fdb6ac60",
+    "semantic_hash": "f3f9c6d9601f1519e9e41d04fdb6ac60"
+  }
+}

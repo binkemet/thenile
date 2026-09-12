@@ -1,0 +1,518 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<!--
+3 Xposed-flavor-only manifest additions. Merged into the base manifest for the `xposed` build
+4     variant; the `aosp` variant never sees these, so a ROM-baked Nile does not advertise itself as
+5     an Xposed/LSPosed module and carries no hook entry point.
+6-->
+7<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+8    package="com.thenile.vault"
+9    android:versionCode="2"
+10    android:versionName="1.1" >
+11
+12    <uses-sdk
+13        android:minSdkVersion="24"
+14        android:targetSdkVersion="36" />
+15
+16    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" /> <!-- Shizuku's own runtime permission on API 34+; pre-34 it grants via its manager app dialog. -->
+16-->D:\thenile\app\src\main\AndroidManifest.xml:4:5-76
+16-->D:\thenile\app\src\main\AndroidManifest.xml:4:22-74
+17    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+17-->D:\thenile\app\src\main\AndroidManifest.xml:6:5-77
+17-->D:\thenile\app\src\main\AndroidManifest.xml:6:22-75
+18    <!--
+19 Root's file hiding runs entirely via a root shell, which bypasses scoped storage — no
+20         permission needed there. SoftVault (Shizuku/no-root) runs plain java.io.File calls inside
+21         Nile's own process, which scoped storage silently blocks for directories/files the app
+22         didn't create itself (confirmed on-device: hide silently no-ops, no error). This is the
+23         broad "All files access" grant instead of per-directory SAF trees — see SoftVault.kt.
+24    -->
+25    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" /> <!-- Re-arms the dead man's switch alarm after reboot (AlarmManager alarms don't survive one). -->
+25-->D:\thenile\app\src\main\AndroidManifest.xml:12:5-110
+25-->D:\thenile\app\src\main\AndroidManifest.xml:12:22-79
+26    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+26-->D:\thenile\app\src\main\AndroidManifest.xml:14:5-80
+26-->D:\thenile\app\src\main\AndroidManifest.xml:14:22-78
+27    <!--
+28 Vault Accounts: list + remove device accounts. Doesn't grant visibility into accounts the
+29         owner hasn't shared with Nile (Android 8+) — see AccountPickerDialog.
+30    -->
+31    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+31-->D:\thenile\app\src\main\AndroidManifest.xml:17:5-70
+31-->D:\thenile\app\src\main\AndroidManifest.xml:17:22-68
+32    <uses-permission android:name="android.permission.USE_BIOMETRIC" /> <!-- suppress DeprecatedClassUsageInspection -->
+32-->[androidx.biometric:biometric:1.2.0-alpha05] C:\Users\londh\.gradle\caches\9.1.0\transforms\252ea6190c022a4c50424344b3a01f04\workspace\transformed\biometric-1.2.0-alpha05\AndroidManifest.xml:22:5-72
+32-->[androidx.biometric:biometric:1.2.0-alpha05] C:\Users\londh\.gradle\caches\9.1.0\transforms\252ea6190c022a4c50424344b3a01f04\workspace\transformed\biometric-1.2.0-alpha05\AndroidManifest.xml:22:22-69
+33    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+33-->[androidx.biometric:biometric:1.2.0-alpha05] C:\Users\londh\.gradle\caches\9.1.0\transforms\252ea6190c022a4c50424344b3a01f04\workspace\transformed\biometric-1.2.0-alpha05\AndroidManifest.xml:25:5-74
+33-->[androidx.biometric:biometric:1.2.0-alpha05] C:\Users\londh\.gradle\caches\9.1.0\transforms\252ea6190c022a4c50424344b3a01f04\workspace\transformed\biometric-1.2.0-alpha05\AndroidManifest.xml:25:22-71
+34
+35    <permission
+35-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:22:5-24:47
+36        android:name="com.thenile.vault.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+36-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:23:9-81
+37        android:protectionLevel="signature" />
+37-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:24:9-44
+38
+39    <uses-permission android:name="com.thenile.vault.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+39-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:26:5-97
+39-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:26:22-94
+40
+41    <application
+41-->D:\thenile\app\src\main\AndroidManifest.xml:19:5-180:19
+42        android:allowBackup="false"
+42-->D:\thenile\app\src\main\AndroidManifest.xml:20:9-36
+43        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+43-->[androidx.core:core:1.18.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\3db2429b6fc5c44076d17a074f1c7700\workspace\transformed\core-1.18.0\AndroidManifest.xml:28:18-86
+44        android:debuggable="true"
+45        android:extractNativeLibs="true"
+46        android:icon="@mipmap/ic_launcher"
+46-->D:\thenile\app\src\main\AndroidManifest.xml:21:9-43
+47        android:label="@string/app_name"
+47-->D:\thenile\app\src\main\AndroidManifest.xml:22:9-41
+48        android:roundIcon="@mipmap/ic_launcher_round"
+48-->D:\thenile\app\src\main\AndroidManifest.xml:23:9-54
+49        android:supportsRtl="true"
+49-->D:\thenile\app\src\main\AndroidManifest.xml:24:9-35
+50        android:theme="@style/Theme.TheNile"
+50-->D:\thenile\app\src\main\AndroidManifest.xml:26:9-45
+51        android:windowSoftInputMode="adjustResize" >
+51-->D:\thenile\app\src\main\AndroidManifest.xml:25:9-51
+52        <meta-data
+52-->D:\thenile\app\src\xposed\AndroidManifest.xml:7:9-9:36
+53            android:name="xposedmodule"
+53-->D:\thenile\app\src\xposed\AndroidManifest.xml:8:13-40
+54            android:value="true" />
+54-->D:\thenile\app\src\xposed\AndroidManifest.xml:9:13-33
+55        <meta-data
+55-->D:\thenile\app\src\xposed\AndroidManifest.xml:10:9-12:55
+56            android:name="xposeddescription"
+56-->D:\thenile\app\src\xposed\AndroidManifest.xml:11:13-45
+57            android:value="The Nile Stealth Engine" />
+57-->D:\thenile\app\src\xposed\AndroidManifest.xml:12:13-52
+58        <meta-data
+58-->D:\thenile\app\src\xposed\AndroidManifest.xml:13:9-15:35
+59            android:name="xposedminversion"
+59-->D:\thenile\app\src\xposed\AndroidManifest.xml:14:13-44
+60            android:value="100" />
+60-->D:\thenile\app\src\xposed\AndroidManifest.xml:15:13-32
+61        <meta-data
+61-->D:\thenile\app\src\xposed\AndroidManifest.xml:16:9-18:54
+62            android:name="xposedscope"
+62-->D:\thenile\app\src\xposed\AndroidManifest.xml:17:13-39
+63            android:resource="@array/xposed_scope" />
+63-->D:\thenile\app\src\xposed\AndroidManifest.xml:18:13-51
+64        <meta-data
+64-->D:\thenile\app\src\xposed\AndroidManifest.xml:19:9-21:75
+65            android:name="xposedentrypoint"
+65-->D:\thenile\app\src\xposed\AndroidManifest.xml:20:13-44
+66            android:value="com.thenile.vault.xposed.PackageManagerHook" />
+66-->D:\thenile\app\src\xposed\AndroidManifest.xml:21:13-72
+67
+68        <provider
+69            android:name="com.thenile.vault.AppContextProvider"
+70            android:authorities="com.thenile.vault.appctx"
+71            android:exported="false" />
+72        <!--
+73 Lets the Shizuku app/manager bind to request+relay shell-UID privileges when this
+74             device has no root (e.g. GrapheneOS) but does have Shizuku running via ADB/wireless
+75             debugging. Standard rikka.shizuku-api boilerplate, values as documented upstream.
+76        -->
+77        <provider
+78            android:name="rikka.shizuku.ShizukuProvider"
+79            android:authorities="com.thenile.vault.shizuku"
+80            android:enabled="true"
+81            android:exported="true"
+82            android:multiprocess="false"
+83            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+84
+85        <activity
+85-->D:\thenile\app\src\main\AndroidManifest.xml:44:9-49:20
+86            android:name="com.thenile.vault.ui.PromptActivity"
+86-->D:\thenile\app\src\main\AndroidManifest.xml:45:13-46
+87            android:excludeFromRecents="true"
+87-->D:\thenile\app\src\main\AndroidManifest.xml:48:13-46
+88            android:exported="true"
+88-->D:\thenile\app\src\main\AndroidManifest.xml:46:13-36
+89            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+89-->D:\thenile\app\src\main\AndroidManifest.xml:47:13-72
+90        </activity>
+91        <activity
+91-->D:\thenile\app\src\main\AndroidManifest.xml:51:9-60:20
+92            android:name="com.thenile.vault.ui.AdminActivity"
+92-->D:\thenile\app\src\main\AndroidManifest.xml:52:13-45
+93            android:excludeFromRecents="true"
+93-->D:\thenile\app\src\main\AndroidManifest.xml:55:13-46
+94            android:exported="true"
+94-->D:\thenile\app\src\main\AndroidManifest.xml:53:13-36
+95            android:theme="@style/Theme.TheNile" >
+95-->D:\thenile\app\src\main\AndroidManifest.xml:54:13-49
+96            <intent-filter>
+96-->D:\thenile\app\src\main\AndroidManifest.xml:56:13-59:29
+97                <action android:name="android.intent.action.MAIN" />
+97-->D:\thenile\app\src\main\AndroidManifest.xml:57:17-69
+97-->D:\thenile\app\src\main\AndroidManifest.xml:57:25-66
+98
+99                <category android:name="android.intent.category.LAUNCHER" />
+99-->D:\thenile\app\src\main\AndroidManifest.xml:58:17-77
+99-->D:\thenile\app\src\main\AndroidManifest.xml:58:27-74
+100            </intent-filter>
+101        </activity>
+102        <!--
+103 Injects a "The Nile" tile into the AOSP Settings app under System. Only appears when
+104             Nile is installed on the system image (priv-app) — AOSP's SettingsLib ignores injected
+105             tiles from non-system apps, so this is inert for a normal APK install. A true top-level
+106             Evolver-style dashboard entry needs a Settings source fork; this reuses AdminActivity.
+107        -->
+108        <activity-alias
+108-->D:\thenile\app\src\main\AndroidManifest.xml:83:9-98:26
+109            android:name="com.thenile.vault.ui.NileSettingsTile"
+109-->D:\thenile\app\src\main\AndroidManifest.xml:84:13-48
+110            android:exported="true"
+110-->D:\thenile\app\src\main\AndroidManifest.xml:86:13-36
+111            android:icon="@mipmap/ic_launcher"
+111-->D:\thenile\app\src\main\AndroidManifest.xml:88:13-47
+112            android:label="The Nile"
+112-->D:\thenile\app\src\main\AndroidManifest.xml:87:13-37
+113            android:targetActivity="com.thenile.vault.ui.AdminActivity" >
+113-->D:\thenile\app\src\main\AndroidManifest.xml:85:13-55
+114            <intent-filter>
+114-->D:\thenile\app\src\main\AndroidManifest.xml:89:13-91:29
+115                <action android:name="com.android.settings.action.IA_SETTINGS" />
+115-->D:\thenile\app\src\main\AndroidManifest.xml:90:17-82
+115-->D:\thenile\app\src\main\AndroidManifest.xml:90:25-79
+116            </intent-filter>
+117
+118            <meta-data
+118-->D:\thenile\app\src\main\AndroidManifest.xml:92:13-93:75
+119                android:name="com.android.settings.category"
+119-->D:\thenile\app\src\main\AndroidManifest.xml:92:24-68
+120                android:value="com.android.settings.category.ia.system" />
+120-->D:\thenile\app\src\main\AndroidManifest.xml:93:17-72
+121            <meta-data
+121-->D:\thenile\app\src\main\AndroidManifest.xml:94:13-95:44
+122                android:name="com.android.settings.title"
+122-->D:\thenile\app\src\main\AndroidManifest.xml:94:24-65
+123                android:value="The Nile" />
+123-->D:\thenile\app\src\main\AndroidManifest.xml:95:17-41
+124            <meta-data
+124-->D:\thenile\app\src\main\AndroidManifest.xml:96:13-97:79
+125                android:name="com.android.settings.summary"
+125-->D:\thenile\app\src\main\AndroidManifest.xml:96:24-67
+126                android:value="Vault, decoy switching &amp; anti-forensics" />
+126-->D:\thenile\app\src\main\AndroidManifest.xml:97:17-76
+127        </activity-alias>
+128        <!--
+129 Separate alias (not a second intent-filter on AdminActivity itself) so the
+130             "Browser Deep Link" toggle can disable just this entry point via
+131             setComponentEnabledSetting without touching the launcher entry.
+132        -->
+133        <activity-alias
+133-->D:\thenile\app\src\main\AndroidManifest.xml:65:9-77:26
+134            android:name="com.thenile.vault.ui.AdminActivityDeepLink"
+134-->D:\thenile\app\src\main\AndroidManifest.xml:66:13-53
+135            android:enabled="true"
+135-->D:\thenile\app\src\main\AndroidManifest.xml:69:13-35
+136            android:exported="true"
+136-->D:\thenile\app\src\main\AndroidManifest.xml:68:13-36
+137            android:targetActivity="com.thenile.vault.ui.AdminActivity" >
+137-->D:\thenile\app\src\main\AndroidManifest.xml:67:13-55
+138            <intent-filter>
+138-->D:\thenile\app\src\main\AndroidManifest.xml:70:13-76:29
+139                <action android:name="android.intent.action.VIEW" />
+139-->D:\thenile\app\src\main\AndroidManifest.xml:71:17-69
+139-->D:\thenile\app\src\main\AndroidManifest.xml:71:25-66
+140
+141                <category android:name="android.intent.category.DEFAULT" />
+141-->D:\thenile\app\src\main\AndroidManifest.xml:72:17-76
+141-->D:\thenile\app\src\main\AndroidManifest.xml:72:27-73
+142                <category android:name="android.intent.category.BROWSABLE" />
+142-->D:\thenile\app\src\main\AndroidManifest.xml:73:17-78
+142-->D:\thenile\app\src\main\AndroidManifest.xml:73:27-75
+143
+144                <data
+144-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+145                    android:host="admin"
+145-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+146                    android:scheme="nile" />
+146-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+147                <data
+147-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+148                    android:host="open"
+148-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+149                    android:scheme="nile" />
+149-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+150            </intent-filter>
+151        </activity-alias>
+152
+153        <service
+153-->D:\thenile\app\src\main\AndroidManifest.xml:100:9-109:19
+154            android:name="com.thenile.vault.services.NileTileService"
+154-->D:\thenile\app\src\main\AndroidManifest.xml:101:13-53
+155            android:exported="true"
+155-->D:\thenile\app\src\main\AndroidManifest.xml:102:13-36
+156            android:icon="@mipmap/ic_launcher"
+156-->D:\thenile\app\src\main\AndroidManifest.xml:103:13-47
+157            android:label="The Nile"
+157-->D:\thenile\app\src\main\AndroidManifest.xml:104:13-37
+158            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE" >
+158-->D:\thenile\app\src\main\AndroidManifest.xml:105:13-77
+159            <intent-filter>
+159-->D:\thenile\app\src\main\AndroidManifest.xml:106:13-108:29
+160                <action android:name="android.service.quicksettings.action.QS_TILE" />
+160-->D:\thenile\app\src\main\AndroidManifest.xml:107:17-87
+160-->D:\thenile\app\src\main\AndroidManifest.xml:107:25-84
+161            </intent-filter>
+162        </service>
+163        <service
+163-->D:\thenile\app\src\main\AndroidManifest.xml:111:9-121:19
+164            android:name="com.thenile.vault.services.NileAccessibilityService"
+164-->D:\thenile\app\src\main\AndroidManifest.xml:112:13-62
+165            android:exported="true"
+165-->D:\thenile\app\src\main\AndroidManifest.xml:113:13-36
+166            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+166-->D:\thenile\app\src\main\AndroidManifest.xml:114:13-79
+167            <intent-filter>
+167-->D:\thenile\app\src\main\AndroidManifest.xml:115:13-117:29
+168                <action android:name="android.accessibilityservice.AccessibilityService" />
+168-->D:\thenile\app\src\main\AndroidManifest.xml:116:17-92
+168-->D:\thenile\app\src\main\AndroidManifest.xml:116:25-89
+169            </intent-filter>
+170
+171            <meta-data
+171-->D:\thenile\app\src\main\AndroidManifest.xml:118:13-120:72
+172                android:name="android.accessibilityservice"
+172-->D:\thenile\app\src\main\AndroidManifest.xml:119:17-60
+173                android:resource="@xml/accessibility_service_config" />
+173-->D:\thenile\app\src\main\AndroidManifest.xml:120:17-69
+174        </service>
+175
+176        <receiver
+176-->D:\thenile\app\src\main\AndroidManifest.xml:123:9-138:20
+177            android:name="com.thenile.vault.receivers.SecretCodeReceiver"
+177-->D:\thenile\app\src\main\AndroidManifest.xml:124:13-57
+178            android:exported="true" >
+178-->D:\thenile\app\src\main\AndroidManifest.xml:125:13-36
+179            <intent-filter>
+179-->D:\thenile\app\src\main\AndroidManifest.xml:126:13-129:29
+180                <action android:name="android.provider.Telephony.SECRET_CODE" />
+180-->D:\thenile\app\src\main\AndroidManifest.xml:127:17-81
+180-->D:\thenile\app\src\main\AndroidManifest.xml:127:25-78
+181
+182                <data android:scheme="android_secret_code" />
+182-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+182-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+183            </intent-filter>
+184            <intent-filter>
+184-->D:\thenile\app\src\main\AndroidManifest.xml:130:13-137:29
+185                <action android:name="android.provider.Telephony.SECRET_CODE" />
+185-->D:\thenile\app\src\main\AndroidManifest.xml:127:17-81
+185-->D:\thenile\app\src\main\AndroidManifest.xml:127:25-78
+186
+187                <data
+187-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+188                    android:host="1234"
+188-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+189                    android:scheme="android_secret_code" />
+189-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+190                <data
+190-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+191                    android:host="8888"
+191-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+192                    android:scheme="android_secret_code" />
+192-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+193                <data
+193-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+194                    android:host="9876"
+194-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+195                    android:scheme="android_secret_code" />
+195-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+196                <data
+196-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+197                    android:host="1111"
+197-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+198                    android:scheme="android_secret_code" />
+198-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+199                <data
+199-->D:\thenile\app\src\main\AndroidManifest.xml:74:17-68
+200                    android:host="3333"
+200-->D:\thenile\app\src\main\AndroidManifest.xml:74:45-65
+201                    android:scheme="android_secret_code" />
+201-->D:\thenile\app\src\main\AndroidManifest.xml:74:23-44
+202            </intent-filter>
+203        </receiver>
+204        <!--
+205 Real-lockscreen decoy trigger for the AOSP edition. Fired by a ROM's patched Keyguard,
+206             not by any app: the signature|privileged permission means only the platform (same
+207             signer) or a priv-app can deliver it, so a normal app can't spoof a decoy trigger.
+208             Inert unless the ROM is patched to send it.
+209        -->
+210        <receiver
+210-->D:\thenile\app\src\main\AndroidManifest.xml:144:9-151:20
+211            android:name="com.thenile.vault.receivers.LockscreenDecoyReceiver"
+211-->D:\thenile\app\src\main\AndroidManifest.xml:145:13-62
+212            android:exported="true"
+212-->D:\thenile\app\src\main\AndroidManifest.xml:146:13-36
+213            android:permission="android.permission.MANAGE_USERS" >
+213-->D:\thenile\app\src\main\AndroidManifest.xml:147:13-65
+214            <intent-filter>
+214-->D:\thenile\app\src\main\AndroidManifest.xml:148:13-150:29
+215                <action android:name="com.thenile.vault.action.LOCKSCREEN_DECOY" />
+215-->D:\thenile\app\src\main\AndroidManifest.xml:149:17-84
+215-->D:\thenile\app\src\main\AndroidManifest.xml:149:25-81
+216            </intent-filter>
+217        </receiver>
+218        <!--
+219 Dead man's switch: periodic check (armed by DeadManSwitch.reschedule) plus a re-arm on
+220             boot, since AlarmManager alarms don't survive a reboot. Not exported to other apps —
+221             android:exported is left implicit-false, but BOOT_COMPLETED still requires the system
+222             be able to deliver it, which it can regardless.
+223        -->
+224        <receiver
+224-->D:\thenile\app\src\main\AndroidManifest.xml:157:9-164:20
+225            android:name="com.thenile.vault.receivers.DeadManSwitchReceiver"
+225-->D:\thenile\app\src\main\AndroidManifest.xml:158:13-60
+226            android:exported="false" >
+226-->D:\thenile\app\src\main\AndroidManifest.xml:159:13-37
+227            <intent-filter>
+227-->D:\thenile\app\src\main\AndroidManifest.xml:160:13-163:29
+228                <action android:name="android.intent.action.BOOT_COMPLETED" />
+228-->D:\thenile\app\src\main\AndroidManifest.xml:161:17-79
+228-->D:\thenile\app\src\main\AndroidManifest.xml:161:25-76
+229                <action android:name="com.thenile.vault.action.DEAD_MAN_SWITCH_CHECK" />
+229-->D:\thenile\app\src\main\AndroidManifest.xml:162:17-89
+229-->D:\thenile\app\src\main\AndroidManifest.xml:162:25-86
+230            </intent-filter>
+231        </receiver>
+232        <!--
+233 WrongPinSwitch's trigger source: onPasswordFailed()/onPasswordSucceeded() only fire
+234             for an active device admin, granted by the user via the button in Admin > Security &
+235             Auth (Settings.ACTION_ADD_DEVICE_ADMIN) — inert until then. android:permission is
+236             required by the platform for every device admin receiver.
+237        -->
+238        <receiver
+238-->D:\thenile\app\src\main\AndroidManifest.xml:170:9-178:20
+239            android:name="com.thenile.vault.receivers.NileDeviceAdminReceiver"
+239-->D:\thenile\app\src\main\AndroidManifest.xml:171:13-62
+240            android:exported="true"
+240-->D:\thenile\app\src\main\AndroidManifest.xml:172:13-36
+241            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+241-->D:\thenile\app\src\main\AndroidManifest.xml:173:13-70
+242            <meta-data
+242-->D:\thenile\app\src\main\AndroidManifest.xml:174:13-112
+243                android:name="android.app.device_admin"
+243-->D:\thenile\app\src\main\AndroidManifest.xml:174:24-63
+244                android:resource="@xml/device_admin_policies" />
+244-->D:\thenile\app\src\main\AndroidManifest.xml:174:64-109
+245
+246            <intent-filter>
+246-->D:\thenile\app\src\main\AndroidManifest.xml:175:13-177:29
+247                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+247-->D:\thenile\app\src\main\AndroidManifest.xml:176:17-82
+247-->D:\thenile\app\src\main\AndroidManifest.xml:176:25-79
+248            </intent-filter>
+249        </receiver>
+250
+251        <uses-library
+251-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:23:9-25:40
+252            android:name="androidx.window.extensions"
+252-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:24:13-54
+253            android:required="false" />
+253-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:25:13-37
+254        <uses-library
+254-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:26:9-28:40
+255            android:name="androidx.window.sidecar"
+255-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:27:13-51
+256            android:required="false" />
+256-->[androidx.window:window:1.5.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\99ecdfe4fc0ed9bf92b8f70d52ffdaec\workspace\transformed\window-1.5.0\AndroidManifest.xml:28:13-37
+257
+258        <activity
+258-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\d5e44e77794bb22bc04e247c47f8fea0\workspace\transformed\ui-tooling\AndroidManifest.xml:23:9-25:39
+259            android:name="androidx.compose.ui.tooling.PreviewActivity"
+259-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\d5e44e77794bb22bc04e247c47f8fea0\workspace\transformed\ui-tooling\AndroidManifest.xml:24:13-71
+260            android:exported="true" />
+260-->[androidx.compose.ui:ui-tooling-android:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\d5e44e77794bb22bc04e247c47f8fea0\workspace\transformed\ui-tooling\AndroidManifest.xml:25:13-36
+261
+262        <provider
+262-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:24:9-32:20
+263            android:name="androidx.startup.InitializationProvider"
+263-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:25:13-67
+264            android:authorities="com.thenile.vault.androidx-startup"
+264-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:26:13-68
+265            android:exported="false" >
+265-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:27:13-37
+266            <meta-data
+266-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:29:13-31:52
+267                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+267-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:30:17-75
+268                android:value="androidx.startup" />
+268-->[androidx.emoji2:emoji2:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\6bd2211b29e114de40e7e562013709ff\workspace\transformed\emoji2-1.4.0\AndroidManifest.xml:31:17-49
+269            <meta-data
+269-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\2e3863b913f0299a0504c496f54ceb53\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:29:13-31:52
+270                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+270-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\2e3863b913f0299a0504c496f54ceb53\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:30:17-78
+271                android:value="androidx.startup" />
+271-->[androidx.lifecycle:lifecycle-process:2.10.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\2e3863b913f0299a0504c496f54ceb53\workspace\transformed\lifecycle-process-2.10.0\AndroidManifest.xml:31:17-49
+272            <meta-data
+272-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+273                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+273-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+274                android:value="androidx.startup" />
+274-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+275        </provider>
+276
+277        <activity
+277-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\3bc8afe445c6855ea8cb6f63555eefda\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:23:9-26:79
+278            android:name="androidx.activity.ComponentActivity"
+278-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\3bc8afe445c6855ea8cb6f63555eefda\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:24:13-63
+279            android:exported="true"
+279-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\3bc8afe445c6855ea8cb6f63555eefda\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:25:13-36
+280            android:theme="@android:style/Theme.Material.Light.NoActionBar" />
+280-->[androidx.compose.ui:ui-test-manifest:1.10.6] C:\Users\londh\.gradle\caches\9.1.0\transforms\3bc8afe445c6855ea8cb6f63555eefda\workspace\transformed\ui-test-manifest-1.10.6\AndroidManifest.xml:26:13-76
+281
+282        <meta-data
+282-->[dev.rikka.shizuku:provider:13.1.5] C:\Users\londh\.gradle\caches\9.1.0\transforms\08ef45dcfe68eeb55142c811042ba5e1\workspace\transformed\provider-13.1.5\AndroidManifest.xml:11:9-13:36
+283            android:name="moe.shizuku.client.V3_SUPPORT"
+283-->[dev.rikka.shizuku:provider:13.1.5] C:\Users\londh\.gradle\caches\9.1.0\transforms\08ef45dcfe68eeb55142c811042ba5e1\workspace\transformed\provider-13.1.5\AndroidManifest.xml:12:13-57
+284            android:value="true" />
+284-->[dev.rikka.shizuku:provider:13.1.5] C:\Users\londh\.gradle\caches\9.1.0\transforms\08ef45dcfe68eeb55142c811042ba5e1\workspace\transformed\provider-13.1.5\AndroidManifest.xml:13:13-33
+285
+286        <receiver
+286-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+287            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+287-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+288            android:directBootAware="false"
+288-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+289            android:enabled="true"
+289-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+290            android:exported="true"
+290-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+291            android:permission="android.permission.DUMP" >
+291-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+292            <intent-filter>
+292-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+293                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+293-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+293-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+294            </intent-filter>
+295            <intent-filter>
+295-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+296                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+296-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+296-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+297            </intent-filter>
+298            <intent-filter>
+298-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+299                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+299-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+299-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+300            </intent-filter>
+301            <intent-filter>
+301-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+302                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+302-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+302-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\londh\.gradle\caches\9.1.0\transforms\e122c454de80630aec404f64945863c9\workspace\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+303            </intent-filter>
+304        </receiver>
+305    </application>
+306
+307</manifest>

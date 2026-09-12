@@ -1,0 +1,86 @@
+[
+    {
+        "merged": "com.thenile.vault.app-xposedDebug-46:/xml_device_admin_policies.xml.flat",
+        "source": "com.thenile.vault.app-main-48:/xml/device_admin_policies.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\drawable_ic_nile_river_transparent.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\drawable\\ic_nile_river_transparent.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-anydpi-v26\\ic_launcher_round.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xxxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\drawable_ic_launcher_foreground.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\drawable\\ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-hdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\xml_data_extraction_rules.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\xml\\data_extraction_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-mdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\xml_accessibility_service_config.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\xml\\accessibility_service_config.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\drawable_ic_nile_river.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\drawable\\ic_nile_river.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xxhdpi\\ic_launcher.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-hdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-anydpi-v26\\ic_launcher.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\drawable_ic_launcher_monochrome.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\drawable\\ic_launcher_monochrome.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\drawable_ic_launcher_background.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\drawable\\ic_launcher_background.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xxxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-xxhdpi\\ic_launcher_round.webp"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\xml_backup_rules.xml.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\xml\\backup_rules.xml"
+    },
+    {
+        "merged": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-xposedDebug-46:\\mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "C:\\Users\\londh\\.gradle\\daemon\\9.1.0\\com.thenile.vault.app-main-48:\\mipmap-mdpi\\ic_launcher.webp"
+    }
+]

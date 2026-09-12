@@ -1,0 +1,20 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.thenile.vault.app-mergeAospDebugResources-45:/values-watch-v20/values-watch-v20.xml",
+            "map": [
+                {
+                    "source": "C:\\Users\\londh\\.gradle\\caches\\9.1.0\\transforms\\6497be86c37b9033589da44f0bfec2cf\\workspace\\transformed\\appcompat-1.2.0\\res\\values-watch-v20\\values-watch-v20.xml",
+                    "from": {
+                        "startLines": "2,5,8",
+                        "startColumns": "4,4,4",
+                        "startOffsets": "55,214,385",
+                        "endLines": "4,7,10",
+                        "endColumns": "12,12,12",
+                        "endOffsets": "209,380,553"
+                    }
+                }
+            ]
+        }
+    ]
+}

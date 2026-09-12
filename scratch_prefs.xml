@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8' standalone='yes' ?>
+<map>
+    <string name="adminCustomPin"></string>
+    <boolean name="hideAppIcon" value="false" />
+    <boolean name="enableVolumeKeys" value="false" />
+    <string name="codeAdmin">3333</string>
+    <string name="decoyLockScreenMode">switch_user</string>
+    <string name="profiles">[{"id":"default","name":"Default Profile","packages":[],"directories":[],"dummyDirectories":[],"files":["/sdcard/Download/secret_note.txt"],"isActive":true,"hideOnDecoy":true,"decoyPin":"1234"}]</string>
+    <boolean name="enableTile" value="true" />
+    <string name="calculatorTriggerExpression">47-87+23</string>
+    <string name="codeDecoy">1234</string>
+    <boolean name="enableFakeCrash" value="false" />
+    <boolean name="enableCalculatorDecoy" value="false" />
+    <string name="codeLock">1111</string>
+    <int name="decoyUserId" value="10" />
+    <string name="codeUnlock">9876</string>
+    <boolean name="enableDeepLink" value="true" />
+    <int name="decoyUnlockLimit" value="1" />
+    <string name="adminLockMethod">biometric</string>
+</map>

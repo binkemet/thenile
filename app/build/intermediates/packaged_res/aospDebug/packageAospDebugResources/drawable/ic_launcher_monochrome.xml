@@ -1,0 +1,15 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="0.2109375"
+        android:scaleY="0.2109375">
+        <!-- S-Curve Nile River with Boat Cutout (evenOdd) -->
+        <path
+            android:fillType="evenOdd"
+            android:fillColor="#000000"
+            android:pathData="M -20,-20 C -20,280 300,240 300,532 L 420,532 C 420,180 100,220 100,-20 Z M 265,178 C 315,238 310,288 290,298 L 240,298 Z M 215,298 C 220,320 305,320 310,298 Z" />
+    </group>
+</vector>

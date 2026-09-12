@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.thenile.vault.VaultDecoyTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-12T21:45:02.395Z" hostname="GOAT" time="0.0">
+  <properties/>
+  <testcase name="testDecoyPinMatchingForFallbackCode" classname="com.thenile.vault.VaultDecoyTest" time="0.0"/>
+  <testcase name="testDecoyPinMatchingForSpecificCode" classname="com.thenile.vault.VaultDecoyTest" time="0.0"/>
+  <testcase name="testVaultDecoyPinMatching" classname="com.thenile.vault.VaultDecoyTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

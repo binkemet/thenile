@@ -1,0 +1,11 @@
+09-11 21:32:16.970 12364 12382 I TestRunner: started: jniEncryptDecryptRoundTrip(com.thenile.vault.HiddenVolumeDeviceTest)
+09-11 21:32:17.167   655   821 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+09-11 21:32:17.169   655   821 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+09-11 21:32:17.169   655   821 D InetDiagMessage: Destroyed live tcp sockets for uids={10126} in 8ms
+09-11 21:32:17.205  1028  1267 D EGL_emulation: app_time_stats: avg=146.54ms min=9.86ms max=1980.22ms count=15
+09-11 21:32:17.405   422  2267 D android.hardware.audio@7.1-impl.ranchu: threadLoop: entering standby, frames: 1300160
+09-11 21:32:17.439   655  1017 W InputManager-JNI: Input channel object 'd00246f Toast (client)' was disposed without first being removed with the input manager!
+09-11 21:32:17.778   655   821 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET, states=14
+09-11 21:32:17.782   655   821 D InetDiagMessage: Destroyed 0 sockets, proto=IPPROTO_TCP, family=AF_INET6, states=14
+09-11 21:32:17.782   655   821 D InetDiagMessage: Destroyed live tcp sockets for uids={10101} in 5ms
+09-11 21:32:17.828 12364 12382 I TestRunner: finished: jniEncryptDecryptRoundTrip(com.thenile.vault.HiddenVolumeDeviceTest)

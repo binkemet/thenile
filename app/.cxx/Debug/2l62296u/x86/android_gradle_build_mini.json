@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "D:\\thenile\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\londh\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\thenile\\app\\.cxx\\Debug\\2l62296u\\x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\londh\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\thenile\\app\\.cxx\\Debug\\2l62296u\\x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "thenile::@6890427a1f51a3e7e1df": {
+      "artifactName": "thenile",
+      "abi": "x86",
+      "output": "D:\\thenile\\app\\build\\intermediates\\cxx\\Debug\\2l62296u\\obj\\x86\\libthenile.so",
+      "runtimeFiles": []
+    }
+  }
+}

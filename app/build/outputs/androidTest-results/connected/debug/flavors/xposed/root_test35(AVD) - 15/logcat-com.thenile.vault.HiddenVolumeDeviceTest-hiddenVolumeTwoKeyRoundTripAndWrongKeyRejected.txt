@@ -1,0 +1,146 @@
+09-11 21:32:11.099 12364 12382 I TestRunner: started: hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected(com.thenile.vault.HiddenVolumeDeviceTest)
+09-11 21:32:11.261 12388 12388 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 0 <<<<<<
+09-11 21:32:11.269 12388 12388 I AndroidRuntime: Using default boot image
+09-11 21:32:11.269 12388 12388 I AndroidRuntime: Leaving lock profiling enabled
+09-11 21:32:11.273 12388 12388 I app_process: Core platform API reporting enabled, enforcing=false
+09-11 21:32:11.274 12388 12388 I app_process: Using CollectorTypeCMC GC.
+09-11 21:32:11.414 12388 12388 D nativeloader: InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so
+09-11 21:32:11.424 12388 12388 D nativeloader: Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:11.424 12388 12388 D app_process: u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded.
+09-11 21:32:11.425 12388 12388 D app_process: I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+09-11 21:32:11.430 12388 12388 D nativeloader: Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:11.431 12388 12388 D nativeloader: Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:11.433 12388 12388 W app_process: Unexpected CPU variant for x86: x86_64.
+09-11 21:32:11.433 12388 12388 W app_process: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+09-11 21:32:11.456 12388 12388 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+09-11 21:32:11.457 12388 12388 D AndroidRuntime: Calling main entry com.android.commands.am.Am
+09-11 21:32:11.504   655  1017 V GrammaticalInflectionUtils: AttributionSource: AttributionSource { uid = 10209, packageName = null, attributionTag = null, token = android.os.Binder@8aa4a9b, deviceId = 0, next = null } does not have READ_SYSTEM_GRAMMATICAL_GENDER permission.
+09-11 21:32:11.617 12388 12388 D AndroidRuntime: Shutting down VM
+09-11 21:32:11.625   655   688 W system_server: Long monitor contention with owner binder:655_B (1017) at int com.android.server.wm.ActivityStarter.execute()(ActivityStarter.java:825) waiters=1 in void com.android.server.wm.RootWindowContainer$RankTaskLayersRunnable.run() for 101ms
+09-11 21:32:11.636   475   475 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+09-11 21:32:11.655   655   734 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:11.661  1339  1339 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=29, baseIntent=Intent { act=android.intent.action.VIEW flg=0x58800020 pkg=com.topjohnwu.magisk cmp=com.topjohnwu.magisk/.ui.surequest.SuRequestActivity }
+09-11 21:32:11.777  1028  1267 D EGL_emulation: app_time_stats: avg=7579.36ms min=1.92ms max=106017.98ms count=14
+09-11 21:32:11.797 11702 11702 D AppCompatDelegate: Checking for metadata for AppLocalesMetadataHolderService : Service not found
+09-11 21:32:11.828 11702 11702 I AppCompatDelegate: The Activity's LayoutInflater already has a Factory installed so we can not install AppCompat's
+09-11 21:32:11.911 11702 11702 W HWUI    : Unknown dataspace 0
+09-11 21:32:12.017   475  1019 W ServiceManagerCppClient: Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10209 pid=0
+09-11 21:32:12.017   475  1019 D PermissionCache: checking android.permission.ACCESS_SURFACE_FLINGER for uid=10209 => denied (381 us)
+09-11 21:32:12.018   475  1019 W ServiceManagerCppClient: Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10209 pid=0
+09-11 21:32:12.018   475  1019 D PermissionCache: checking android.permission.ROTATE_SURFACE_FLINGER for uid=10209 => denied (590 us)
+09-11 21:32:12.018   475   578 W ServiceManagerCppClient: Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10209 pid=11702
+09-11 21:32:12.018   475  1019 W ServiceManagerCppClient: Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10209 pid=0
+09-11 21:32:12.018   475  1019 D PermissionCache: checking android.permission.INTERNAL_SYSTEM_WINDOW for uid=10209 => denied (623 us)
+09-11 21:32:12.019   475   578 D PermissionCache: checking android.permission.ACCESS_SURFACE_FLINGER for uid=10209 => denied (1790 us)
+09-11 21:32:12.020 11702 12405 I EGL_emulation: Opening libGLESv1_CM_emulation.so
+09-11 21:32:12.021 11702 12405 I EGL_emulation: Opening libGLESv2_emulation.so
+09-11 21:32:12.110 11702 12405 W HWUI    : Failed to choose config with EGL_SWAP_BEHAVIOR_PRESERVED, retrying without...
+09-11 21:32:12.110 11702 12405 W HWUI    : Failed to initialize 101010-2 format, error = EGL_SUCCESS
+09-11 21:32:12.185   178   178 I hwservicemanager: getTransport: Cannot find entry android.hardware.graphics.mapper@4.0::IMapper/default in either framework or device VINTF manifest.
+09-11 21:32:12.186 11702 12405 I Gralloc4: mapper 4.x is not supported
+09-11 21:32:12.265   655   734 W ServiceManagerCppClient: Permission failure: android.permission.ACCESS_SURFACE_FLINGER from uid=10209 pid=0
+09-11 21:32:12.265   655   734 D PermissionCache: checking android.permission.ACCESS_SURFACE_FLINGER for uid=10209 => denied (496 us)
+09-11 21:32:12.265   655   734 W ServiceManagerCppClient: Permission failure: android.permission.ROTATE_SURFACE_FLINGER from uid=10209 pid=0
+09-11 21:32:12.265   655   734 D PermissionCache: checking android.permission.ROTATE_SURFACE_FLINGER for uid=10209 => denied (244 us)
+09-11 21:32:12.265   655   734 W ServiceManagerCppClient: Permission failure: android.permission.INTERNAL_SYSTEM_WINDOW from uid=10209 pid=0
+09-11 21:32:12.265   655   734 D PermissionCache: checking android.permission.INTERNAL_SYSTEM_WINDOW for uid=10209 => denied (79 us)
+09-11 21:32:12.286   655   685 W ziparchive: Unable to open '/data/app/~~a6GpJ6B0esQg8GxS4tS1TQ==/com.topjohnwu.magisk-fmGxIJ8msYB7NcbTj6hYtw==/base.dm': No such file or directory
+09-11 21:32:12.297   655   685 I ActivityTaskManager: Displayed com.topjohnwu.magisk/.ui.surequest.SuRequestActivity for user 0: +803ms
+09-11 21:32:12.359   655   785 I ImeTracker: com.topjohnwu.magisk:4372b841: onRequestHide at ORIGIN_SERVER reason HIDE_UNSPECIFIED_WINDOW fromUser false
+09-11 21:32:12.361   655   785 I ImeTracker: com.topjohnwu.magisk:4372b841: onCancelled at PHASE_SERVER_SHOULD_HIDE
+09-11 21:32:12.396  8665  8665 I GoogleInputMethodService: GoogleInputMethodService.onFinishInput():3157
+09-11 21:32:12.436  8665  8665 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 0, locked = false
+09-11 21:32:12.439  8665  8665 I GoogleInputMethodService: GoogleInputMethodService.onStartInput():1986 onStartInput(EditorInfo{EditorInfo{packageName=com.topjohnwu.magisk, inputType=0, inputTypeString=NULL, enableLearning=false, autoCorrection=false, autoComplete=false, imeOptions=0, privateImeOptions=null, actionName=UNSPECIFIED, actionLabel=null, initialSelStart=-1, initialSelEnd=-1, initialCapsMode=0, label=null, fieldId=0, fieldName=null, extras=null, hintText=null, hintLocales=[]}}, false)
+09-11 21:32:12.442  8665  8665 I GoogleInputMethodService: GoogleInputMethodService.updateDeviceLockedStatus():2248 repeatCheckTimes = 1, locked = false
+09-11 21:32:12.462  8665  8665 I AndroidIME: InputBundleManager.loadActiveInputBundleId():450 loadActiveInputBundleId: und-Latn-x-password, password
+09-11 21:32:12.464  1339  8808 D EGL_emulation: app_time_stats: avg=95954.47ms min=95954.47ms max=95954.47ms count=1
+09-11 21:32:12.502  1028  1028 W TouchableRegionManager: onHeadsUpPinnedModeChanged
+09-11 21:32:12.596  1028  1267 D EGL_emulation: app_time_stats: avg=235.86ms min=1.93ms max=4969.94ms count=22
+09-11 21:32:12.601  1028  1267 D EGL_emulation: app_time_stats: avg=1874.21ms min=37.54ms max=5349.59ms count=3
+09-11 21:32:12.617  1339  8808 D EGL_emulation: app_time_stats: avg=217.59ms min=2.04ms max=3996.40ms count=20
+09-11 21:32:12.661  1028  1028 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=com.android.systemui.back.domain.interactor.BackActionInteractor$callback$2@433f2f9
+09-11 21:32:12.688   422  2267 D android.hardware.audio@7.1-impl.ranchu: threadLoop: entering standby, frames: 1151104
+09-11 21:32:12.707   655  8889 I InputDispatcher: Touched window was removed: 6257b4d NotificationShade in display %0
+09-11 21:32:12.745  1028  1258 D ControlsListingControllerImpl: Unsubscribing callback
+09-11 21:32:12.748  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@c613959
+09-11 21:32:12.750  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@8b4b91e
+09-11 21:32:12.751  1028  1258 D ControlsListingControllerImpl: Unsubscribing callback
+09-11 21:32:12.751  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@8e25ff
+09-11 21:32:12.751  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@e540fcc
+09-11 21:32:12.756  1028  1258 D ControlsListingControllerImpl: Unsubscribing callback
+09-11 21:32:12.757  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@f6fba91
+09-11 21:32:12.758  1028  1028 D DLObserver: remove listener: com.android.systemui.dock.DockManagerExtensionsKt$retrieveIsDocked$1$callback$1@a90cdf6
+09-11 21:32:12.759   518  2261 D BufferPoolAccessor2.0: evictor expired: 1, evicted: 0
+09-11 21:32:13.585   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.586   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.589  8730  9089 I BugleRcsEngine: Connected state: [1], networkType: [WIFI] [CONTEXT thread_id=57 ]
+09-11 21:32:13.589  8730  9720 I BugleRcsEngine: handleMessage processing message:[NOTIFY_UPTIME_IGNORE_STATE_CHANGED] with [non-null]:RcsEngineImpl reference [CONTEXT log_prefix="RcsEngineImpl[DUAL_REG]:[a6c6d3da-4d9d]>Handler" thread_id=66 ]
+09-11 21:32:13.597   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.598   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.599   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.600   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.601   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.602   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.603   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.605   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.605   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.606   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.606  8730  9720 I BugleRcsEngine: No RCS Configuration was found in Bugle for simID: redacted-pii:sim_id[chars:20,last3:897] [CONTEXT log_prefix="ProvisioningEngineDataRetriever" thread_id=66 ]
+09-11 21:32:13.606   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.607   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.607   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.609   655   821 W IPCThreadState: Sending oneway calls to frozen process.
+09-11 21:32:13.746   524   915 D BufferPoolAccessor2.0: evictor expired: 1, evicted: 0
+09-11 21:32:13.939 11702 12405 D EGL_emulation: app_time_stats: avg=54.05ms min=1.68ms max=898.95ms count=28
+09-11 21:32:14.338   471  2271 D audioserver: logFgsApiBegin: FGS Logger Transaction failed, -129
+09-11 21:32:14.339   655  1017 W AS.PlaybackActivityMon: No piid assigned for invalid/internal port id 18
+09-11 21:32:14.383  1339  1339 I TopTaskTracker: onTaskMovedToFront: (moved taskInfo to front) taskId=28, baseIntent=Intent { flg=0x10800000 cmp=com.android.systemui/.wifi.WifiDebuggingActivity }
+09-11 21:32:14.386   475   475 I BpBinder: onLastStrongRef automatically unlinking death recipients:
+09-11 21:32:14.431 12364 12382 D nativeloader: Load /data/app/~~B891ISeAqHjE7TEG8Oy2LQ==/com.thenile.vault-r46XCBYm2U5rcF5K1m-ajw==/lib/x86_64/librust_crypto.so using ns clns-7 from class loader (caller=/data/app/~~B891ISeAqHjE7TEG8Oy2LQ==/com.thenile.vault-r46XCBYm2U5rcF5K1m-ajw==/base.apk!classes6.dex): ok
+09-11 21:32:14.500   655   688 W system_server: Long monitor contention with owner binder:655_3 (734) at void com.android.server.wm.ActivityClientController.activityPaused(android.os.IBinder)(ActivityClientController.java:234) waiters=0 in void com.android.server.wm.ActivityTaskSupervisor$ActivityTaskSupervisorHandler.handleMessage(android.os.Message) for 104ms
+09-11 21:32:14.515   471   576 D audioserver: logFgsApiEnd: FGS Logger Transaction failed, -129
+09-11 21:32:14.570 11702 11711 W opjohnwu.magisk: ApkAssets: Deleting an ApkAssets object '<empty> and /data/app/~~B891ISeAqHjE7TEG8Oy2LQ==/com.thenile.vault-r46XCBYm2U5rcF5K1m-ajw==/base.apk' with 1 weak references
+09-11 21:32:14.576   415   468 I netd    : tetherGetStats() -> {[]} <7.34ms>
+09-11 21:32:14.582  1028  1267 D EGL_emulation: app_time_stats: avg=247.77ms min=1.95ms max=1806.45ms count=11
+09-11 21:32:14.617 12424 12424 D AndroidRuntime: >>>>>> START com.android.internal.os.RuntimeInit uid 0 <<<<<<
+09-11 21:32:14.629 12424 12424 I AndroidRuntime: Using default boot image
+09-11 21:32:14.629 12424 12424 I AndroidRuntime: Leaving lock profiling enabled
+09-11 21:32:14.633 12424 12424 I app_process: Core platform API reporting enabled, enforcing=false
+09-11 21:32:14.634 12424 12424 I app_process: Using CollectorTypeCMC GC.
+09-11 21:32:14.747   524   915 D BufferPoolAccessor2.0: bufferpool2 0x7e1f23b05c88 : 0(0 size) total buffers - 0(0 size) used buffers - 93/97 (recycle/alloc) - 4/96 (fetch/transfer)
+09-11 21:32:14.747   524   915 D BufferPoolAccessor2.0: evictor expired: 1, evicted: 1
+09-11 21:32:14.748 12424 12424 D nativeloader: InitDefaultPublicLibraries for_preload=1: libandroid.so:libaaudio.so:libamidi.so:libbinder_ndk.so:libc.so:libcamera2ndk.so:libdl.so:libEGL.so:libGLESv1_CM.so:libGLESv2.so:libGLESv3.so:libicu.so:libicui18n.so:libicuuc.so:libjnigraphics.so:liblog.so:libmediandk.so:libm.so:libnativehelper.so:libnativewindow.so:libOpenMAXAL.so:libOpenSLES.so:libRS.so:libstdc++.so:libsync.so:libvulkan.so:libwebviewchromium_plat_support.so:libz.so
+09-11 21:32:14.756   173   173 I lowmemorykiller: Kill 'com.android.dynsystem:dynsystem' (10380), uid 1000, oom_score_adj 999 to free 42396kB rss, 37056kB swap; reason: low watermark is breached
+09-11 21:32:14.760 12424 12424 D nativeloader: Load libicu_jni.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:14.760 12424 12424 D app_process: u_setTimeZoneFilesDirectory("/apex/com.android.tzdata/etc/tz/versioned/8/icu") succeeded.
+09-11 21:32:14.760 12424 12424 D app_process: I18n APEX ICU file found: /apex/com.android.i18n/etc/icu/icudt75l.dat
+09-11 21:32:14.760   518  2261 D BufferPoolAccessor2.0: bufferpool2 0x78dfd2061758 : 0(0 size) total buffers - 0(0 size) used buffers - 95/103 (recycle/alloc) - 8/198 (fetch/transfer)
+09-11 21:32:14.760   518  2261 D BufferPoolAccessor2.0: evictor expired: 1, evicted: 1
+09-11 21:32:14.761 12424 12424 D nativeloader: Load libjavacore.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:14.762 12424 12424 D nativeloader: Load libopenjdk.so using APEX ns com_android_art for caller /apex/com.android.art/javalib/core-oj.jar: ok
+09-11 21:32:14.764 12424 12424 W app_process: Unexpected CPU variant for x86: x86_64.
+09-11 21:32:14.764 12424 12424 W app_process: Known variants: atom, sandybridge, silvermont, goldmont, goldmont-plus, goldmont-without-sha-xsaves, tremont, kabylake, default
+09-11 21:32:14.773   173   180 E lowmemorykiller: process_mrelease 10380 failed: No such process
+09-11 21:32:14.777   416   416 I Zygote  : Process 10380 exited due to signal 9 (Killed)
+09-11 21:32:14.777   173   173 I lowmemorykiller: Kill 'com.android.dynsystem' (10323), uid 1000, oom_score_adj 999 to free 42796kB rss, 37264kB swap; reason: low watermark is breached
+09-11 21:32:14.777   655   699 I libprocessgroup: Removed cgroup /sys/fs/cgroup/uid_1000/pid_10380
+09-11 21:32:14.792   416   416 I Zygote  : Process 10323 exited due to signal 9 (Killed)
+09-11 21:32:14.796   655   699 I libprocessgroup: Removed cgroup /sys/fs/cgroup/uid_1000/pid_10323
+09-11 21:32:14.797 12424 12424 D nativeloader: Load libframework-connectivity-tiramisu-jni.so using APEX ns com_android_tethering for caller /apex/com.android.tethering/javalib/framework-connectivity-t.jar: ok
+09-11 21:32:14.798 12424 12424 D AndroidRuntime: Calling main entry com.android.commands.content.Content
+09-11 21:32:14.861 11702 11702 W WindowOnBackDispatcher: sendCancelIfRunning: isInProgress=false callback=android.view.ViewRootImpl$$ExternalSyntheticLambda11@b031e07
+09-11 21:32:14.864 11702 12405 D HWUI    : endAllActiveAnimators on 0x729d6eb37a70 (RippleDrawable) with handle 0x729c7eb530e0
+09-11 21:32:14.898   173   173 I lowmemorykiller: Kill 'com.android.camera2' (10163), uid 10156, oom_score_adj 999 to free 42628kB rss, 37404kB swap; reason: low watermark is breached and swap is low (150992kB < 151416kB)
+09-11 21:32:14.898   655  1008 W InputManager-JNI: Input channel object '1c3af69 com.topjohnwu.magisk/com.topjohnwu.magisk.ui.surequest.SuRequestActivity (client)' was disposed without first being removed with the input manager!
+09-11 21:32:14.908   416   416 I Zygote  : Process 10163 exited due to signal 9 (Killed)
+09-11 21:32:14.913 12424 12424 D AndroidRuntime: Shutting down VM
+09-11 21:32:14.916   173   180 W lowmemorykiller: Failed to open /proc/10163/task; errno=2: process pid(10163) might have died
+09-11 21:32:14.916   173   180 E lowmemorykiller: process_mrelease 10163 failed: No such process
+09-11 21:32:14.959   655   699 I libprocessgroup: Removed cgroup /sys/fs/cgroup/uid_10156/pid_10163
+09-11 21:32:14.986  1339  1339 I TopTaskTracker: onTaskRemoved: taskId=29
+09-11 21:32:14.988  1339  1339 I TopTaskTracker: onTaskRemoved: taskId=29
+09-11 21:32:15.732   415   468 I netd    : tetherGetStats() -> {[]} <0.34ms>
+09-11 21:32:15.748   524   915 D BufferPoolAccessor2.0: evictor expired: 1, evicted: 0
+09-11 21:32:16.784 12364 12507 D ProfileInstaller: Installing profile for com.thenile.vault
+09-11 21:32:16.854 12364 12382 E HiddenVolume: mount HIDDEN: mount failed (formatIfNeeded=false)
+09-11 21:32:16.967 12364 12382 I TestRunner: finished: hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected(com.thenile.vault.HiddenVolumeDeviceTest)

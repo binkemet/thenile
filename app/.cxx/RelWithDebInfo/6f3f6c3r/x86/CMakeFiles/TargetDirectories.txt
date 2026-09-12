@@ -1,0 +1,3 @@
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/x86/CMakeFiles/thenile.dir
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/x86/CMakeFiles/edit_cache.dir
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/x86/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,3 @@
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/armeabi-v7a/CMakeFiles/thenile.dir
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/thenile/app/.cxx/RelWithDebInfo/6f3f6c3r/armeabi-v7a/CMakeFiles/rebuild_cache.dir

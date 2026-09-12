@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.thenile.vault.ConfigCryptoTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-09-12T21:45:02.353Z" hostname="GOAT" time="0.007">
+  <properties/>
+  <testcase name="legacyPlaintextPassesThroughUnchanged" classname="com.thenile.vault.ConfigCryptoTest" time="0.001"/>
+  <testcase name="roundTrips" classname="com.thenile.vault.ConfigCryptoTest" time="0.003"/>
+  <testcase name="encryptedBlobIsNotPlaintext" classname="com.thenile.vault.ConfigCryptoTest" time="0.002"/>
+  <testcase name="eachEncryptionUsesFreshIv" classname="com.thenile.vault.ConfigCryptoTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

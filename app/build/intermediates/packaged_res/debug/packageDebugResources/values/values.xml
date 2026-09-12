@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <item>android</item>
+        <item>com.android.settings</item>
+        <item>com.android.systemui</item>
+        <item>com.android.calculator2</item>
+        <item>com.google.android.calculator</item>
+        <item>com.sec.android.app.popupcalculator</item>
+        <item>com.miui.calculator</item>
+        <item>com.android.dialer</item>
+        <item>com.google.android.dialer</item>
+        <item>com.samsung.android.dialer</item>
+    </string-array>
+    <string name="app_name">The Nile</string>
+    <style name="Theme.TheNile" parent="android:Theme.Material.Light.NoActionBar"/>
+</resources>

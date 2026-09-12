@@ -1,0 +1,242 @@
+{
+  "app/build.gradle.kts": {
+    "mtime": 1786667315.3844936,
+    "ast_hash": "5ec90a21795b3f86447de44fc7582a3d",
+    "semantic_hash": "5ec90a21795b3f86447de44fc7582a3d"
+  },
+  "app/rust_crypto/examples/dmcrypt.rs": {
+    "mtime": 1786406116.409865,
+    "ast_hash": "a51c3d4ea545b2041299e53bb334001d",
+    "semantic_hash": "a51c3d4ea545b2041299e53bb334001d"
+  },
+  "app/rust_crypto/src/dm.rs": {
+    "mtime": 1786406112.2834961,
+    "ast_hash": "83317aa84c7e8ff04a649931448cb237",
+    "semantic_hash": "83317aa84c7e8ff04a649931448cb237"
+  },
+  "app/rust_crypto/src/lib.rs": {
+    "mtime": 1786424714.705247,
+    "ast_hash": "33cc0e1e515e071f74d7136f1594510b",
+    "semantic_hash": "33cc0e1e515e071f74d7136f1594510b"
+  },
+  "app/src/main/java/com/thenile/vault/Config.kt": {
+    "mtime": 1786419824.7989628,
+    "ast_hash": "03134f2fff300a35c8cceb2d3928d40b",
+    "semantic_hash": "03134f2fff300a35c8cceb2d3928d40b"
+  },
+  "app/src/main/java/com/thenile/vault/backup/BackupManager.kt": {
+    "mtime": 1786424772.5536513,
+    "ast_hash": "e31beeda8d488846bf1f788d7ec6ead9",
+    "semantic_hash": "e31beeda8d488846bf1f788d7ec6ead9"
+  },
+  "app/src/main/java/com/thenile/vault/receivers/SecretCodeReceiver.kt": {
+    "mtime": 1786918129.2026727,
+    "ast_hash": "da63d46cea29e7c3af2f4407c1d60bdc",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/root/StorageMountManager.kt": {
+    "mtime": 1786550092.0194287,
+    "ast_hash": "3a099506f9408a1a2a3403f724351f43",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/root/TraceCleaner.kt": {
+    "mtime": 1786406406.299953,
+    "ast_hash": "6ae712d5297142f2e47a7ba4f5c3b28d",
+    "semantic_hash": "6ae712d5297142f2e47a7ba4f5c3b28d"
+  },
+  "app/src/main/java/com/thenile/vault/services/NileAccessibilityService.kt": {
+    "mtime": 1786757348.5844867,
+    "ast_hash": "974e17c73f994f83ffdd87bd48104e93",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/services/NileTileService.kt": {
+    "mtime": 1786420425.1070008,
+    "ast_hash": "e29fb57d823e7db85990c332cb5f84d2",
+    "semantic_hash": "e29fb57d823e7db85990c332cb5f84d2"
+  },
+  "app/src/main/java/com/thenile/vault/state/SettingsManager.kt": {
+    "mtime": 1786918380.8509035,
+    "ast_hash": "d38df43f9eb1af2eac1638a3e5307404",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/state/VaultStateManager.kt": {
+    "mtime": 1786841968.5156431,
+    "ast_hash": "57c227b3163f1fc57a3dfc0ea2417c9b",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/ui/AdminActivity.kt": {
+    "mtime": 1786918406.530636,
+    "ast_hash": "4f26a33e91532d47a2adfbe45c16c50b",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/ui/FakeCrashScreen.kt": {
+    "mtime": 1786457247.0901966,
+    "ast_hash": "d8fef28d457124b20ed1aea923628e85",
+    "semantic_hash": "d8fef28d457124b20ed1aea923628e85"
+  },
+  "app/src/main/java/com/thenile/vault/ui/PromptActivity.kt": {
+    "mtime": 1786655608.7127306,
+    "ast_hash": "2a07a81c6b5ae38b9e13af5076de7121",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/xposed/PackageManagerHook.kt": {
+    "mtime": 1786918893.504396,
+    "ast_hash": "8c05ddd7efec4c851ee88909af629442",
+    "semantic_hash": ""
+  },
+  "app/src/test/java/com/thenile/vault/BackupTest.kt": {
+    "mtime": 1786856981.7138846,
+    "ast_hash": "b23e9a46decddb5c34a10fc3cb1d6078",
+    "semantic_hash": ""
+  },
+  "app/src/test/java/com/thenile/vault/ConfigTest.kt": {
+    "mtime": 1786419847.9194095,
+    "ast_hash": "e52bd1f82c53b9cba6d794a609865382",
+    "semantic_hash": "e52bd1f82c53b9cba6d794a609865382"
+  },
+  "app/src/test/java/com/thenile/vault/ProfileDecoyTest.kt": {
+    "mtime": 1786417836.8232536,
+    "ast_hash": "5f5e86b755f076c7610c380d283b762d",
+    "semantic_hash": "5f5e86b755f076c7610c380d283b762d"
+  },
+  "build.gradle.kts": {
+    "mtime": 1786384058.8474212,
+    "ast_hash": "aa88c6c665b41d3ab89c3cd8b0c7d128",
+    "semantic_hash": "aa88c6c665b41d3ab89c3cd8b0c7d128"
+  },
+  "gradlew": {
+    "mtime": 1786384058.8599002,
+    "ast_hash": "857faf4b42fc9e324fb40b7223f2a94a",
+    "semantic_hash": "857faf4b42fc9e324fb40b7223f2a94a"
+  },
+  "settings.gradle.kts": {
+    "mtime": 1786667320.152985,
+    "ast_hash": "8bcf93892bb8280d7a6af44d6b109deb",
+    "semantic_hash": "8bcf93892bb8280d7a6af44d6b109deb"
+  },
+  "AGENTS.md": {
+    "mtime": 1786400886.8266623,
+    "ast_hash": "21ceb6533048be51308e69e7b74a35cf",
+    "semantic_hash": "21ceb6533048be51308e69e7b74a35cf"
+  },
+  "CHANGELOG.md": {
+    "mtime": 1786546351.4073572,
+    "ast_hash": "1c46d15e0deeee7daf6906383961e6a2",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1786843817.536914,
+    "ast_hash": "c43e5addb4bd106266212034ba45ee79",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/changelogs/1.txt": {
+    "mtime": 1786546362.5128524,
+    "ast_hash": "27d53e2359a774f8c49e45658a5a45e0",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/full_description.txt": {
+    "mtime": 1786546357.2390723,
+    "ast_hash": "97a2acdef535ce1c598930f70d7c395f",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/short_description.txt": {
+    "mtime": 1786457241.451095,
+    "ast_hash": "019fb2ec9d103178547d4e0978d20be9",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher.webp": {
+    "mtime": 1786384058.990469,
+    "ast_hash": "39d9bb21eb48f128a71c3f01ad3cd427",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-hdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.99159,
+    "ast_hash": "70d6f58af3c76ee221c829b1ce9daa04",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher.webp": {
+    "mtime": 1786384058.9941041,
+    "ast_hash": "d2acce71c7b46e5e9540d23a9f7b2166",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-mdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.9956195,
+    "ast_hash": "6376acb48f96a855ee95c113cd7fd616",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher.webp": {
+    "mtime": 1786384058.9978402,
+    "ast_hash": "bd087d80b70bec05a43c745f29dc3ffc",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384058.9988513,
+    "ast_hash": "7479edd56ab712609f030054bffd7263",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher.webp": {
+    "mtime": 1786384059.0009034,
+    "ast_hash": "ea180e8d1a2e8300cc998b987266b736",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384059.0029972,
+    "ast_hash": "947842742b29eeda80ee0805e1600366",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher.webp": {
+    "mtime": 1786384059.0056665,
+    "ast_hash": "54ab624970c86c2146e76b93f27586f7",
+    "semantic_hash": ""
+  },
+  "app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.webp": {
+    "mtime": 1786384059.007519,
+    "ast_hash": "9ee591be72fb336861a8044086054daa",
+    "semantic_hash": ""
+  },
+  "icon.svg": {
+    "mtime": 1786423432.3010793,
+    "ast_hash": "c4d5d24ca4ff35368a81ac3d7958088d",
+    "semantic_hash": ""
+  },
+  "app/src/main/assets/xposed.json": {
+    "mtime": 1786857933.1856902,
+    "ast_hash": "a1548e6492f675be801bd37c72e98fdc",
+    "semantic_hash": ""
+  },
+  "app/src/main/java/com/thenile/vault/root/DecoyAction.kt": {
+    "mtime": 1786750634.156005,
+    "ast_hash": "96bf64b93ac019e79dfa67dd74ef1926",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/images/phoneScreenshots/1.png": {
+    "mtime": 1786843066.235642,
+    "ast_hash": "4ba10867a071974391a38d7b2cb644ef",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/images/phoneScreenshots/2.png": {
+    "mtime": 1786843124.0126877,
+    "ast_hash": "c681112fed54d2131c9dac647dba41d4",
+    "semantic_hash": ""
+  },
+  "metadata/en-US/images/phoneScreenshots/3.png": {
+    "mtime": 1786843224.65948,
+    "ast_hash": "67c60056352d88c94f48064ba9ba8a53",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck.png": {
+    "mtime": 1786855880.510594,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck3.png": {
+    "mtime": 1786855961.0992665,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  },
+  "metadata/rootcheck4.png": {
+    "mtime": 1786856126.1244996,
+    "ast_hash": "a2f9d4714c4802db8bbf0b78fce3048a",
+    "semantic_hash": ""
+  }
+}

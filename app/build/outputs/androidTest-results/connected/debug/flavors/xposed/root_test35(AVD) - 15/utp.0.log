@@ -1,0 +1,45 @@
+INFOS: Constructing runner from config.
+INFOS: Configuring Android Instrumentation driver: android_instrumentation_runtime {
+  instrumentation_info {
+    app_package: "com.thenile.vault"
+    test_package: "com.thenile.vault.test"
+    test_runner_class: "androidx.test.runner.AndroidJUnitRunner"
+  }
+  instrumentation_args {
+    args_map {
+      key: "additionalTestOutputDir"
+      value: "/sdcard/Android/media/com.thenile.vault/additional_test_output"
+    }
+    args_map {
+      key: "class"
+      value: "com.thenile.vault.HiddenVolumeDeviceTest"
+    }
+  }
+}
+am_instrument_timeout: 31536000
+
+INFOS: Configuring AndroidTestApkInstallerPlugin: apks_to_install {
+  apk_paths: "D:\\thenile\\app\\build\\outputs\\apk\\xposed\\debug\\app-xposed-debug.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+apks_to_install {
+  apk_paths: "D:\\thenile\\app\\build\\outputs\\apk\\androidTest\\xposed\\debug\\app-xposed-debug-androidTest.apk"
+  install_options {
+  }
+  uninstall_after_test: true
+}
+instrumentation_target_package_id: "com.thenile.vault"
+
+INFOS: No installables found in test fixture. Nothing to install.
+INFOS: Installing [D:\thenile\app\build\outputs\apk\xposed\debug\app-xposed-debug.apk] on device emulator-5554.
+INFOS: Installing [D:\thenile\app\build\outputs\apk\androidTest\xposed\debug\app-xposed-debug-androidTest.apk] on device emulator-5554.
+INFOS: Start logcat streaming.
+INFOS: Running Android Instrumentation driver.
+INFOS: Copying files from device to host: /sdcard/Android/media/com.thenile.vault/additional_test_output to D:\thenile\app\build\outputs\connected_android_test_additional_output\xposedDebugAndroidTest\connected\root_test35(AVD) - 15
+INFOS: Stop logcat streaming.
+INFOS: Uninstalling com.thenile.vault for device emulator-5554.
+INFOS: Uninstalling com.thenile.vault.test for device emulator-5554.
+INFOS: Execute com.thenile.vault.HiddenVolumeDeviceTest.hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected: PASSED
+INFOS: Execute com.thenile.vault.HiddenVolumeDeviceTest.jniEncryptDecryptRoundTrip: PASSED

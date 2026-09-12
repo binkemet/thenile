@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="xposed_scope">
+        <item>android</item>
+        <item>com.android.settings</item>
+        <item>com.android.shell</item>
+    </string-array>
+    <string name="app_name">The Nile</string>
+    <style name="Theme.TheNile" parent="android:Theme.Material.Light.NoActionBar"/>
+</resources>

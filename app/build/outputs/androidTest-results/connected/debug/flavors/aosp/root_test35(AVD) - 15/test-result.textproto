@@ -1,0 +1,71 @@
+# proto-message: google.testing.platform.proto.api.core.TestSuiteResult
+# 2026-09-12T11:20:41.908643600Z:
+test_suite_meta_data {
+  scheduled_test_case_count: 2
+  device {
+    id: "emulator-5554"
+    friendly_name: "primary"
+  }
+}
+test_status: SKIPPED
+test_result {
+  test_case {
+    test_class: "HiddenVolumeDeviceTest"
+    test_package: "com.thenile.vault"
+    test_method: "hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected"
+    start_time {
+      seconds: 1789212034
+      nanos: 303000000
+    }
+    end_time {
+      seconds: 1789212034
+      nanos: 623000000
+    }
+    device {
+      id: "emulator-5554"
+      friendly_name: "primary"
+    }
+  }
+  test_status: IGNORED
+  error {
+    error_message: "org.junit.AssumptionViolatedException: needs root\nat org.junit.Assume.assumeTrue(Assume.java:68)\nat com.thenile.vault.HiddenVolumeDeviceTest.requireRootAndHelper(HiddenVolumeDeviceTest.kt:24)\nat com.thenile.vault.HiddenVolumeDeviceTest.hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected(HiddenVolumeDeviceTest.kt:47)\n"
+    error_type: "org.junit.AssumptionViolatedException"
+    stack_trace: "org.junit.AssumptionViolatedException: needs root\nat org.junit.Assume.assumeTrue(Assume.java:68)\nat com.thenile.vault.HiddenVolumeDeviceTest.requireRootAndHelper(HiddenVolumeDeviceTest.kt:24)\nat com.thenile.vault.HiddenVolumeDeviceTest.hiddenVolumeTwoKeyRoundTripAndWrongKeyRejected(HiddenVolumeDeviceTest.kt:47)\n"
+  }
+}
+test_result {
+  test_case {
+    test_class: "HiddenVolumeDeviceTest"
+    test_package: "com.thenile.vault"
+    test_method: "jniEncryptDecryptRoundTrip"
+    start_time {
+      seconds: 1789212034
+      nanos: 636000000
+    }
+    end_time {
+      seconds: 1789212034
+      nanos: 656000000
+    }
+    device {
+      id: "emulator-5554"
+      friendly_name: "primary"
+    }
+  }
+  test_status: IGNORED
+  error {
+    error_message: "org.junit.AssumptionViolatedException: needs root\nat org.junit.Assume.assumeTrue(Assume.java:68)\nat com.thenile.vault.HiddenVolumeDeviceTest.jniEncryptDecryptRoundTrip(HiddenVolumeDeviceTest.kt:32)\n"
+    error_type: "org.junit.AssumptionViolatedException"
+    stack_trace: "org.junit.AssumptionViolatedException: needs root\nat org.junit.Assume.assumeTrue(Assume.java:68)\nat com.thenile.vault.HiddenVolumeDeviceTest.jniEncryptDecryptRoundTrip(HiddenVolumeDeviceTest.kt:32)\n"
+  }
+}
+output_artifact {
+  label {
+    label: "test-results.log"
+    namespace: "com.google.testing.platform.runtime.android.driver.AndroidInstrumentationDriver"
+  }
+  source_path {
+    path: "D:\\thenile\\app\\build\\outputs\\androidTest-results\\connected\\debug\\flavors\\aosp\\root_test35(AVD) - 15\\testlog\\test-results.log"
+  }
+  type: TEST_DATA
+  mime_type: "text/plain"
+}

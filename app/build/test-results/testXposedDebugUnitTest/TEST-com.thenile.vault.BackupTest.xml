@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.thenile.vault.BackupTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-12T17:09:33.535Z" hostname="GOAT" time="0.06">
+  <properties/>
+  <testcase name="testImportDuplicateIdGeneratesNewUuid" classname="com.thenile.vault.BackupTest" time="0.05"/>
+  <testcase name="testBackupExportImportRoundtrip" classname="com.thenile.vault.BackupTest" time="0.01"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

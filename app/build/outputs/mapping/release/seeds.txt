@@ -1,0 +1,1707 @@
+androidx.compose.ui.input.pointer.PointerInputEventHandler
+androidx.compose.animation.EnterExitTransitionElement
+androidx.compose.foundation.text.modifiers.TextAnnotatedStringElement
+androidx.compose.foundation.ScrollingLayoutElement
+androidx.compose.foundation.gestures.ScrollableElement
+androidx.appcompat.view.menu.ActionMenuItemView
+com.topjohnwu.superuser.internal.SerialExecutorService
+androidx.appcompat.widget.ViewStubCompat
+androidx.appcompat.widget.AlertDialogLayout
+androidx.compose.foundation.layout.UnspecifiedConstraintsElement
+androidx.compose.foundation.MagnifierElement
+androidx.lifecycle.SavedStateHandlesVM
+androidx.compose.foundation.text.contextmenu.modifier.TextContextMenuToolbarHandlerElement
+androidx.compose.foundation.selection.SelectableElement
+com.topjohnwu.superuser.internal.PendingJob
+androidx.appcompat.widget.ActionBarContextView
+androidx.core.graphics.drawable.IconCompatParcelizer
+com.topjohnwu.superuser.internal.ShellInputSource
+androidx.compose.foundation.lazy.layout.TraversablePrefetchStateModifierElement
+com.thenile.vault.ui.AdminActivity
+android.support.v4.app.RemoteActionCompatParcelizer
+com.topjohnwu.superuser.Shell$ResultCallback
+androidx.appcompat.widget.DialogTitle
+com.topjohnwu.superuser.Shell$Result
+com.topjohnwu.superuser.internal.StreamGobbler$ERR
+androidx.core.app.CoreComponentFactory
+androidx.profileinstaller.ProfileInstallerInitializer
+androidx.compose.ui.semantics.AppendedSemanticsElement
+androidx.compose.foundation.layout.PaddingValuesElement
+androidx.appcompat.widget.FitWindowsFrameLayout
+androidx.core.app.RemoteActionCompat
+com.thenile.vault.ui.PromptActivity
+com.thenile.vault.services.NileTileService
+com.topjohnwu.superuser.Shell$Task
+androidx.biometric.BiometricFragment
+androidx.compose.foundation.BackgroundElement
+androidx.compose.ui.draganddrop.AndroidDragAndDropManager$modifier$1
+androidx.appcompat.view.menu.ListMenuItemView
+androidx.compose.animation.VeilModifierElement
+androidx.compose.foundation.text.contextmenu.modifier.AddTextContextMenuDataComponentsWithContextElement
+androidx.compose.ui.draw.PainterElement
+androidx.appcompat.widget.FitWindowsLinearLayout
+androidx.compose.ui.draw.ShadowGraphicsLayerElement
+androidx.core.widget.NestedScrollView
+androidx.compose.foundation.BorderModifierNodeElement
+com.thenile.vault.state.DummyDir
+androidx.lifecycle.ProcessLifecycleOwner$attach$1
+androidx.appcompat.widget.ActionBarOverlayLayout
+com.topjohnwu.superuser.internal.JobImpl
+androidx.compose.material3.MinimumInteractiveModifier
+com.topjohnwu.superuser.internal.ResultImpl
+androidx.compose.foundation.layout.IntrinsicWidthElement
+androidx.lifecycle.ReportFragment
+androidx.profileinstaller.ProfileInstallReceiver
+com.topjohnwu.superuser.internal.UiThreadHandler
+com.topjohnwu.superuser.R
+androidx.compose.ui.input.pointer.PointerHoverIconModifierElement
+androidx.compose.foundation.text.input.internal.LegacyAdaptingPlatformTextInputModifier
+androidx.compose.ui.input.pointer.StylusHoverIconModifierElement
+androidx.compose.foundation.lazy.layout.LazyLayoutSemanticsModifier
+com.thenile.vault.services.NileAccessibilityService
+com.thenile.vault.root.StorageMountManager
+com.thenile.vault.backup.BackupManager
+androidx.compose.foundation.text.input.internal.CoreTextFieldSemanticsModifier
+androidx.versionedparcelable.CustomVersionedParcelable
+androidx.biometric.BiometricViewModel
+androidx.startup.InitializationProvider
+androidx.annotation.Keep
+com.topjohnwu.superuser.Shell$GetShellCallback
+com.topjohnwu.superuser.CallbackList
+androidx.compose.ui.focus.FocusOwnerImpl$modifier$1
+androidx.compose.ui.layout.OnGloballyPositionedElement
+androidx.compose.foundation.text.handwriting.StylusHandwritingElement
+androidx.compose.foundation.relocation.BringIntoViewRequesterElement
+kotlinx.coroutines.internal.StackTraceRecoveryKt
+androidx.compose.ui.draw.DrawWithCacheElement
+androidx.compose.ui.draw.DrawWithContentElement
+androidx.compose.ui.focus.FocusChangedElement
+com.thenile.vault.receivers.SecretCodeReceiver
+androidx.compose.foundation.layout.FillElement
+com.topjohnwu.superuser.internal.BuilderImpl
+androidx.appcompat.widget.SearchView
+androidx.emoji2.text.EmojiCompatInitializer
+androidx.core.graphics.drawable.IconCompat
+androidx.compose.ui.layout.LayoutIdElement
+androidx.compose.foundation.text.contextmenu.modifier.TextContextMenuGestureElement
+androidx.compose.foundation.selection.ToggleableElement
+androidx.loader.app.LoaderManagerImpl$LoaderViewModel
+androidx.lifecycle.ProcessLifecycleOwner$attach$1$onActivityPreCreated$1
+kotlin.coroutines.jvm.internal.BaseContinuationImpl
+com.topjohnwu.superuser.NoShellException
+androidx.compose.ui.input.pointer.SuspendPointerInputElement
+androidx.compose.foundation.layout.BoxChildDataElement
+androidx.compose.material3.internal.ChildSemanticsNodeElement
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements
+androidx.compose.foundation.ScrollableAreaElement
+androidx.graphics.path.ConicConverter
+androidx.appcompat.widget.ActionBarContainer
+androidx.fragment.app.DialogFragment
+androidx.appcompat.app.AlertController$RecycleListView
+androidx.appcompat.widget.ActionMenuView
+androidx.compose.foundation.FocusableElement
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream
+androidx.lifecycle.ProcessLifecycleInitializer
+androidx.transition.FragmentTransitionSupport
+androidx.compose.ui.graphics.BlockGraphicsLayerElement
+android.support.v4.graphics.drawable.IconCompatParcelizer
+com.topjohnwu.superuser.internal.ShellTerminatedException
+androidx.appcompat.widget.SearchView$SearchAutoComplete
+com.topjohnwu.superuser.Shell$Builder
+com.thenile.vault.Config
+com.topjohnwu.superuser.internal.NOPList
+androidx.compose.foundation.layout.ConsumedInsetsModifierElement
+androidx.appcompat.widget.Toolbar
+androidx.compose.animation.AnimatedContentTransitionScopeImpl$SizeModifierElement
+com.topjohnwu.superuser.Shell
+androidx.compose.foundation.text.modifiers.SelectableTextAnnotatedStringElement
+androidx.compose.ui.layout.LayoutElement
+com.thenile.vault.xposed.PackageManagerHook
+com.topjohnwu.superuser.Shell$Initializer
+androidx.compose.foundation.text.modifiers.TextStringSimpleElement
+com.topjohnwu.superuser.internal.CommandSource
+androidx.compose.foundation.lazy.layout.AwaitFirstLayoutModifier
+androidx.appcompat.widget.ButtonBarLayout
+androidx.window.reflection.Consumer2
+androidx.compose.foundation.ClickableElement
+com.topjohnwu.superuser.internal.StreamGobbler$OUT
+androidx.window.area.reflectionguard.ExtensionWindowAreaPresentationRequirements
+androidx.compose.foundation.layout.PaddingElement
+com.topjohnwu.superuser.ShellUtils
+com.topjohnwu.superuser.internal.WaitRunnable
+androidx.compose.foundation.layout.SizeElement
+androidx.appcompat.widget.ContentFrameLayout
+androidx.compose.foundation.layout.OffsetElement
+androidx.compose.ui.draw.DrawBehindElement
+androidx.lifecycle.LifecycleDispatcher$DispatcherActivityCallback
+androidx.lifecycle.LegacySavedStateHandleController$OnRecreation
+androidx.appcompat.view.menu.ExpandedMenuView
+com.topjohnwu.superuser.Shell$Job
+androidx.compose.foundation.layout.WrapContentElement
+androidx.compose.ui.layout.OnSizeChangedModifier
+androidx.compose.foundation.selection.TriStateToggleableElement
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream
+androidx.core.app.RemoteActionCompatParcelizer
+androidx.window.area.reflectionguard.ExtensionWindowAreaStatusRequirements
+com.topjohnwu.superuser.internal.MainShell
+androidx.window.reflection.Predicate2
+com.topjohnwu.superuser.internal.StreamGobbler
+androidx.compose.foundation.layout.HorizontalAlignElement
+androidx.compose.material3.ThumbElement
+androidx.compose.foundation.lazy.layout.LazyLayoutBeyondBoundsModifierElement
+androidx.compose.ui.focus.FocusRequesterElement
+com.topjohnwu.superuser.internal.Utils
+androidx.lifecycle.ReportFragment$LifecycleCallbacks
+androidx.compose.foundation.layout.LayoutWeightElement
+com.thenile.vault.state.Profile
+androidx.window.reflection.JFunction2
+androidx.compose.foundation.lazy.layout.LazyLayoutItemAnimator$DisplayingDisappearingItemsElement
+androidx.compose.foundation.IndicationModifierElement
+androidx.compose.material3.ExposedDropdownMenuAnchorElement
+androidx.compose.ui.input.key.KeyInputElement
+androidx.graphics.path.PathIteratorPreApi34Impl
+com.topjohnwu.superuser.internal.ShellImpl
+androidx.versionedparcelable.ParcelImpl
+com.thenile.vault.xposed.PackageManagerHook$Companion
+androidx.compose.ui.platform.AndroidComposeView$root$1$1
+com.topjohnwu.superuser.internal.InputStreamSource
+androidx.compose.ui.platform.LifecycleRetainedValuesStoreOwner
+androidx.compose.ui.graphics.GraphicsLayerElement
+androidx.compose.runtime.ParcelableSnapshotMutableIntState: android.os.Parcelable$Creator CREATOR
+androidx.compose.foundation.lazy.layout.DefaultLazyKey: android.os.Parcelable$Creator CREATOR
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_CREATE
+com.topjohnwu.superuser.internal.SerialExecutorService: boolean isShutdown
+androidx.compose.runtime.ParcelableSnapshotMutableLongState: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.internal.ResultImpl: int code
+com.topjohnwu.superuser.Shell: int FLAG_NON_ROOT_SHELL
+com.topjohnwu.superuser.internal.JobImpl: java.lang.String END_UUID
+com.topjohnwu.superuser.CallbackList: java.util.List mBase
+com.topjohnwu.superuser.Shell: int FLAG_REDIRECT_STDERR
+kotlinx.coroutines.scheduling.WorkQueue: int blockingTasksInBuffer$volatile
+kotlinx.coroutines.CompletedExceptionally: int _handled$volatile
+kotlinx.coroutines.internal.ThreadSafeHeap: int _size$volatile
+kotlinx.coroutines.channels.BufferedChannel: long sendersAndCloseStatus$volatile
+androidx.transition.ChangeBounds$6: androidx.transition.ChangeBounds$ViewBounds mViewBounds
+kotlinx.coroutines.internal.LockFreeTaskQueueCore: java.lang.Object _next$volatile
+com.topjohnwu.superuser.Shell: int NON_ROOT_SHELL
+com.topjohnwu.superuser.internal.NOPList: com.topjohnwu.superuser.internal.NOPList list
+com.topjohnwu.superuser.internal.Utils: java.lang.Class synchronizedCollectionClass
+kotlinx.coroutines.JobSupport: java.lang.Object _parentHandle$volatile
+com.topjohnwu.superuser.internal.ShellInputSource: java.lang.String TAG
+kotlinx.coroutines.sync.SemaphoreAndMutexImpl: java.lang.Object tail$volatile
+kotlinx.coroutines.scheduling.CoroutineScheduler: int _isTerminated$volatile
+com.topjohnwu.superuser.internal.UiThreadHandler: android.os.Handler handler
+androidx.concurrent.futures.AbstractResolvableFuture: java.lang.Object value
+com.topjohnwu.superuser.internal.JobImpl: int UUID_LEN
+com.thenile.vault.Config: java.util.Set KNOWN_CODES
+com.thenile.vault.xposed.PackageManagerHook: long lastCheck
+com.thenile.vault.state.Profile: java.lang.String id
+androidx.fragment.app.BackStackState: android.os.Parcelable$Creator CREATOR
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String cachedSelf
+kotlinx.coroutines.internal.LockFreeLinkedListNode: java.lang.Object _next$volatile
+com.topjohnwu.superuser.internal.ResultImpl: com.topjohnwu.superuser.internal.ResultImpl SHELL_ERR
+com.topjohnwu.superuser.internal.PendingJob: boolean isSU
+com.topjohnwu.superuser.internal.JobImpl: java.util.List out
+kotlinx.coroutines.internal.LockFreeTaskQueue: java.lang.Object _cur$volatile
+com.thenile.vault.xposed.PackageManagerHook: java.util.Set CALCULATOR_PACKAGES
+com.topjohnwu.superuser.internal.ShellImpl: java.util.concurrent.ExecutorService executor
+com.thenile.vault.state.Profile: java.lang.String decoyPin
+kotlinx.coroutines.JobSupport$Finishing: java.lang.Object _exceptionsHolder$volatile
+com.thenile.vault.Config: int $stable
+com.thenile.vault.state.DummyDir: java.lang.String target
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_ANY
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.internal.ShellImpl[] mainShell
+com.topjohnwu.superuser.internal.ShellImpl: com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream STDIN
+com.topjohnwu.superuser.internal.ShellImpl: com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream STDERR
+kotlinx.coroutines.CancellableContinuationImpl: int _decisionAndIndex$volatile
+com.topjohnwu.superuser.internal.SerialExecutorService: java.util.ArrayDeque mTasks
+androidx.activity.result.ActivityResult: android.os.Parcelable$Creator CREATOR
+com.thenile.vault.Config: java.lang.String CODE_DURESS
+com.thenile.vault.xposed.PackageManagerHook: com.thenile.vault.xposed.PackageManagerHook$Companion Companion
+kotlinx.coroutines.scheduling.CoroutineScheduler: long controlState$volatile
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.internal.BuilderImpl mainBuilder
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event[] $VALUES
+kotlinx.coroutines.channels.BufferedChannel: long receivers$volatile
+com.thenile.vault.Config: java.lang.String SELF_PACKAGE
+kotlinx.coroutines.android.AndroidExceptionPreHandler: java.lang.Object _preHandler
+kotlinx.coroutines.DefaultExecutor: java.lang.Thread _thread
+kotlinx.coroutines.android.HandlerDispatcherKt: android.view.Choreographer choreographer
+com.topjohnwu.superuser.ShellUtils: char SINGLE_QUOTE
+androidx.concurrent.futures.AbstractResolvableFuture$Waiter: androidx.concurrent.futures.AbstractResolvableFuture$Waiter next
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event$Companion Companion
+kotlinx.coroutines.flow.StateFlowImpl: java.lang.Object _state$volatile
+kotlinx.coroutines.sync.SemaphoreAndMutexImpl: long enqIdx$volatile
+androidx.compose.runtime.ParcelableSnapshotMutableFloatState: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.internal.ShellImpl: java.lang.Process proc
+androidx.concurrent.futures.AbstractResolvableFuture: androidx.concurrent.futures.AbstractResolvableFuture$Waiter waiters
+kotlinx.coroutines.EventLoopImplBase: int _isCompleted$volatile
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.internal.ShellImpl shell
+com.thenile.vault.xposed.PackageManagerHook: java.util.WeakHashMap lastCalculatorMatch
+androidx.appcompat.widget.Toolbar$SavedState: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.internal.WaitRunnable: java.lang.Runnable r
+com.topjohnwu.superuser.internal.MainShell: boolean isInitMain
+kotlinx.coroutines.channels.BufferedChannel: long bufferEnd$volatile
+kotlinx.coroutines.scheduling.WorkQueue: int producerIndex$volatile
+com.topjohnwu.superuser.internal.ShellImpl: int status
+com.topjohnwu.superuser.Shell: boolean enableVerboseLogging
+com.thenile.vault.Config: java.util.List TARGET_PACKAGES
+androidx.fragment.app.FragmentManager$LaunchedFragmentInfo: android.os.Parcelable$Creator CREATOR
+kotlinx.coroutines.CancelledContinuation: int _resumed$volatile
+kotlinx.coroutines.internal.LimitedDispatcher: int runningWorkers$volatile
+kotlinx.coroutines.JobSupport$Finishing: java.lang.Object _rootCause$volatile
+com.topjohnwu.superuser.internal.ResultImpl: java.util.List out
+com.thenile.vault.state.Profile: boolean isActive
+kotlinx.coroutines.internal.LockFreeLinkedListNode: java.lang.Object _removedRef$volatile
+com.thenile.vault.Config: java.lang.String STATE_PROP
+com.topjohnwu.superuser.internal.Utils: android.content.Context context
+com.thenile.vault.state.Profile: java.lang.String name
+com.thenile.vault.state.DummyDir: boolean encrypt
+kotlinx.coroutines.scheduling.CoroutineScheduler$Worker: int workerCtl$volatile
+androidx.fragment.app.FragmentState: android.os.Parcelable$Creator CREATOR
+com.thenile.vault.state.DummyDir: int $stable
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: androidx.lifecycle.ReportFragment$LifecycleCallbacks$Companion Companion
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_DESTROY
+kotlinx.coroutines.channels.BufferedChannel: java.lang.Object closeHandler$volatile
+kotlinx.coroutines.sync.SemaphoreAndMutexImpl: int _availablePermits$volatile
+androidx.activity.result.IntentSenderRequest: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.Shell: int FLAG_MOUNT_MASTER
+com.thenile.vault.state.DummyDir: java.lang.String dummy
+com.topjohnwu.superuser.internal.ShellImpl: boolean redirect
+com.thenile.vault.state.Profile: int $stable
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_RESUME
+kotlinx.coroutines.InvokeOnCancelling: int _invoked$volatile
+androidx.concurrent.futures.AbstractResolvableFuture: androidx.concurrent.futures.AbstractResolvableFuture$Listener listeners
+com.topjohnwu.superuser.internal.StreamGobbler: java.io.InputStream in
+com.topjohnwu.superuser.internal.JobImpl: java.util.List UNSET_ERR
+kotlinx.coroutines.sync.MutexImpl: java.lang.Object owner$volatile
+androidx.customview.view.AbsSavedState: android.os.Parcelable$Creator CREATOR
+kotlin.SafePublicationLazyImpl: java.lang.Object _value
+com.thenile.vault.Config: java.lang.String CODE_LOCK
+com.topjohnwu.superuser.internal.PendingJob: boolean retry
+com.thenile.vault.xposed.PackageManagerHook: java.util.Set cachedHidden
+kotlinx.coroutines.UndispatchedCoroutine: boolean threadLocalIsSet
+com.thenile.vault.state.Profile: java.util.List directories
+com.topjohnwu.superuser.internal.StreamGobbler: java.lang.String TAG
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String BOGUS_CREDENTIAL
+kotlinx.coroutines.EventLoopImplBase$DelayedTask: java.lang.Object _heap
+kotlinx.coroutines.JobSupport: java.lang.Object _state$volatile
+androidx.concurrent.futures.AbstractResolvableFuture$Waiter: java.lang.Thread thread
+kotlinx.coroutines.internal.LockFreeTaskQueueCore: long _state$volatile
+com.topjohnwu.superuser.internal.ResultImpl: com.topjohnwu.superuser.internal.ResultImpl INSTANCE
+com.topjohnwu.superuser.Shell: int ROOT_MOUNT_MASTER
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_STOP
+androidx.fragment.app.BackStackRecordState: android.os.Parcelable$Creator CREATOR
+kotlinx.coroutines.internal.ConcurrentLinkedListNode: java.lang.Object _next$volatile
+androidx.lifecycle.ProcessLifecycleOwner$attach$1$onActivityPreCreated$1: androidx.lifecycle.ProcessLifecycleOwner this$0
+com.topjohnwu.superuser.Shell$Result: int JOB_NOT_EXECUTED
+com.topjohnwu.superuser.internal.ResultImpl: java.util.List err
+kotlinx.coroutines.internal.LockFreeLinkedListNode: java.lang.Object _prev$volatile
+kotlinx.coroutines.sync.SemaphoreAndMutexImpl: long deqIdx$volatile
+kotlinx.coroutines.scheduling.WorkQueue: java.lang.Object lastScheduledTask$volatile
+androidx.appcompat.widget.SearchView$SavedState: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell$Initializer[] initializers
+com.topjohnwu.superuser.Shell: int ROOT_SHELL
+com.thenile.vault.Config: java.lang.String CODE_DECOY
+com.topjohnwu.superuser.CallbackList: java.util.concurrent.Executor mExecutor
+com.thenile.vault.xposed.PackageManagerHook: java.util.Set pmMethods
+com.topjohnwu.superuser.internal.BuilderImpl: java.lang.String TAG
+kotlinx.coroutines.scheduling.CoroutineScheduler$Worker: int indexInArray
+com.thenile.vault.state.Profile: java.util.List packages
+kotlinx.coroutines.channels.BufferedChannel: java.lang.Object sendSegment$volatile
+kotlinx.coroutines.internal.DispatchedContinuation: java.lang.Object _reusableCancellableContinuation$volatile
+androidx.compose.runtime.ParcelableSnapshotMutableState: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.internal.ShellImpl: com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream STDOUT
+com.topjohnwu.superuser.internal.JobImpl: java.util.List err
+com.thenile.vault.Config: java.util.List HIDDEN_PACKAGES
+kotlinx.coroutines.sync.SemaphoreAndMutexImpl: java.lang.Object head$volatile
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_PAUSE
+androidx.compose.runtime.snapshots.SnapshotStateList: android.os.Parcelable$Creator CREATOR
+com.topjohnwu.superuser.Shell: int UNKNOWN
+com.thenile.vault.Config: com.thenile.vault.Config INSTANCE
+kotlinx.coroutines.internal.ResizableAtomicArray: java.util.concurrent.atomic.AtomicReferenceArray array
+androidx.fragment.app.FragmentManagerState: android.os.Parcelable$Creator CREATOR
+kotlinx.coroutines.internal.Segment: int cleanedAndPointers$volatile
+com.topjohnwu.superuser.internal.JobImpl: byte[] END_CMD
+kotlinx.coroutines.channels.BufferedChannel: java.lang.Object _closeCause$volatile
+com.thenile.vault.xposed.PackageManagerHook: int $stable
+com.topjohnwu.superuser.Shell: java.util.concurrent.ExecutorService EXECUTOR
+kotlinx.coroutines.scheduling.CoroutineScheduler$Worker: java.lang.Object nextParkedWorker
+kotlinx.coroutines.JobSupport$Finishing: int _isCompleting$volatile
+kotlinx.coroutines.DispatchedCoroutine: int _decision$volatile
+com.topjohnwu.superuser.internal.JobImpl: java.util.List sources
+kotlinx.coroutines.internal.ConcurrentLinkedListNode: java.lang.Object _prev$volatile
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: androidx.lifecycle.ProcessLifecycleOwner this$0
+com.topjohnwu.superuser.internal.StreamGobbler$OUT: int NO_RESULT_CODE
+kotlinx.coroutines.CancellableContinuationImpl: java.lang.Object _state$volatile
+kotlinx.coroutines.EventLoopImplBase: java.lang.Object _delayed$volatile
+androidx.core.widget.NestedScrollView$SavedState: android.os.Parcelable$Creator CREATOR
+kotlinx.coroutines.DefaultExecutor: int debugStatus
+kotlinx.coroutines.channels.BufferedChannel: java.lang.Object bufferEndSegment$volatile
+androidx.lifecycle.Lifecycle$Event: kotlin.enums.EnumEntries $ENTRIES
+kotlinx.coroutines.EventLoopImplBase: java.lang.Object _queue$volatile
+com.topjohnwu.superuser.internal.Utils: java.lang.String TAG
+com.topjohnwu.superuser.internal.BuilderImpl: int flags
+com.topjohnwu.superuser.internal.CommandSource: java.lang.String[] cmd
+com.topjohnwu.superuser.internal.StreamGobbler: java.util.List list
+androidx.appcompat.widget.AppCompatSpinner$SavedState: android.os.Parcelable$Creator CREATOR
+androidx.versionedparcelable.ParcelImpl: android.os.Parcelable$Creator CREATOR
+kotlinx.coroutines.channels.BufferedChannel: java.lang.Object receiveSegment$volatile
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.internal.ResultImpl result
+com.topjohnwu.superuser.internal.UiThreadHandler: java.util.concurrent.Executor executor
+kotlinx.coroutines.scheduling.CoroutineScheduler: long parkedWorkersStack$volatile
+com.topjohnwu.superuser.internal.SerialExecutorService: java.util.concurrent.FutureTask scheduleTask
+kotlinx.coroutines.scheduling.WorkQueue: int consumerIndex$volatile
+kotlinx.coroutines.channels.BufferedChannel: long completedExpandBuffersAndPauseFlag$volatile
+kotlinx.coroutines.CancellableContinuationImpl: java.lang.Object _parentHandle$volatile
+com.thenile.vault.state.Profile: boolean hideOnDecoy
+com.thenile.vault.state.Profile: java.util.List dummyDirectories
+com.thenile.vault.Config: java.lang.String CODE_UNLOCK
+com.topjohnwu.superuser.internal.InputStreamSource: java.io.InputStream in
+com.topjohnwu.superuser.internal.BuilderImpl: long timeout
+com.topjohnwu.superuser.internal.Utils: int currentRootState
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event ON_START
+kotlin.coroutines.SafeContinuation: java.lang.Object result
+com.topjohnwu.superuser.Shell: int getStatus()
+com.topjohnwu.superuser.internal.InputStreamSource: void serve(java.io.OutputStream)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityResumed(android.app.Activity)
+androidx.appcompat.widget.Toolbar: int getCurrentContentInsetEnd()
+androidx.compose.ui.platform.AndroidComposeViewStartDragAndDropN: boolean startDragAndDrop(android.view.View,androidx.compose.ui.draganddrop.DragAndDropTransferData,androidx.compose.ui.draganddrop.ComposeDragShadowBuilder)
+androidx.biometric.BiometricFragment$Api28Impl: void setDescription(android.hardware.biometrics.BiometricPrompt$Builder,java.lang.CharSequence)
+androidx.appcompat.widget.AppCompatImageButton: void setImageDrawable(android.graphics.drawable.Drawable)
+androidx.core.widget.NestedScrollView: NestedScrollView(android.content.Context,android.util.AttributeSet,int)
+androidx.core.view.ViewCompat$Api30Impl: android.view.WindowInsets dispatchApplyWindowInsets(android.view.View,android.view.WindowInsets)
+androidx.compose.ui.text.internal.InlineClassHelperKt: java.lang.Void throwIllegalArgumentExceptionForNullCheck(java.lang.String)
+androidx.appcompat.widget.SearchView: void setOnQueryTextListener(androidx.appcompat.widget.SearchView$OnQueryTextListener)
+androidx.compose.ui.unit.ConstraintsKt: void throwInvalidConstraintException(int,int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: void setStableInsets(androidx.core.graphics.Insets)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void registerIn(android.app.Activity)
+com.topjohnwu.superuser.internal.MainShell: void returnShell(com.topjohnwu.superuser.Shell,java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$GetShellCallback)
+com.thenile.vault.state.DummyDir: java.lang.String getTarget()
+androidx.core.view.WindowInsetsCompat$Impl20: android.graphics.Rect[] getBoundingRectsFromInsets(androidx.core.graphics.Insets)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.Object hookLockCredential$lambda$1(com.thenile.vault.xposed.PackageManagerHook,java.lang.ClassLoader,io.github.libxposed.api.XposedInterface$Chain)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.SoftwareKeyboardController getSoftwareKeyboardController()
+androidx.compose.ui.platform.AndroidComposeView: void setFontFamilyResolver(androidx.compose.ui.text.font.FontFamily$Resolver)
+androidx.core.view.WindowInsetsCompat$Impl: void initTypeBoundingRectsMaps()
+androidx.core.view.WindowInsetsCompat$Impl20: void setDisplayShape(androidx.core.view.DisplayShapeCompat)
+androidx.appcompat.widget.ButtonBarLayout: void setStacked(boolean)
+androidx.compose.ui.platform.LifecycleRetainedValuesStoreOwner: LifecycleRetainedValuesStoreOwner()
+androidx.compose.foundation.text.Handle: androidx.compose.foundation.text.Handle[] values()
+androidx.appcompat.widget.ActionBarOverlayLayout: void setHasNonEmbeddedTabs(boolean)
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.view.WindowInsetsCompat consumeSystemWindowInsets()
+androidx.appcompat.widget.AppCompatTextView: void setCustomSelectionActionModeCallback(android.view.ActionMode$Callback)
+androidx.compose.foundation.internal.InlineClassHelperKt: void throwIllegalStateException(java.lang.String)
+androidx.compose.foundation.text.contextmenu.modifier.ToolbarHandlerState: androidx.compose.foundation.text.contextmenu.modifier.ToolbarHandlerState valueOf(java.lang.String)
+androidx.core.widget.NestedScrollView: void setOnScrollChangeListener(androidx.core.widget.NestedScrollView$OnScrollChangeListener)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setHideOnContentScrollEnabled(boolean)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.text.font.FontFamily$Resolver getFontFamilyResolver()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidAccessibilityManager getAccessibilityManager()
+androidx.compose.runtime.InvalidationResult: androidx.compose.runtime.InvalidationResult[] values()
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.layout.LayoutCoordinates getParentLayoutCoordinates()
+androidx.appcompat.widget.ActionBarOverlayLayout: void setShowingForActionMode(boolean)
+androidx.core.view.WindowInsetsCompat$Impl20: java.util.List getBoundingRects(int)
+androidx.appcompat.widget.AppCompatTextView: int[] getAutoSizeTextAvailableSizes()
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setBackgroundResource(int)
+androidx.startup.InitializationProvider: java.lang.String getType(android.net.Uri)
+androidx.compose.material3.tokens.ColorSchemeKeyTokens: androidx.compose.material3.tokens.ColorSchemeKeyTokens valueOf(java.lang.String)
+androidx.compose.ui.window.PopupLayout: void getParams$ui$annotations()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.draganddrop.DragAndDropManager getDragAndDropManager()
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell build()
+androidx.compose.ui.window.PopupLayout: boolean getCanCalculatePosition()
+androidx.biometric.BiometricManager$Api29Impl: int canAuthenticate(android.hardware.biometrics.BiometricManager)
+com.thenile.vault.state.Profile: java.lang.String component1()
+androidx.compose.ui.util.ListUtilsKt: java.lang.Void throwNoSuchElementException(java.lang.String)
+com.topjohnwu.superuser.internal.BuilderImpl: BuilderImpl()
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: android.util.DisplayMetrics getRearDisplayMetrics()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.draganddrop.AndroidDragAndDropManager getDragAndDropManager()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.layout.InsetsListener getInsetsListener()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getStableInsets()
+androidx.compose.ui.platform.AndroidViewsHandler: java.util.HashMap getHolderToLayoutNode()
+androidx.appcompat.widget.AppCompatButton: void setSupportCompoundDrawablesTintList(android.content.res.ColorStateList)
+com.thenile.vault.services.NileTileService: NileTileService()
+androidx.appcompat.widget.AppCompatCheckBox: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.appcompat.widget.AppCompatImageButton: void setSupportImageTintList(android.content.res.ColorStateList)
+androidx.appcompat.view.menu.ActionMenuItemView: androidx.appcompat.view.menu.MenuItemImpl getItemData()
+androidx.fragment.app.FragmentContainerView: void setLayoutTransition(android.animation.LayoutTransition)
+androidx.compose.ui.window.PopupLayout: boolean getShouldCreateCompositionOnAttachedToWindow()
+androidx.appcompat.widget.ViewStubCompat: void setLayoutInflater(android.view.LayoutInflater)
+androidx.appcompat.widget.AppCompatSpinner: java.lang.CharSequence getPrompt()
+androidx.appcompat.widget.AppCompatSpinner: void setBackgroundResource(int)
+androidx.core.view.WindowInsetsCompat$Impl: boolean isRound()
+androidx.compose.runtime.PreconditionsKt: void throwIllegalArgumentException(java.lang.String)
+androidx.compose.ui.graphics.layer.ViewLayer: android.view.View getOwnerView()
+com.topjohnwu.superuser.internal.UiThreadHandler: UiThreadHandler()
+androidx.appcompat.widget.AppCompatImageView: void setImageResource(int)
+androidx.biometric.CryptoObjectUtils$Api33Impl: android.security.identity.PresentationSession getPresentationSession(android.hardware.biometrics.BiometricPrompt$CryptoObject)
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell getCachedShell()
+androidx.appcompat.widget.Toolbar: void setSubtitle(int)
+androidx.appcompat.widget.AppCompatEditText: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.appcompat.widget.ActionMenuView: void setPopupTheme(int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl35: void initTypeBoundingRects(androidx.core.view.WindowInsetsCompat)
+androidx.compose.ui.graphics.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+androidx.appcompat.widget.SearchView: void setAppSearchData(android.os.Bundle)
+com.thenile.vault.state.Profile: boolean equals(java.lang.Object)
+androidx.appcompat.widget.AppCompatSpinner: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.compose.material3.tokens.MotionSchemeKeyTokens: androidx.compose.material3.tokens.MotionSchemeKeyTokens[] values()
+androidx.compose.ui.window.Api30Impl: void setFitInsetsSides(android.view.WindowManager$LayoutParams,int)
+androidx.core.view.ViewCompat$Api28Impl: java.lang.CharSequence getAccessibilityPaneTitle(android.view.View)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl$1: void onAuthenticationFailed()
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event[] values()
+androidx.lifecycle.LifecycleDispatcher$DispatcherActivityCallback: LifecycleDispatcher$DispatcherActivityCallback()
+com.topjohnwu.superuser.internal.Utils: android.content.Context getDeContext()
+com.topjohnwu.superuser.internal.ShellImpl: void close()
+androidx.compose.ui.unit.LayoutDirection: androidx.compose.ui.unit.LayoutDirection valueOf(java.lang.String)
+androidx.appcompat.widget.Toolbar: void setLogoDescription(java.lang.CharSequence)
+androidx.appcompat.view.menu.ListMenuItemView: void setSubMenuArrowVisible(boolean)
+androidx.compose.ui.input.pointer.util.VelocityTracker1D$Strategy: androidx.compose.ui.input.pointer.util.VelocityTracker1D$Strategy[] values()
+androidx.appcompat.widget.ActionBarOverlayLayout: int getNestedScrollAxes()
+androidx.appcompat.widget.AppCompatRadioButton: android.graphics.PorterDuff$Mode getSupportButtonTintMode()
+androidx.core.view.WindowInsetsCompat$Impl30: WindowInsetsCompat$Impl30(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.core.view.WindowInsetsCompat$Impl28: androidx.core.view.WindowInsetsCompat consumeDisplayCutout()
+androidx.biometric.BiometricFragment$Api28Impl: android.hardware.biometrics.BiometricPrompt buildPrompt(android.hardware.biometrics.BiometricPrompt$Builder)
+androidx.appcompat.widget.Toolbar: int getContentInsetLeft()
+com.topjohnwu.superuser.internal.ShellImpl: boolean waitAndClose(long,java.util.concurrent.TimeUnit)
+androidx.appcompat.widget.AppCompatRadioButton: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.core.view.WindowInsetsCompat$Impl35: void initTypeBoundingRectsMaps()
+com.thenile.vault.state.Profile: java.lang.String getId()
+androidx.appcompat.widget.AppCompatButton: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.fragment.app.SpecialEffectsController$Operation$State: androidx.fragment.app.SpecialEffectsController$Operation$State[] values()
+androidx.compose.ui.layout.IntrinsicMinMax: androidx.compose.ui.layout.IntrinsicMinMax valueOf(java.lang.String)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.Object hookCalculatorTrigger$lambda$1(com.thenile.vault.xposed.PackageManagerHook,io.github.libxposed.api.XposedInterface$Chain)
+androidx.compose.ui.layout.IntrinsicWidthHeight: androidx.compose.ui.layout.IntrinsicWidthHeight valueOf(java.lang.String)
+androidx.appcompat.view.menu.ListMenuItemView: void setForceShowIcon(boolean)
+androidx.appcompat.widget.ViewStubCompat: int getInflatedId()
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getMinWidthMinor()
+androidx.appcompat.view.menu.ListMenuItemView: ListMenuItemView(android.content.Context,android.util.AttributeSet,int)
+androidx.core.view.ViewCompat$Api29Impl: android.view.View$AccessibilityDelegate getAccessibilityDelegate(android.view.View)
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: WindowInsetsCompat$BuilderImpl20()
+androidx.appcompat.widget.LinearLayoutCompat: void setDividerPadding(int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: WindowInsetsCompat$BuilderImpl(androidx.core.view.WindowInsetsCompat)
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getInsets(int,boolean)
+com.topjohnwu.superuser.internal.Utils: boolean hasStartupAgents(android.content.Context)
+androidx.appcompat.view.menu.ListMenuItemView: void setTitle(java.lang.CharSequence)
+androidx.compose.ui.input.pointer.PointerInputEventHandler: java.lang.Object invoke(androidx.compose.ui.input.pointer.PointerInputScope,kotlin.coroutines.Continuation)
+com.thenile.vault.state.DummyDir: java.lang.String component2()
+androidx.appcompat.widget.AppCompatSpinner: void setPrompt(java.lang.CharSequence)
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getInsets(int)
+androidx.compose.foundation.gestures.Orientation: androidx.compose.foundation.gestures.Orientation[] values()
+androidx.appcompat.widget.DropDownListView: void setListSelectionHidden(boolean)
+com.topjohnwu.superuser.internal.ShellImpl: ShellImpl(com.topjohnwu.superuser.internal.BuilderImpl,java.lang.Process)
+androidx.compose.foundation.layout.IntrinsicSize: androidx.compose.foundation.layout.IntrinsicSize valueOf(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.autofill.Autofill getAutofill()
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: android.view.WindowInsets createWindowInsetsInstance()
+androidx.compose.ui.platform.AndroidComposeView: void setUncaughtExceptionHandler$ui(androidx.compose.ui.node.RootForTest$UncaughtExceptionHandler)
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityDestroyed(android.app.Activity)
+androidx.compose.ui.platform.AndroidComposeView: boolean getHasPendingMeasureOrLayout()
+com.thenile.vault.xposed.PackageManagerHook: void triggerDecoyHide(java.lang.String,boolean)
+androidx.core.view.WindowInsetsCompat$Impl: java.util.List getBoundingRectsIgnoringVisibility(int)
+androidx.compose.ui.node.Invalidation: androidx.compose.ui.node.Invalidation valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.CommandSource: CommandSource(java.lang.String[])
+androidx.appcompat.widget.ContentFrameLayout: void setAttachListener(androidx.appcompat.widget.ContentFrameLayout$OnAttachListener)
+com.thenile.vault.state.Profile: java.util.List component5()
+com.topjohnwu.superuser.internal.ShellInputSource: void serve(java.io.OutputStream)
+androidx.appcompat.widget.Toolbar: void setSubtitleTextColor(int)
+androidx.appcompat.widget.AppCompatTextView: androidx.core.text.PrecomputedTextCompat$Params getTextMetricsParamsCompat()
+androidx.core.app.CoreComponentFactory: CoreComponentFactory()
+androidx.appcompat.widget.ActionBarOverlayLayout: void setUiOptions(int)
+com.topjohnwu.superuser.internal.Utils: boolean isProcess64Bit()
+androidx.appcompat.widget.AppCompatButton: void setSupportCompoundDrawablesTintMode(android.graphics.PorterDuff$Mode)
+androidx.core.view.WindowInsetsCompat$Impl35: WindowInsetsCompat$Impl35(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.appcompat.widget.AppCompatImageButton: void setImageBitmap(android.graphics.Bitmap)
+androidx.appcompat.widget.ActionBarContextView: void setContentHeight(int)
+androidx.core.view.WindowInsetsCompat$Impl30: void copyRootViewBounds(android.view.View)
+androidx.core.view.WindowInsetsCompat$Impl: boolean isConsumed()
+androidx.appcompat.widget.Toolbar: void setNavigationContentDescription(int)
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivitySaveInstanceState(android.app.Activity,android.os.Bundle)
+androidx.appcompat.widget.ActionBarContextView: ActionBarContextView(android.content.Context,android.util.AttributeSet,int)
+androidx.compose.ui.platform.AndroidComposeView: long getLastMatrixRecalculationAnimationTime$ui()
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: void setMandatorySystemGestureInsets(androidx.core.graphics.Insets)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl: AppCompatTextViewAutoSizeHelper$Impl()
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.view.WindowInsetsCompat inset(int,int,int,int)
+androidx.compose.ui.window.Api30Impl: int getMaxDialogHeightExcludingSystemBarInsets(android.view.Window)
+com.topjohnwu.superuser.internal.CommandSource: void serve(java.io.OutputStream)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String requestedPkg(java.lang.Object)
+androidx.compose.ui.platform.actionmodecallback.MenuItemOption: androidx.compose.ui.platform.actionmodecallback.MenuItemOption[] values()
+com.topjohnwu.superuser.internal.InputStreamSource: void close()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPostStarted(android.app.Activity)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityCreated(android.app.Activity,android.os.Bundle)
+androidx.transition.FragmentTransitionSupport: FragmentTransitionSupport()
+androidx.biometric.PackageUtils$Api23Impl: boolean hasSystemFeatureFingerprint(android.content.pm.PackageManager)
+com.topjohnwu.superuser.internal.ShellImpl: com.topjohnwu.superuser.Shell$Job newJob()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.LayoutNode getRoot()
+androidx.compose.material3.tokens.ShapeKeyTokens: androidx.compose.material3.tokens.ShapeKeyTokens valueOf(java.lang.String)
+androidx.compose.ui.platform.AbstractComposeView: void setViewCompositionStrategy(androidx.compose.ui.platform.ViewCompositionStrategy)
+androidx.compose.ui.node.LayoutNode: java.lang.String exceptionMessageForParentingOrOwnership(androidx.compose.ui.node.LayoutNode)
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPreStopped(android.app.Activity)
+androidx.compose.ui.platform.AndroidComposeView: void setLayoutDirection(androidx.compose.ui.unit.LayoutDirection)
+androidx.appcompat.widget.Toolbar: int getCurrentContentInsetLeft()
+androidx.compose.foundation.text.selection.SelectedTextType: androidx.compose.foundation.text.selection.SelectedTextType[] values()
+com.topjohnwu.superuser.Shell$Initializer: boolean onInit(android.content.Context,com.topjohnwu.superuser.Shell)
+com.thenile.vault.state.Profile: java.lang.String getDecoyPin()
+androidx.appcompat.widget.AppCompatButton: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: void setSystemWindowInsets(androidx.core.graphics.Insets)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityStopped(android.app.Activity)
+androidx.appcompat.widget.Toolbar: void setCollapseContentDescription(int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl35: WindowInsetsCompat$BuilderImpl35()
+androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicWidthHeight: androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicWidthHeight valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.appcompat.widget.Toolbar: int getCurrentContentInsetRight()
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job sh(java.lang.String[])
+androidx.compose.foundation.text.HandleState: androidx.compose.foundation.text.HandleState[] values()
+com.thenile.vault.state.Profile: boolean component7()
+androidx.appcompat.widget.Toolbar: void setTitleMarginBottom(int)
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream: void close0()
+androidx.compose.ui.platform.CalculateMatrixToWindowApi29: void calculateMatrixToWindow-EL8BTi8(android.view.View,float[])
+androidx.appcompat.widget.SearchView: void setSubmitButtonEnabled(boolean)
+androidx.appcompat.widget.AppCompatSpinner: void setDropDownWidth(int)
+androidx.compose.foundation.MutatePriority: androidx.compose.foundation.MutatePriority[] values()
+androidx.compose.ui.platform.AndroidComposeViewTranslationCallbackS: void setViewTranslationCallback(android.view.View)
+com.topjohnwu.superuser.CallbackList: CallbackList()
+androidx.appcompat.widget.ActionBarContextView: java.lang.CharSequence getSubtitle()
+androidx.compose.animation.EnterExitState: androidx.compose.animation.EnterExitState[] values()
+androidx.compose.ui.contentcapture.ContentCaptureEventType: androidx.compose.ui.contentcapture.ContentCaptureEventType valueOf(java.lang.String)
+androidx.appcompat.widget.LinearLayoutCompat: void setGravity(int)
+androidx.appcompat.widget.SearchView: int getPreferredWidth()
+androidx.core.view.WindowInsetsCompat$Impl35: java.util.List getBoundingRects(int)
+androidx.biometric.CancellationSignalProvider$Api16Impl: void cancel(android.os.CancellationSignal)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void startRearDisplaySession(android.app.Activity,androidx.window.extensions.core.util.function.Consumer)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.graphics.GraphicsContext getGraphicsContext()
+androidx.appcompat.widget.AppCompatImageView: void setImageURI(android.net.Uri)
+androidx.appcompat.widget.ActionBarContainer: void setTabContainer(androidx.appcompat.widget.ScrollingTabContainerView)
+androidx.compose.foundation.MutatePriority: androidx.compose.foundation.MutatePriority valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell build(java.lang.String[])
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.text.input.TextInputService getTextInputService()
+androidx.appcompat.widget.AppCompatButton: android.graphics.PorterDuff$Mode getSupportCompoundDrawablesTintMode()
+com.thenile.vault.xposed.PackageManagerHook: java.util.Set getHidden()
+androidx.appcompat.widget.SearchView: void setSearchableInfo(android.app.SearchableInfo)
+androidx.appcompat.widget.AppCompatButton: void setSupportAllCaps(boolean)
+androidx.biometric.CryptoObjectUtils$Api23Impl: void setEncryptionPaddingPKCS7(android.security.keystore.KeyGenParameterSpec$Builder)
+androidx.appcompat.widget.DialogTitle: DialogTitle(android.content.Context,android.util.AttributeSet,int)
+androidx.appcompat.app.AlertController$RecycleListView: AlertController$RecycleListView(android.content.Context)
+androidx.core.view.WindowInsetsCompat$Impl: void setRootWindowInsets(androidx.core.view.WindowInsetsCompat)
+androidx.biometric.BiometricFragment: BiometricFragment()
+androidx.compose.ui.window.PopupLayout: java.lang.String getTestTag()
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream: ShellImpl$NoCloseInputStream(java.io.InputStream)
+androidx.appcompat.widget.Toolbar: android.view.Menu getMenu()
+androidx.appcompat.widget.AppCompatRadioButton: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.appcompat.widget.Toolbar: void setCollapseIcon(int)
+androidx.appcompat.widget.LinearLayoutCompat: void setShowDividers(int)
+androidx.compose.ui.window.PopupLayout: void setParentLayoutCoordinates(androidx.compose.ui.layout.LayoutCoordinates)
+androidx.emoji2.text.ConcurrencyHelpers$Handler28Impl: android.os.Handler createAsync(android.os.Looper)
+androidx.compose.ui.platform.ComposeView: boolean getShouldCreateCompositionOnAttachedToWindow()
+androidx.core.view.WindowInsetsCompat$Impl35: WindowInsetsCompat$Impl35(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl35)
+androidx.lifecycle.ProcessLifecycleOwner$attach$1$onActivityPreCreated$1: void onActivityPostStarted(android.app.Activity)
+androidx.core.view.ViewCompat$Api21Impl$1: android.view.WindowInsets onApplyWindowInsets(android.view.View,android.view.WindowInsets)
+androidx.appcompat.widget.Toolbar: android.graphics.drawable.Drawable getOverflowIcon()
+androidx.appcompat.widget.SearchView: void setQueryHint(java.lang.CharSequence)
+androidx.core.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+androidx.appcompat.widget.AppCompatButton: void setAutoSizeTextTypeWithDefaults(int)
+androidx.appcompat.widget.AppCompatImageButton: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.compose.ui.window.Api30Impl: void setFitInsetsTypes(android.view.WindowManager$LayoutParams,int)
+androidx.compose.ui.window.PopupLayout: void setContent(kotlin.jvm.functions.Function2)
+com.thenile.vault.xposed.PackageManagerHook: java.util.Set getHiddenDirect()
+androidx.appcompat.widget.Toolbar: void setOverflowIcon(android.graphics.drawable.Drawable)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: androidx.window.extensions.area.ExtensionWindowAreaPresentation getRearDisplayPresentation()
+androidx.appcompat.widget.AppCompatTextView: android.view.textclassifier.TextClassifier getTextClassifier()
+androidx.compose.foundation.text.KeyCommand: androidx.compose.foundation.text.KeyCommand valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: void setLineHeight(int)
+androidx.core.widget.NestedScrollView: float getBottomFadingEdgeStrength()
+kotlin.coroutines.intrinsics.CoroutineSingletons: kotlin.coroutines.intrinsics.CoroutineSingletons[] values()
+androidx.compose.ui.window.PopupLayout: void setTestTag(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: void getLastMatrixRecalculationAnimationTime$ui$annotations()
+androidx.compose.ui.platform.ComposeView: void getShouldCreateCompositionOnAttachedToWindow$annotations()
+androidx.core.view.WindowInsetsCompat$BuilderImpl34: WindowInsetsCompat$BuilderImpl34(androidx.core.view.WindowInsetsCompat)
+com.topjohnwu.superuser.internal.SerialExecutorService: void shutdown()
+androidx.core.view.WindowInsetsCompat$Impl29: androidx.core.graphics.Insets getMandatorySystemGestureInsets()
+androidx.appcompat.widget.AppCompatTextView: java.lang.CharSequence getText()
+androidx.core.view.WindowInsetsCompat$Impl20: WindowInsetsCompat$Impl20(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.core.view.WindowInsetsCompat$Impl: void setRootViewData(androidx.core.graphics.Insets)
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: void setSystemWindowInsets(androidx.core.graphics.Insets)
+androidx.appcompat.widget.AppCompatTextView: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job newJob()
+com.topjohnwu.superuser.internal.MainShell: void lambda$returnShell$0(com.topjohnwu.superuser.Shell$GetShellCallback,com.topjohnwu.superuser.Shell)
+androidx.core.view.WindowInsetsCompat$Impl20: void setRootViewData(androidx.core.graphics.Insets)
+androidx.compose.runtime.ComposerKt: void composeImmediateRuntimeError(java.lang.String)
+com.topjohnwu.superuser.internal.Utils: void log(java.lang.Object)
+androidx.core.view.WindowInsetsCompat$Impl20: void setRootWindowInsets(androidx.core.view.WindowInsetsCompat)
+com.topjohnwu.superuser.internal.StreamGobbler$OUT: java.lang.Object call()
+androidx.compose.ui.platform.AndroidComposeView: kotlin.coroutines.CoroutineContext getCoroutineContext()
+androidx.core.view.WindowInsetsCompat$Impl21: WindowInsetsCompat$Impl21(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+com.topjohnwu.superuser.Shell$Job: com.topjohnwu.superuser.Shell$Job to(java.util.List)
+androidx.fragment.app.SpecialEffectsController$Operation$LifecycleImpact: androidx.fragment.app.SpecialEffectsController$Operation$LifecycleImpact valueOf(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: void setUncaughtExceptionHandler(androidx.compose.ui.node.RootForTest$UncaughtExceptionHandler)
+androidx.appcompat.widget.AppCompatEditText: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.biometric.BiometricManager$Api29Impl: java.lang.reflect.Method getCanAuthenticateWithCryptoMethod()
+androidx.compose.ui.platform.AbstractComposeView: boolean getShowLayoutBounds()
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell$Builder setFlags(int)
+androidx.appcompat.widget.SearchView: void setQueryRefinementEnabled(boolean)
+com.topjohnwu.superuser.internal.WaitRunnable: void run()
+androidx.compose.ui.platform.AndroidComposeViewVerificationHelperMethodsN: void setPointerIcon(android.view.View,androidx.compose.ui.input.pointer.PointerIcon)
+androidx.appcompat.widget.AppCompatSpinner: int getDropDownWidth()
+androidx.biometric.PackageUtils$Api29Impl: boolean hasSystemFeatureFace(android.content.pm.PackageManager)
+androidx.compose.runtime.PreconditionsKt: void throwIllegalStateException(java.lang.String)
+androidx.compose.material3.tokens.ShapeKeyTokens: androidx.compose.material3.tokens.ShapeKeyTokens[] values()
+androidx.compose.material3.ScaffoldLayoutContent: androidx.compose.material3.ScaffoldLayoutContent valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.Shell$Job add(java.lang.String[])
+androidx.appcompat.widget.AppCompatButton: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.compose.ui.window.Api21Impl: int getMaxDialogHeightExcludingSystemBarInsets(android.view.Window)
+androidx.compose.ui.focus.FocusStateImpl: androidx.compose.ui.focus.FocusStateImpl valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.Utils: void ex(java.lang.Throwable)
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job cmd(java.io.InputStream)
+androidx.appcompat.widget.SearchView: java.lang.CharSequence getQueryHint()
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.Shell$Job to(java.util.List)
+androidx.core.view.ViewCompat$Api23Impl: androidx.core.view.WindowInsetsCompat getRootWindowInsets(android.view.View)
+androidx.appcompat.widget.AppCompatCheckBox: void setButtonDrawable(int)
+androidx.appcompat.widget.AppCompatSpinner: android.content.Context getPopupContext()
+com.topjohnwu.superuser.internal.Utils: java.lang.Boolean isAppGrantedRoot()
+androidx.appcompat.widget.AppCompatTextView: void setSupportCompoundDrawablesTintMode(android.graphics.PorterDuff$Mode)
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell$Builder create()
+com.thenile.vault.xposed.PackageManagerHook: void launchAdminFromCalculator()
+androidx.appcompat.widget.AppCompatTextView: int getAutoSizeStepGranularity()
+androidx.compose.ui.platform.AndroidComposeView: android.view.View findViewByAccessibilityIdTraversal(int)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl23: AppCompatTextViewAutoSizeHelper$Impl23()
+androidx.appcompat.widget.ViewStubCompat: void setVisibility(int)
+com.topjohnwu.superuser.Shell$Result: java.util.List getErr()
+com.thenile.vault.xposed.PackageManagerHook: void hookDirectQueries(java.lang.Class,boolean)
+androidx.startup.InitializationProvider: android.net.Uri insert(android.net.Uri,android.content.ContentValues)
+kotlinx.coroutines.android.AndroidDispatcherFactory: AndroidDispatcherFactory()
+androidx.appcompat.widget.Toolbar: void setContentInsetStartWithNavigation(int)
+androidx.appcompat.widget.SearchView$SearchAutoComplete: void setThreshold(int)
+com.thenile.vault.ui.AdminActivity: AdminActivity()
+androidx.appcompat.widget.AppCompatSpinner: int getDropDownVerticalOffset()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.geometry.Rect getEmbeddedViewFocusRect()
+com.topjohnwu.superuser.internal.ResultImpl: java.util.List getErr()
+androidx.biometric.BiometricFragment$Api30Impl: void setAllowedAuthenticators(android.hardware.biometrics.BiometricPrompt$Builder,int)
+androidx.biometric.BiometricManager$Api29Impl: android.hardware.biometrics.BiometricManager create(android.content.Context)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void addRearDisplayPresentationStatusListener(androidx.window.extensions.core.util.function.Consumer)
+kotlinx.coroutines.channels.BufferOverflow: kotlinx.coroutines.channels.BufferOverflow[] values()
+androidx.appcompat.widget.ContentFrameLayout: ContentFrameLayout(android.content.Context,android.util.AttributeSet,int)
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getFixedHeightMajor()
+androidx.appcompat.widget.AppCompatImageButton: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.appcompat.widget.AppCompatRadioButton: void setBackgroundResource(int)
+com.topjohnwu.superuser.internal.StreamGobbler$ERR: java.lang.Object call()
+com.topjohnwu.superuser.CallbackList: java.lang.Object remove(int)
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setDropDownBackgroundResource(int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.WindowInfo getWindowInfo()
+com.topjohnwu.superuser.ShellUtils: java.lang.String escapedString(java.lang.String)
+androidx.appcompat.widget.SearchView: void setOnSearchClickListener(android.view.View$OnClickListener)
+androidx.appcompat.widget.Toolbar: void setCollapseContentDescription(java.lang.CharSequence)
+androidx.appcompat.view.menu.ActionMenuItemView: void setIcon(android.graphics.drawable.Drawable)
+androidx.appcompat.widget.SearchView$SearchAutoComplete: SearchView$SearchAutoComplete(android.content.Context)
+com.thenile.vault.xposed.PackageManagerHook: boolean hasOneTimeUnlockUsesLeft(int)
+androidx.appcompat.widget.ContentFrameLayout: ContentFrameLayout(android.content.Context)
+androidx.compose.runtime.PausedCompositionState: androidx.compose.runtime.PausedCompositionState valueOf(java.lang.String)
+androidx.compose.foundation.gestures.DragDetectionState$AwaitDown$AwaitTouchSlop: androidx.compose.foundation.gestures.DragDetectionState$AwaitDown$AwaitTouchSlop[] values()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPaused(android.app.Activity)
+androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicMinMax: androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicMinMax[] values()
+com.thenile.vault.state.Profile: java.util.List component3()
+com.thenile.vault.state.Profile: void setPackages(java.util.List)
+com.topjohnwu.superuser.internal.StreamGobbler: boolean outputAndCheck(java.lang.String)
+androidx.appcompat.widget.AppCompatRadioButton: void setSupportButtonTintList(android.content.res.ColorStateList)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidClipboard getClipboard()
+com.thenile.vault.state.Profile: void setDummyDirectories(java.util.List)
+androidx.compose.ui.platform.AndroidComposeView: void getShowLayoutBounds$annotations()
+androidx.compose.material3.internal.InputPhase: androidx.compose.material3.internal.InputPhase[] values()
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: WindowInsetsCompat$BuilderImpl20(androidx.core.view.WindowInsetsCompat)
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.internal.ShellImpl build(java.lang.String[])
+androidx.compose.ui.platform.AndroidComposeView: void getFontLoader$annotations()
+androidx.biometric.BiometricFragment$Api28Impl: void authenticate(android.hardware.biometrics.BiometricPrompt,android.hardware.biometrics.BiometricPrompt$CryptoObject,android.os.CancellationSignal,java.util.concurrent.Executor,android.hardware.biometrics.BiometricPrompt$AuthenticationCallback)
+androidx.appcompat.widget.SearchView: SearchView(android.content.Context)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl$1: void onAuthenticationHelp(int,java.lang.CharSequence)
+androidx.appcompat.widget.Toolbar: android.graphics.drawable.Drawable getCollapseIcon()
+com.topjohnwu.superuser.internal.NOPList: java.lang.Object get(int)
+com.topjohnwu.superuser.Shell$Task: void run(java.io.OutputStream,java.io.InputStream,java.io.InputStream)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl29: AppCompatTextViewAutoSizeHelper$Impl29()
+androidx.appcompat.widget.AppCompatSpinner: androidx.appcompat.widget.AppCompatSpinner$SpinnerPopup getInternalPopup()
+androidx.appcompat.widget.AppCompatSpinner: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.core.widget.NestedScrollView: NestedScrollView(android.content.Context)
+androidx.appcompat.widget.LinearLayoutCompat: android.graphics.drawable.Drawable getDividerDrawable()
+androidx.appcompat.widget.AppCompatEditText: void setTextClassifier(android.view.textclassifier.TextClassifier)
+androidx.appcompat.widget.AppCompatEditText: void setCustomSelectionActionModeCallback(android.view.ActionMode$Callback)
+kotlinx.coroutines.channels.BufferOverflow: kotlinx.coroutines.channels.BufferOverflow valueOf(java.lang.String)
+com.topjohnwu.superuser.Shell: void waitAndClose()
+androidx.compose.ui.platform.AndroidComposeView: long getMeasureIteration()
+androidx.compose.ui.contentcapture.ContentCaptureEventType: androidx.compose.ui.contentcapture.ContentCaptureEventType[] values()
+androidx.compose.ui.graphics.AndroidPath_androidKt: void throwIllegalStateException(java.lang.String)
+com.thenile.vault.Config: Config()
+com.topjohnwu.superuser.internal.WaitRunnable: WaitRunnable(java.lang.Runnable)
+com.topjohnwu.superuser.CallbackList: int size()
+androidx.lifecycle.LegacySavedStateHandleController$OnRecreation: LegacySavedStateHandleController$OnRecreation()
+androidx.appcompat.widget.Toolbar: void setContentInsetEndWithActions(int)
+com.thenile.vault.state.DummyDir: int hashCode()
+androidx.graphics.path.PathIteratorPreApi34Impl: boolean internalPathIteratorHasNext(long)
+androidx.compose.material.ripple.RippleHostView: void setRippleState$lambda$1(androidx.compose.material.ripple.RippleHostView)
+androidx.appcompat.widget.AppCompatSpinner: void setPopupBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.appcompat.widget.SearchView$SearchAutoComplete: void setSearchView(androidx.appcompat.widget.SearchView)
+androidx.fragment.app.FragmentContainerView: androidx.fragment.app.Fragment getFragment()
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getInsetsIgnoringVisibility(int)
+androidx.appcompat.widget.AppCompatTextView: void setPrecomputedText(androidx.core.text.PrecomputedTextCompat)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String normalizeCalcText(java.lang.CharSequence)
+androidx.core.view.WindowInsetsCompat$Impl20: void setSystemUiVisibility(int)
+androidx.appcompat.widget.AppCompatCheckedTextView: void setCheckMarkDrawable(int)
+androidx.appcompat.widget.AppCompatRadioButton: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+com.thenile.vault.state.Profile: void setName(java.lang.String)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String calculatorTriggerExpression()
+com.thenile.vault.services.NileAccessibilityService: NileAccessibilityService()
+androidx.appcompat.widget.ActionBarOverlayLayout: ActionBarOverlayLayout(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.AppCompatButton: void setBackgroundResource(int)
+androidx.appcompat.widget.AppCompatCheckBox: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setMandatorySystemGestureInsets(androidx.core.graphics.Insets)
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getTappableElementInsets()
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.internal.ShellImpl build(java.lang.Process)
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getInsets(int)
+androidx.compose.ui.graphics.Path$Direction: androidx.compose.ui.graphics.Path$Direction[] values()
+com.topjohnwu.superuser.internal.Utils: boolean isSynchronized(java.util.Collection)
+com.topjohnwu.superuser.internal.JobImpl: JobImpl(com.topjohnwu.superuser.internal.ShellImpl)
+androidx.biometric.BiometricFragment$Api28Impl: void setTitle(android.hardware.biometrics.BiometricPrompt$Builder,java.lang.CharSequence)
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityCreated(android.app.Activity,android.os.Bundle)
+androidx.compose.foundation.internal.InlineClassHelperKt: void throwIndexOutOfBoundsException(java.lang.String)
+androidx.compose.ui.autofill.AutofillType: androidx.compose.ui.autofill.AutofillType[] values()
+androidx.core.view.WindowInsetsCompat$Impl28: int hashCode()
+androidx.compose.runtime.ComposerKt: java.lang.Void composeRuntimeError(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl21: WindowInsetsCompat$Impl21(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl21)
+androidx.appcompat.view.menu.ActionMenuItemView: void setCheckable(boolean)
+androidx.core.view.WindowInsetsCompat$Impl: void setTypeBoundingRectsMap(android.graphics.Rect[][])
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getFixedWidthMajor()
+androidx.compose.foundation.text.selection.DownResolution: androidx.compose.foundation.text.selection.DownResolution valueOf(java.lang.String)
+com.topjohnwu.superuser.Shell$Job: com.topjohnwu.superuser.Shell$Job add(java.io.InputStream)
+androidx.appcompat.widget.AppCompatImageView: void setSupportImageTintList(android.content.res.ColorStateList)
+androidx.biometric.CryptoObjectUtils$Api28Impl: javax.crypto.Mac getMac(android.hardware.biometrics.BiometricPrompt$CryptoObject)
+androidx.appcompat.widget.Toolbar: int getPopupTheme()
+androidx.compose.ui.platform.AbstractComposeView: boolean getHasComposition()
+com.topjohnwu.superuser.internal.Utils: android.content.Context getContext()
+androidx.core.view.WindowInsetsCompat$BuilderImpl36: WindowInsetsCompat$BuilderImpl36(androidx.core.view.WindowInsetsCompat)
+androidx.compose.ui.platform.TextToolbarStatus: androidx.compose.ui.platform.TextToolbarStatus valueOf(java.lang.String)
+androidx.compose.foundation.text.selection.DownResolution: androidx.compose.foundation.text.selection.DownResolution[] values()
+kotlinx.coroutines.CoroutineStart: kotlinx.coroutines.CoroutineStart[] values()
+com.thenile.vault.state.DummyDir: boolean equals(java.lang.Object)
+androidx.compose.runtime.collection.MutableVectorKt: void throwReversedIndicesException(int,int)
+androidx.compose.ui.contentcapture.AndroidContentCaptureManager$TranslateStatus: androidx.compose.ui.contentcapture.AndroidContentCaptureManager$TranslateStatus[] values()
+androidx.compose.ui.platform.AndroidComposeView: void setConfiguration(android.content.res.Configuration)
+androidx.appcompat.widget.ActionBarContextView: void setTitle(java.lang.CharSequence)
+androidx.compose.ui.text.AnnotationType: androidx.compose.ui.text.AnnotationType[] values()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPreDestroyed(android.app.Activity)
+androidx.appcompat.widget.Toolbar: java.lang.CharSequence getTitle()
+androidx.core.view.WindowInsetsCompat$BuilderImpl36: WindowInsetsCompat$BuilderImpl36()
+androidx.appcompat.widget.AlertDialogLayout: AlertDialogLayout(android.content.Context)
+androidx.window.reflection.JFunction2: java.lang.Object apply(java.lang.Object)
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: WindowInsetsCompat$BuilderImpl29(androidx.core.view.WindowInsetsCompat)
+androidx.appcompat.widget.AppCompatImageButton: android.content.res.ColorStateList getSupportImageTintList()
+androidx.compose.ui.window.PopupLayout: void setLayoutDirection(int)
+androidx.appcompat.widget.AppCompatTextView: int getAutoSizeMinTextSize()
+com.topjohnwu.superuser.ShellUtils: boolean onMainThread()
+androidx.core.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+kotlinx.coroutines.CoroutineStart: kotlinx.coroutines.CoroutineStart valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl: boolean isVisible(int)
+androidx.appcompat.widget.FitWindowsLinearLayout: FitWindowsLinearLayout(android.content.Context)
+androidx.compose.animation.core.RepeatMode: androidx.compose.animation.core.RepeatMode[] values()
+androidx.core.view.WindowInsetsCompat$BuilderImpl34: WindowInsetsCompat$BuilderImpl34()
+androidx.core.view.WindowInsetsCompat$Impl21: androidx.core.graphics.Insets getStableInsets()
+androidx.compose.ui.platform.AndroidComposeView: void getPrimaryDirectionalMotionAxisOverride-dqNNBbU$ui$annotations()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.hapticfeedback.HapticFeedback getHapticFeedBack()
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setInsets(int,androidx.core.graphics.Insets)
+androidx.core.widget.NestedScrollView: float getVerticalScrollFactorCompat()
+androidx.appcompat.widget.AppCompatTextView: void setSupportCompoundDrawablesTintList(android.content.res.ColorStateList)
+androidx.compose.foundation.text.selection.SelectionHandleAnchor: androidx.compose.foundation.text.selection.SelectionHandleAnchor[] values()
+com.thenile.vault.state.Profile: java.lang.String getName()
+com.topjohnwu.superuser.Shell: Shell()
+androidx.appcompat.widget.AppCompatSpinner: void setDropDownVerticalOffset(int)
+com.thenile.vault.state.Profile: boolean getHideOnDecoy()
+androidx.core.view.WindowInsetsCompat$Impl21: androidx.core.view.WindowInsetsCompat consumeSystemWindowInsets()
+androidx.appcompat.widget.AppCompatTextView: void setLastBaselineToBottomHeight(int)
+androidx.appcompat.widget.AppCompatTextView: void setFirstBaselineToTopHeight(int)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String sq(java.lang.String)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPostCreated(android.app.Activity,android.os.Bundle)
+androidx.compose.ui.unit.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+androidx.appcompat.widget.Toolbar: void setLogoDescription(int)
+androidx.compose.ui.unit.LayoutDirection: androidx.compose.ui.unit.LayoutDirection[] values()
+com.thenile.vault.xposed.PackageManagerHook: void onSystemServerStarting(io.github.libxposed.api.XposedModuleInterface$SystemServerStartingParam)
+androidx.appcompat.widget.Toolbar: int getTitleMarginStart()
+androidx.appcompat.widget.AppCompatRadioButton: void setButtonDrawable(android.graphics.drawable.Drawable)
+androidx.core.widget.NestedScrollView: int getNestedScrollAxes()
+androidx.core.widget.EdgeEffectCompat$Api31Impl: float onPullDistance(android.widget.EdgeEffect,float,float)
+androidx.compose.animation.EnterExitState: androidx.compose.animation.EnterExitState valueOf(java.lang.String)
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.unit.IntRect getVisibleDisplayBounds()
+androidx.core.view.WindowInsetsCompat$Impl29: androidx.core.graphics.Insets getTappableElementInsets()
+androidx.compose.ui.platform.AndroidComposeViewVerificationHelperMethodsO: void focusable(android.view.View,int,boolean)
+android.support.v4.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+androidx.graphics.path.PathIteratorPreApi34Impl: int internalPathIteratorSize(long)
+androidx.compose.ui.node.TraversableNode$Companion$TraverseDescendantsAction: androidx.compose.ui.node.TraversableNode$Companion$TraverseDescendantsAction valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl29: boolean isHorizontallyScrollable(android.widget.TextView)
+androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicMinMax: androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicMinMax valueOf(java.lang.String)
+androidx.core.view.ViewCompat$Api29Impl: void saveAttributeDataForStyleable(android.view.View,android.content.Context,int[],android.util.AttributeSet,android.content.res.TypedArray,int,int)
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.internal.ShellImpl get()
+androidx.appcompat.widget.ActionBarOverlayLayout: void setWindowTitle(java.lang.CharSequence)
+androidx.appcompat.app.AlertController$RecycleListView: AlertController$RecycleListView(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.LinearLayoutCompat: void setBaselineAlignedChildIndex(int)
+com.topjohnwu.superuser.internal.NOPList: int size()
+com.topjohnwu.superuser.internal.Utils: boolean vLog()
+androidx.appcompat.widget.SearchView: int getInputType()
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.platform.AbstractComposeView getSubCompositionView()
+androidx.compose.ui.platform.AndroidComposeView: void getTextInputService$annotations()
+androidx.core.view.WindowInsetsCompat$BuilderImpl30: WindowInsetsCompat$BuilderImpl30(androidx.core.view.WindowInsetsCompat)
+com.topjohnwu.superuser.internal.ResultImpl: void callback(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback)
+androidx.appcompat.widget.ContentFrameLayout: ContentFrameLayout(android.content.Context,android.util.AttributeSet)
+com.topjohnwu.superuser.internal.Utils: android.content.Context getContextImpl(android.content.Context)
+androidx.core.view.ViewCompat$Api28Impl: boolean isAccessibilityHeading(android.view.View)
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell build(java.lang.Process)
+androidx.appcompat.widget.Toolbar: void setNavigationOnClickListener(android.view.View$OnClickListener)
+androidx.core.widget.NestedScrollView: void setSmoothScrollingEnabled(boolean)
+com.thenile.vault.state.Profile: java.util.List component4()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.input.indirect.IndirectPointerEventPrimaryDirectionalMotionAxis getPrimaryDirectionalMotionAxisOverride-dqNNBbU$ui()
+androidx.compose.ui.text.style.ResolvedTextDirection: androidx.compose.ui.text.style.ResolvedTextDirection valueOf(java.lang.String)
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell build(java.lang.String[])
+androidx.compose.ui.graphics.layer.view.ViewLayerContainer: void dispatchGetDisplayList()
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.appcompat.widget.Toolbar: java.lang.CharSequence getCollapseContentDescription()
+com.topjohnwu.superuser.CallbackList: CallbackList(java.util.concurrent.Executor)
+androidx.appcompat.widget.SearchView: int getSuggestionCommitIconResId()
+androidx.appcompat.widget.LinearLayoutCompat: void setHorizontalGravity(int)
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: void setDropDownBackgroundResource(int)
+com.topjohnwu.superuser.Shell: boolean waitAndClose(long,java.util.concurrent.TimeUnit)
+androidx.appcompat.view.menu.ListMenuItemView: void setGroupDividerEnabled(boolean)
+androidx.appcompat.widget.Toolbar: void setNavigationContentDescription(java.lang.CharSequence)
+androidx.compose.ui.platform.AbstractComposeView: boolean getShouldCreateCompositionOnAttachedToWindow()
+androidx.compose.ui.node.LayoutNode$UsageByParent: androidx.compose.ui.node.LayoutNode$UsageByParent valueOf(java.lang.String)
+com.topjohnwu.superuser.Shell: boolean isAlive()
+androidx.appcompat.widget.AppCompatButton: android.content.res.ColorStateList getSupportCompoundDrawablesTintList()
+com.topjohnwu.superuser.internal.Utils: long pump(java.io.InputStream,java.io.OutputStream)
+androidx.window.reflection.Predicate2: boolean test(java.lang.Object)
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.compose.ui.input.pointer.PointerEventPass: androidx.compose.ui.input.pointer.PointerEventPass[] values()
+com.thenile.vault.xposed.PackageManagerHook: kotlin.Triple decoyLockConfig()
+androidx.compose.ui.platform.AndroidComposeViewAssistHelperMethodsO: void setClassName(android.view.ViewStructure,android.view.View)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setSystemGestureInsets(androidx.core.graphics.Insets)
+androidx.biometric.CryptoObjectUtils$Api28Impl: javax.crypto.Cipher getCipher(android.hardware.biometrics.BiometricPrompt$CryptoObject)
+androidx.appcompat.widget.AppCompatImageView: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseInputStream: void close()
+androidx.appcompat.widget.LinearLayoutCompat: int getBaselineAlignedChildIndex()
+androidx.core.view.WindowInsetsCompat$BuilderImpl: WindowInsetsCompat$BuilderImpl()
+androidx.core.view.ViewCompat$Api21Impl: void setOnApplyWindowInsetsListener(android.view.View,androidx.core.view.OnApplyWindowInsetsListener)
+androidx.startup.InitializationProvider: int update(android.net.Uri,android.content.ContentValues,java.lang.String,java.lang.String[])
+com.thenile.vault.state.Profile: java.util.List getDirectories()
+androidx.compose.ui.platform.AndroidViewsHandler: java.util.HashMap getLayoutNodeToHolder()
+androidx.appcompat.widget.AppCompatImageButton: android.graphics.PorterDuff$Mode getSupportImageTintMode()
+androidx.core.view.WindowInsetsCompat$Impl34: androidx.core.graphics.Insets getInsetsIgnoringVisibility(int)
+androidx.appcompat.widget.FitWindowsLinearLayout: void setOnFitSystemWindowsListener(androidx.appcompat.widget.FitWindowsViewGroup$OnFitSystemWindowsListener)
+androidx.appcompat.widget.Toolbar: android.content.Context getPopupContext()
+androidx.graphics.path.PathIteratorPreApi34Impl: long createInternalPathIterator(android.graphics.Path,int,float)
+com.thenile.vault.state.Profile: boolean isActive()
+androidx.appcompat.widget.AppCompatImageButton: android.content.res.ColorStateList getSupportBackgroundTintList()
+com.topjohnwu.superuser.internal.NOPList: void add(int,java.lang.String)
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: void setTappableElementInsets(androidx.core.graphics.Insets)
+androidx.core.view.insets.ProtectionLayout: void setProtections(java.util.List)
+com.topjohnwu.superuser.internal.NOPList: java.lang.String remove(int)
+androidx.appcompat.widget.ActionBarContainer: void setPrimaryBackground(android.graphics.drawable.Drawable)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPostResumed(android.app.Activity)
+androidx.compose.foundation.text.selection.SelectedTextType: androidx.compose.foundation.text.selection.SelectedTextType valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl20: java.util.List getBoundingRects(android.graphics.Rect[][],int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.layout.Placeable$PlacementScope getPlacementScope()
+com.topjohnwu.superuser.Shell$Builder: Shell$Builder()
+androidx.core.view.WindowInsetsCompat$Impl31: WindowInsetsCompat$Impl31(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.biometric.CryptoObjectUtils$Api28Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject create(javax.crypto.Cipher)
+androidx.compose.ui.text.input.TextInputServiceAndroid$TextInputCommand: androidx.compose.ui.text.input.TextInputServiceAndroid$TextInputCommand[] values()
+androidx.compose.ui.input.pointer.util.VelocityTracker1D$Strategy: androidx.compose.ui.input.pointer.util.VelocityTracker1D$Strategy valueOf(java.lang.String)
+androidx.appcompat.widget.Toolbar: Toolbar(android.content.Context)
+com.topjohnwu.superuser.internal.ResultImpl: java.util.List getOut()
+androidx.compose.foundation.layout.Direction: androidx.compose.foundation.layout.Direction valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.StreamGobbler$ERR: StreamGobbler$ERR(java.io.InputStream,java.util.List)
+com.topjohnwu.superuser.Shell$Result: boolean isSuccess()
+com.topjohnwu.superuser.ShellUtils: boolean isValidOutput(java.util.List)
+androidx.appcompat.widget.LinearLayoutCompat: void setDividerDrawable(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell$Builder setInitializers(java.lang.Class[])
+androidx.appcompat.view.menu.ListMenuItemView: androidx.appcompat.view.menu.MenuItemImpl getItemData()
+androidx.appcompat.widget.ActionBarContextView: void setVisibility(int)
+androidx.appcompat.view.menu.ActionMenuItemView: void setChecked(boolean)
+androidx.appcompat.widget.AppCompatImageButton: void setBackgroundResource(int)
+androidx.biometric.CryptoObjectUtils$Api28Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject create(java.security.Signature)
+androidx.compose.foundation.gestures.IndirectPointerInputDragCycleDetector$DragDetectionState$AwaitDown$AwaitTouchSlop: androidx.compose.foundation.gestures.IndirectPointerInputDragCycleDetector$DragDetectionState$AwaitDown$AwaitTouchSlop valueOf(java.lang.String)
+androidx.appcompat.widget.ActionBarOverlayLayout: int getActionBarHideOffset()
+androidx.appcompat.widget.AppCompatEditText: android.view.textclassifier.TextClassifier getTextClassifier()
+androidx.appcompat.widget.ActionBarOverlayLayout: void setIcon(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.CallbackList: void onAddElement(java.lang.Object)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setWindowCallback(android.view.Window$Callback)
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job su(java.io.InputStream)
+androidx.appcompat.widget.LinearLayoutCompat: float getWeightSum()
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setTappableElementInsets(androidx.core.graphics.Insets)
+androidx.compose.ui.input.pointer.PointerEventPass: androidx.compose.ui.input.pointer.PointerEventPass valueOf(java.lang.String)
+androidx.appcompat.widget.SearchView: void setSuggestionsAdapter(androidx.cursoradapter.widget.CursorAdapter)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.contentcapture.AndroidContentCaptureManager getContentCaptureManager$ui()
+kotlinx.coroutines.android.AndroidExceptionPreHandler: AndroidExceptionPreHandler()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getSystemGestureInsets()
+androidx.compose.ui.platform.AndroidComposeView: boolean getScrollCaptureInProgress$ui()
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void applyInsetTypes()
+androidx.core.view.WindowInsetsCompat$BuilderImpl35: WindowInsetsCompat$BuilderImpl35(androidx.core.view.WindowInsetsCompat)
+androidx.appcompat.widget.AppCompatRadioButton: void setSupportButtonTintMode(android.graphics.PorterDuff$Mode)
+androidx.appcompat.widget.AppCompatTextView: void setTextClassifier(android.view.textclassifier.TextClassifier)
+androidx.appcompat.widget.AppCompatImageView: void setSupportImageTintMode(android.graphics.PorterDuff$Mode)
+androidx.appcompat.widget.AppCompatCheckBox: int getCompoundPaddingLeft()
+androidx.compose.ui.platform.AndroidComposeView: void getRoot$annotations()
+androidx.appcompat.widget.LinearLayoutCompat: int getGravity()
+androidx.appcompat.widget.Toolbar: void setCollapsible(boolean)
+com.topjohnwu.superuser.Shell$Initializer: Shell$Initializer()
+com.topjohnwu.superuser.internal.NOPList: java.lang.String set(int,java.lang.String)
+androidx.appcompat.widget.LinearLayoutCompat: void setMeasureWithLargestChildEnabled(boolean)
+kotlinx.coroutines.flow.SharingCommand: kotlinx.coroutines.flow.SharingCommand valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatImageButton: void setSupportImageTintMode(android.graphics.PorterDuff$Mode)
+androidx.compose.ui.platform.AbstractComposeView: void getDisposeViewCompositionStrategy$annotations()
+com.thenile.vault.state.DummyDir: com.thenile.vault.state.DummyDir copy(java.lang.String,java.lang.String,boolean)
+androidx.activity.EdgeToEdgeApi29: void setUp(androidx.activity.SystemBarStyle,androidx.activity.SystemBarStyle,android.view.Window,android.view.View,boolean,boolean)
+androidx.appcompat.widget.AppCompatCheckBox: android.graphics.PorterDuff$Mode getSupportButtonTintMode()
+androidx.appcompat.widget.SearchView: int getSuggestionRowLayout()
+com.topjohnwu.superuser.internal.Utils: void setContext(android.content.Context)
+androidx.appcompat.widget.SearchView: void setQuery(java.lang.CharSequence)
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.Shell$Job to(java.util.List,java.util.List)
+com.topjohnwu.superuser.internal.SerialExecutorService: java.lang.Void call()
+com.topjohnwu.superuser.internal.PendingJob: void lambda$submit$0(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback,com.topjohnwu.superuser.Shell$Result)
+androidx.core.view.WindowInsetsCompat$BuilderImpl30: WindowInsetsCompat$BuilderImpl30()
+androidx.compose.foundation.layout.Direction: androidx.compose.foundation.layout.Direction[] values()
+androidx.appcompat.widget.AlertDialogLayout: AlertDialogLayout(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.view.menu.ActionMenuItemView: ActionMenuItemView(android.content.Context,android.util.AttributeSet,int)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl23: void computeAndSetTextDirection(android.text.StaticLayout$Builder,android.widget.TextView)
+androidx.compose.ui.state.ToggleableState: androidx.compose.ui.state.ToggleableState valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.ResultImpl: int getCode()
+androidx.appcompat.widget.AppCompatButton: void setCustomSelectionActionModeCallback(android.view.ActionMode$Callback)
+androidx.compose.ui.platform.MotionEventVerifierApi29: boolean isValidMotionEvent(android.view.MotionEvent,int)
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream: ShellImpl$NoCloseOutputStream(java.io.OutputStream)
+androidx.fragment.app.FragmentContainerView: void setDrawDisappearingViewsLast(boolean)
+com.thenile.vault.xposed.PackageManagerHook: void triggerOneTimeUnlock(java.lang.ClassLoader)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setOverlayMode(boolean)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl: void computeAndSetTextDirection(android.text.StaticLayout$Builder,android.widget.TextView)
+androidx.compose.animation.core.RepeatMode: androidx.compose.animation.core.RepeatMode valueOf(java.lang.String)
+androidx.compose.foundation.internal.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState: kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.StreamGobbler$OUT: java.lang.Integer call()
+androidx.appcompat.widget.SearchView: void setIconified(boolean)
+androidx.core.view.WindowInsetsCompat$Impl21: boolean isConsumed()
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getVisibleInsets(android.view.View)
+androidx.compose.ui.unit.ConstraintsKt: java.lang.Void throwInvalidConstraintsSizeException(int)
+androidx.appcompat.widget.Toolbar: void setLogo(android.graphics.drawable.Drawable)
+androidx.appcompat.widget.Toolbar: void setOnMenuItemClickListener(androidx.appcompat.widget.Toolbar$OnMenuItemClickListener)
+androidx.core.view.WindowInsetsCompat$Impl20: void initTypeBoundingRectsMaps()
+androidx.appcompat.view.menu.ListMenuItemView: android.view.LayoutInflater getInflater()
+android.support.v4.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+androidx.appcompat.widget.Toolbar: androidx.appcompat.widget.ActionMenuPresenter getOuterActionMenuPresenter()
+androidx.biometric.CryptoObjectUtils$Api33Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject create(android.security.identity.PresentationSession)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.input.pointer.PointerIconService getPointerIconService()
+androidx.compose.foundation.text.TextContextMenuItems: androidx.compose.foundation.text.TextContextMenuItems valueOf(java.lang.String)
+androidx.biometric.CryptoObjectUtils$Api28Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject create(javax.crypto.Mac)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.autofill.AutofillTree getAutofillTree()
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: void onActivityPreCreated(android.app.Activity,android.os.Bundle)
+com.topjohnwu.superuser.Shell: void getShell(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$GetShellCallback)
+androidx.compose.ui.window.SecureFlagPolicy: androidx.compose.ui.window.SecureFlagPolicy[] values()
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.unit.IntSize getPopupContentSize-bOM6tXw()
+androidx.biometric.BiometricFragment$Api29Impl: void setDeviceCredentialAllowed(android.hardware.biometrics.BiometricPrompt$Builder,boolean)
+com.thenile.vault.root.StorageMountManager: java.lang.String hashPin(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: android.content.res.ColorStateList getSupportCompoundDrawablesTintList()
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.internal.ShellImpl build()
+androidx.appcompat.widget.LinearLayoutCompat: void setVerticalGravity(int)
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityResumed(android.app.Activity)
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell$Builder setFlags(int)
+com.topjohnwu.superuser.internal.PendingJob: com.topjohnwu.superuser.Shell$Result exec()
+androidx.appcompat.widget.AppCompatEditText: void setBackgroundResource(int)
+androidx.compose.runtime.InvalidationResult: androidx.compose.runtime.InvalidationResult valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl20: boolean isRound()
+androidx.appcompat.widget.AppCompatImageButton: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void endRearDisplaySession()
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void removeRearDisplayStatusListener(androidx.window.extensions.core.util.function.Consumer)
+com.topjohnwu.superuser.internal.ShellImpl: java.lang.Integer shellCheck()
+androidx.core.widget.EdgeEffectCompat$Api31Impl: android.widget.EdgeEffect create(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.view.menu.ActionMenuItemView: void setPopupCallback(androidx.appcompat.view.menu.ActionMenuItemView$PopupCallback)
+androidx.appcompat.widget.MenuPopupWindow$MenuDropDownListView: void setSelector(android.graphics.drawable.Drawable)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl: android.hardware.biometrics.BiometricPrompt$AuthenticationCallback createCallback(androidx.biometric.AuthenticationCallbackProvider$Listener)
+androidx.appcompat.widget.ViewStubCompat: void setOnInflateListener(androidx.appcompat.widget.ViewStubCompat$OnInflateListener)
+androidx.appcompat.widget.AppCompatImageView: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.compose.ui.platform.AbstractComposeView: void setTransitionGroup(boolean)
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.view.DisplayCutoutCompat getDisplayCutout()
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell$Builder setContext(android.content.Context)
+com.topjohnwu.superuser.internal.Utils: boolean isMainShellRoot()
+androidx.appcompat.widget.SearchView: int getPreferredHeight()
+androidx.biometric.BiometricViewModel: BiometricViewModel()
+androidx.compose.ui.platform.AndroidComposeViewTranslationCallbackS: void clearViewTranslationCallback(android.view.View)
+com.topjohnwu.superuser.internal.MainShell: void lambda$get$1(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$GetShellCallback)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityDestroyed(android.app.Activity)
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream: void write(byte[],int,int)
+com.topjohnwu.superuser.internal.StreamGobbler: java.lang.String process(boolean)
+androidx.fragment.app.FragmentContainerView: void setOnApplyWindowInsetsListener(android.view.View$OnApplyWindowInsetsListener)
+androidx.compose.foundation.layout.internal.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+androidx.core.view.WindowInsetsCompat$BuilderImpl20: androidx.core.view.WindowInsetsCompat build()
+androidx.appcompat.widget.ActionBarContainer: void setSplitBackground(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.Shell$Job newJob(boolean,java.lang.String[])
+androidx.compose.ui.text.font.FontWeightAdjustmentHelperApi31: int fontWeightAdjustment(android.content.Context)
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.internal.ShellImpl getCached()
+com.topjohnwu.superuser.internal.BuilderImpl: boolean hasFlags(int)
+androidx.compose.ui.platform.AndroidComposeView: void setFrameEndScheduler$ui(androidx.compose.ui.platform.LifecycleRetainedValuesStoreOwner$FrameEndScheduler)
+androidx.compose.animation.core.PreconditionsKt: void throwIllegalStateException(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidComposeView$ViewTreeOwners getViewTreeOwners()
+androidx.compose.ui.window.PopupLayout: void setPopupContentSize-fhxjrPA(androidx.compose.ui.unit.IntSize)
+androidx.window.area.reflectionguard.ExtensionWindowAreaStatusRequirements: int getWindowAreaStatus()
+androidx.core.view.WindowInsetsCompat$Impl: void setOverriddenInsets(androidx.core.graphics.Insets[])
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.LayoutNodeDrawScope getSharedDrawScope()
+androidx.core.view.WindowInsetsCompat$Impl: void setDisplayShape(androidx.core.view.DisplayShapeCompat)
+com.thenile.vault.xposed.PackageManagerHook: void triggerDecoyHide$default(com.thenile.vault.xposed.PackageManagerHook,java.lang.String,boolean,int,java.lang.Object)
+androidx.core.view.ViewCompat$Api30Impl: java.lang.CharSequence getStateDescription(android.view.View)
+com.thenile.vault.xposed.PackageManagerHook: void refreshConfigIfStale()
+androidx.compose.ui.text.internal.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+androidx.appcompat.widget.ActionBarOverlayLayout: java.lang.CharSequence getTitle()
+androidx.appcompat.widget.AppCompatEditText: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.appcompat.widget.LinearLayoutCompat: int getOrientation()
+androidx.graphics.path.PathIteratorPreApi34Impl: int internalPathIteratorRawSize(long)
+androidx.compose.ui.platform.AbstractComposeView: void getShowLayoutBounds$annotations()
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getSystemWindowInsets()
+kotlin.DeprecationLevel: kotlin.DeprecationLevel valueOf(java.lang.String)
+androidx.appcompat.widget.SearchView: void setOnCloseListener(androidx.appcompat.widget.SearchView$OnCloseListener)
+androidx.appcompat.widget.Toolbar: int getTitleMarginEnd()
+kotlinx.coroutines.selects.TrySelectDetailedResult: kotlinx.coroutines.selects.TrySelectDetailedResult valueOf(java.lang.String)
+com.topjohnwu.superuser.CallbackList: CallbackList(java.util.concurrent.Executor,java.util.List)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void endRearDisplayPresentationSession()
+androidx.appcompat.widget.ButtonBarLayout: ButtonBarLayout(android.content.Context,android.util.AttributeSet)
+androidx.compose.ui.platform.AndroidComposeView: void set_viewTreeOwners(androidx.compose.ui.platform.AndroidComposeView$ViewTreeOwners)
+androidx.compose.ui.node.LayoutNode$LayoutState: androidx.compose.ui.node.LayoutNode$LayoutState valueOf(java.lang.String)
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityStarted(android.app.Activity)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.RootForTest$UncaughtExceptionHandler getUncaughtExceptionHandler$ui()
+androidx.biometric.CryptoObjectUtils$Api30Impl: android.security.identity.IdentityCredential getIdentityCredential(android.hardware.biometrics.BiometricPrompt$CryptoObject)
+androidx.fragment.app.DialogFragment: DialogFragment()
+com.thenile.vault.xposed.PackageManagerHook$Companion: PackageManagerHook$Companion()
+com.thenile.vault.state.VaultState: com.thenile.vault.state.VaultState valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: int getAutoSizeTextType()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.ClipboardManager getClipboardManager()
+com.topjohnwu.superuser.Shell$Job: java.util.concurrent.Future enqueue()
+androidx.appcompat.widget.AppCompatSpinner: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.core.widget.NestedScrollView: void setFillViewport(boolean)
+androidx.appcompat.widget.AppCompatRadioButton: void setButtonDrawable(int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setStableInsets(androidx.core.graphics.Insets)
+androidx.core.graphics.drawable.IconCompatParcelizer: IconCompatParcelizer()
+androidx.compose.ui.window.PopupLayout: void setParentLayoutDirection(androidx.compose.ui.unit.LayoutDirection)
+androidx.compose.ui.node.TraversableNode$Companion$TraverseDescendantsAction: androidx.compose.ui.node.TraversableNode$Companion$TraverseDescendantsAction[] values()
+androidx.compose.ui.window.PopupLayout: void setPositionProvider(androidx.compose.ui.window.PopupPositionProvider)
+androidx.compose.ui.platform.AndroidComposeViewForceDarkModeQ: void disallowForceDark(android.view.View)
+androidx.appcompat.widget.ActionMenuView: void setOverflowReserved(boolean)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setLogo(int)
+androidx.biometric.BiometricManager$Api30Impl: int canAuthenticate(android.hardware.biometrics.BiometricManager,int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void setSystemWindowInsets(androidx.core.graphics.Insets)
+kotlinx.coroutines.selects.TrySelectDetailedResult: kotlinx.coroutines.selects.TrySelectDetailedResult[] values()
+androidx.appcompat.widget.AppCompatTextView: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.core.view.WindowInsetsCompat$Impl28: boolean equals(java.lang.Object)
+androidx.biometric.CryptoObjectUtils$Api30Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject create(android.security.identity.IdentityCredential)
+androidx.compose.ui.platform.AndroidComposeView: void setDensity(androidx.compose.ui.unit.Density)
+androidx.compose.ui.platform.AbstractComposeView: int getAutoClearFocusBehavior-4UtRPd4()
+com.topjohnwu.superuser.Shell: void execTask(com.topjohnwu.superuser.Shell$Task)
+androidx.appcompat.widget.SearchView: int getImeOptions()
+androidx.profileinstaller.ProfileInstallerInitializer: ProfileInstallerInitializer()
+androidx.core.view.WindowInsetsCompat$Impl: void initDisplayShape(android.view.View)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.input.InputModeManager getInputModeManager()
+com.thenile.vault.xposed.PackageManagerHook: java.lang.Object hookPm$lambda$1$0(com.thenile.vault.xposed.PackageManagerHook,java.lang.Class,io.github.libxposed.api.XposedInterface$Chain)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AccessibilityManager getAccessibilityManager()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.TextToolbar getTextToolbar()
+androidx.compose.ui.contentcapture.AndroidContentCaptureManager$TranslateStatus: androidx.compose.ui.contentcapture.AndroidContentCaptureManager$TranslateStatus valueOf(java.lang.String)
+androidx.biometric.CryptoObjectUtils$Api23Impl: android.security.keystore.KeyGenParameterSpec buildKeyGenParameterSpec(android.security.keystore.KeyGenParameterSpec$Builder)
+com.topjohnwu.superuser.internal.MainShell: void setBuilder(com.topjohnwu.superuser.Shell$Builder)
+androidx.appcompat.widget.Toolbar: void setTitleMarginStart(int)
+androidx.appcompat.view.menu.ListMenuItemView: void setCheckable(boolean)
+androidx.appcompat.widget.MenuPopupWindow$MenuDropDownListView: void setHoverListener(androidx.appcompat.widget.MenuItemHoverListener)
+androidx.window.area.reflectionguard.ExtensionWindowAreaStatusRequirements: android.util.DisplayMetrics getWindowAreaDisplayMetrics()
+androidx.compose.ui.platform.AndroidComposeView: androidx.collection.IntObjectMap getLayoutNodes()
+androidx.appcompat.widget.SearchView$SearchAutoComplete: int getSearchViewTextMinWidthDp()
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job sh(java.io.InputStream)
+androidx.compose.ui.platform.AndroidComposeView: void setCoroutineContext(kotlin.coroutines.CoroutineContext)
+androidx.core.view.WindowInsetsCompat$Impl: void setTypeMaxBoundingRectsMap(android.graphics.Rect[][])
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getInsetsIgnoringVisibility(int)
+androidx.activity.EdgeToEdgeApi30: void adjustLayoutInDisplayCutoutMode(android.view.Window)
+androidx.activity.EdgeToEdgeApi26: void setUp(androidx.activity.SystemBarStyle,androidx.activity.SystemBarStyle,android.view.Window,android.view.View,boolean,boolean)
+com.topjohnwu.superuser.internal.NOPList: NOPList()
+androidx.fragment.app.DefaultSpecialEffectsController$Api26Impl: void reverse(android.animation.AnimatorSet)
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.Shell$Result exec()
+androidx.appcompat.widget.Toolbar: java.lang.CharSequence getNavigationContentDescription()
+androidx.compose.ui.platform.AndroidComposeView: void setPrimaryDirectionalMotionAxisOverride-r2epLt8$ui(androidx.compose.ui.input.indirect.IndirectPointerEventPrimaryDirectionalMotionAxis)
+androidx.window.reflection.Consumer2: void accept(java.lang.Object)
+androidx.startup.InitializationProvider: android.database.Cursor query(android.net.Uri,java.lang.String[],java.lang.String,java.lang.String[],java.lang.String)
+androidx.compose.ui.internal.InlineClassHelperKt: void throwIllegalArgumentException(java.lang.String)
+com.thenile.vault.root.StorageMountManager: java.lang.String deriveKey(java.lang.String,java.lang.String)
+androidx.compose.foundation.internal.InlineClassHelperKt: java.lang.Void throwIllegalArgumentExceptionForNullCheck(java.lang.String)
+androidx.appcompat.widget.AppCompatImageView: void setBackgroundResource(int)
+androidx.core.view.ViewCompat$Api21Impl: androidx.core.view.WindowInsetsCompat computeSystemWindowInsets(android.view.View,androidx.core.view.WindowInsetsCompat,android.graphics.Rect)
+android.support.v4.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+com.topjohnwu.superuser.internal.Utils: boolean isRootImpossible()
+androidx.appcompat.widget.LinearLayoutCompat: int getVirtualChildCount()
+com.thenile.vault.state.Profile: int hashCode()
+androidx.core.view.WindowInsetsCompat$Impl29: WindowInsetsCompat$Impl29(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl29)
+com.topjohnwu.superuser.internal.Utils: void err(java.lang.Throwable)
+androidx.biometric.BiometricFragment$Api29Impl: void setConfirmationRequired(android.hardware.biometrics.BiometricPrompt$Builder,boolean)
+androidx.compose.foundation.text.HandleState: androidx.compose.foundation.text.HandleState valueOf(java.lang.String)
+androidx.compose.foundation.internal.InlineClassHelperKt: java.lang.Void throwIllegalStateExceptionForNullCheck(java.lang.String)
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.appcompat.widget.ActionBarContextView: ActionBarContextView(android.content.Context)
+androidx.appcompat.widget.AppCompatCheckBox: void setSupportButtonTintList(android.content.res.ColorStateList)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.Object hookDirectQueries$lambda$1$0(com.thenile.vault.xposed.PackageManagerHook,boolean,io.github.libxposed.api.XposedInterface$Chain)
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void addRearDisplayStatusListener(androidx.window.extensions.core.util.function.Consumer)
+androidx.window.area.reflectionguard.ExtensionWindowAreaPresentationRequirements: void setPresentationView(android.view.View)
+androidx.appcompat.widget.LinearLayoutCompat: int getDividerWidth()
+androidx.core.view.WindowInsetsCompat$Impl20: void loadReflectionField()
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.window.PopupPositionProvider getPositionProvider()
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl: android.hardware.biometrics.BiometricPrompt$CryptoObject getCryptoObject(android.hardware.biometrics.BiometricPrompt$AuthenticationResult)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl29: void computeAndSetTextDirection(android.text.StaticLayout$Builder,android.widget.TextView)
+com.topjohnwu.superuser.CallbackList: void add(int,java.lang.Object)
+androidx.compose.ui.graphics.layer.ViewLayer: androidx.compose.ui.graphics.CanvasHolder getCanvasHolder()
+com.thenile.vault.ui.PromptActivity: PromptActivity()
+com.topjohnwu.superuser.ShellUtils: long gcd(long,long)
+androidx.core.view.WindowInsetsCompat$Impl20: void setTypeBoundingRectsMap(android.graphics.Rect[][])
+kotlin.time.DurationUnit: kotlin.time.DurationUnit[] values()
+androidx.appcompat.widget.SearchView: void setInputType(int)
+androidx.appcompat.widget.Toolbar: void setNavigationIcon(int)
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: void setBackgroundResource(int)
+com.topjohnwu.superuser.internal.PendingJob: PendingJob(boolean)
+androidx.appcompat.widget.AppCompatTextView: int getLastBaselineToBottomHeight()
+com.topjohnwu.superuser.internal.SerialExecutorService: boolean isShutdown()
+com.thenile.vault.state.DummyDir: java.lang.String component1()
+com.topjohnwu.superuser.internal.SerialExecutorService: void execute(java.lang.Runnable)
+androidx.appcompat.widget.ActionMenuView: android.graphics.drawable.Drawable getOverflowIcon()
+androidx.compose.animation.core.PreconditionsKt: void throwIllegalArgumentException(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl: boolean equals(java.lang.Object)
+androidx.appcompat.widget.FitWindowsLinearLayout: FitWindowsLinearLayout(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.ActionBarContainer: void setVisibility(int)
+com.topjohnwu.superuser.internal.JobImpl: void lambda$submit$0(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.focus.FocusOwner getFocusOwner()
+com.thenile.vault.state.Profile: java.util.List getPackages()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidViewsHandler getAndroidViewsHandler$ui()
+androidx.compose.ui.graphics.layer.ViewLayer: boolean getCanUseCompositingLayer$ui_graphics()
+androidx.appcompat.widget.Toolbar: int getContentInsetRight()
+com.thenile.vault.backup.BackupManager: java.lang.String decryptPayloadNative(java.lang.String,java.lang.String,byte[],java.lang.String)
+androidx.compose.ui.internal.InlineClassHelperKt: void throwIndexOutOfBoundsException(java.lang.String)
+com.topjohnwu.superuser.internal.ShellInputSource: void close()
+com.thenile.vault.state.Profile: java.util.List getDummyDirectories()
+androidx.appcompat.widget.AppCompatImageView: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.core.view.insets.ProtectionLayout: androidx.core.view.insets.SystemBarStateMonitor getOrInstallSystemBarStateMonitor()
+androidx.appcompat.view.menu.ListMenuItemView: void setIcon(android.graphics.drawable.Drawable)
+com.thenile.vault.xposed.PackageManagerHook: void hookLockCredential(java.lang.ClassLoader)
+com.thenile.vault.state.DummyDir: java.lang.String toString()
+androidx.appcompat.view.menu.ExpandedMenuView: ExpandedMenuView(android.content.Context,android.util.AttributeSet,int)
+androidx.compose.ui.layout.IntrinsicWidthHeight: androidx.compose.ui.layout.IntrinsicWidthHeight[] values()
+androidx.compose.ui.platform.AbstractComposeView: void setAutoClearFocusBehavior-17tfJxM(int)
+com.topjohnwu.superuser.internal.Utils: void setConfirmedRootState(boolean)
+androidx.compose.ui.graphics.Path$Direction: androidx.compose.ui.graphics.Path$Direction valueOf(java.lang.String)
+androidx.appcompat.view.menu.ActionMenuItemView: ActionMenuItemView(android.content.Context,android.util.AttributeSet)
+com.topjohnwu.superuser.internal.ResultImpl: void lambda$callback$0(com.topjohnwu.superuser.Shell$ResultCallback)
+androidx.compose.ui.platform.AndroidComposeView: void setShowLayoutBounds(boolean)
+com.topjohnwu.superuser.ShellUtils: ShellUtils()
+androidx.appcompat.widget.AppCompatCheckBox: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.unit.LayoutDirection getLayoutDirection()
+androidx.lifecycle.SavedStateHandlesVM: SavedStateHandlesVM()
+androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicMinMax: androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicMinMax valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl29: void setStableInsets(androidx.core.graphics.Insets)
+androidx.appcompat.widget.AppCompatButton: int getAutoSizeStepGranularity()
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityPaused(android.app.Activity)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: androidx.core.view.WindowInsetsCompat build()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.text.font.Font$ResourceLoader getFontLoader()
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream: void close0()
+com.thenile.vault.state.Profile: Profile(java.lang.String,java.lang.String,java.util.List,java.util.List,java.util.List,boolean,boolean,java.lang.String)
+com.topjohnwu.superuser.internal.MainShell: MainShell()
+androidx.appcompat.widget.DialogTitle: DialogTitle(android.content.Context)
+androidx.appcompat.view.menu.ExpandedMenuView: int getWindowAnimations()
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job cmd(java.lang.String[])
+androidx.fragment.app.SpecialEffectsController$Operation$State: androidx.fragment.app.SpecialEffectsController$Operation$State valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl30: boolean isVisible(int)
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getInsetsForType(int,boolean)
+androidx.biometric.BiometricFragment$Api28Impl: android.hardware.biometrics.BiometricPrompt$Builder createPromptBuilder(android.content.Context)
+com.topjohnwu.superuser.Shell: boolean rootAccess()
+com.topjohnwu.superuser.internal.NOPList: java.lang.String get(int)
+androidx.core.view.WindowInsetsCompat$Impl20: WindowInsetsCompat$Impl20(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl20)
+androidx.compose.ui.node.LayoutNode$LayoutState: androidx.compose.ui.node.LayoutNode$LayoutState[] values()
+androidx.appcompat.widget.Toolbar: int getContentInsetEndWithActions()
+androidx.compose.material3.ScaffoldLayoutContent: androidx.compose.material3.ScaffoldLayoutContent[] values()
+androidx.appcompat.widget.SearchView: void setImeOptions(int)
+androidx.appcompat.widget.AppCompatTextView: int getAutoSizeMaxTextSize()
+com.thenile.vault.xposed.PackageManagerHook: void hookPm(java.lang.Class,java.lang.Class)
+androidx.appcompat.widget.Toolbar: int getCurrentContentInsetStart()
+androidx.graphics.path.PathIteratorPreApi34Impl: int internalPathIteratorPeek(long)
+androidx.appcompat.widget.SearchView: void setOnSuggestionListener(androidx.appcompat.widget.SearchView$OnSuggestionListener)
+androidx.biometric.CryptoObjectUtils$Api23Impl: void setBlockModeCBC(android.security.keystore.KeyGenParameterSpec$Builder)
+androidx.appcompat.widget.AppCompatEditText: android.text.Editable getText()
+androidx.appcompat.widget.Toolbar: void setTitleTextColor(android.content.res.ColorStateList)
+androidx.compose.runtime.collection.MutableVectorKt: void throwNegativeIndexException(int)
+androidx.appcompat.widget.Toolbar: android.widget.TextView getTitleTextView()
+com.topjohnwu.superuser.Shell$Job: void submit()
+com.topjohnwu.superuser.internal.JobImpl: JobImpl()
+com.topjohnwu.superuser.internal.ResultImpl: ResultImpl()
+androidx.appcompat.widget.Toolbar: void setSubtitle(java.lang.CharSequence)
+androidx.core.view.WindowInsetsCompat$TypeImpl34: int toPlatformType(int)
+androidx.core.view.WindowInsetsCompat$Impl28: androidx.core.view.DisplayCutoutCompat getDisplayCutout()
+androidx.appcompat.widget.AppCompatButton: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.appcompat.widget.AppCompatCheckBox: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.fragment.app.SpecialEffectsController$Operation$LifecycleImpact: androidx.fragment.app.SpecialEffectsController$Operation$LifecycleImpact[] values()
+androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicWidthHeight: androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicWidthHeight valueOf(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: androidx.collection.MutableIntObjectMap getLayoutNodes()
+com.topjohnwu.superuser.internal.ShellImpl: void release()
+androidx.appcompat.widget.Toolbar: void setLogo(int)
+androidx.compose.ui.focus.FocusStateImpl: androidx.compose.ui.focus.FocusStateImpl[] values()
+androidx.biometric.KeyguardUtils$Api23Impl: android.app.KeyguardManager getKeyguardManager(android.content.Context)
+androidx.appcompat.widget.ActionMenuView: ActionMenuView(android.content.Context,android.util.AttributeSet)
+com.thenile.vault.xposed.PackageManagerHook: boolean isUnlocked()
+com.topjohnwu.superuser.Shell: boolean isRoot()
+androidx.appcompat.widget.LinearLayoutCompat: void setWeightSum(float)
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: void onActivityPaused(android.app.Activity)
+androidx.core.view.WindowInsetsCompat$Impl28: WindowInsetsCompat$Impl28(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.compose.runtime.PausedCompositionState: androidx.compose.runtime.PausedCompositionState[] values()
+androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicMinMax: androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicMinMax[] values()
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setCustomSelectionActionModeCallback(android.view.ActionMode$Callback)
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: ProcessLifecycleOwner$attach$1(androidx.lifecycle.ProcessLifecycleOwner)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.RootForTest getRootForTest()
+androidx.appcompat.widget.Toolbar: android.widget.TextView getSubtitleTextView()
+androidx.lifecycle.EmptyActivityLifecycleCallbacks: void onActivityStopped(android.app.Activity)
+androidx.appcompat.widget.AppCompatRadioButton: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+androidx.appcompat.widget.AppCompatCheckBox: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.compose.ui.focus.CustomDestinationResult: androidx.compose.ui.focus.CustomDestinationResult valueOf(java.lang.String)
+androidx.appcompat.widget.SearchView: androidx.cursoradapter.widget.CursorAdapter getSuggestionsAdapter()
+androidx.compose.animation.core.MutatePriority: androidx.compose.animation.core.MutatePriority[] values()
+androidx.core.view.WindowInsetsCompat$Impl20: boolean equals(java.lang.Object)
+androidx.appcompat.widget.AppCompatSpinner: void setAdapter(android.widget.Adapter)
+androidx.appcompat.widget.SearchView: void setOnQueryTextFocusChangeListener(android.view.View$OnFocusChangeListener)
+com.topjohnwu.superuser.internal.Utils: void err(java.lang.String,java.lang.Throwable)
+androidx.appcompat.widget.ViewStubCompat: int getLayoutResource()
+androidx.core.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()
+androidx.graphics.path.PathIteratorPreApi34Impl: void destroyInternalPathIterator(long)
+androidx.biometric.FingerprintDialogFragment$Api26Impl: int getColorErrorAttr()
+androidx.appcompat.widget.ActionBarContextView: int getAnimatedVisibility()
+androidx.core.view.WindowInsetsCompat$Impl28: WindowInsetsCompat$Impl28(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl28)
+androidx.appcompat.widget.Toolbar: Toolbar(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.AppCompatImageView: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.startup.InitializationProvider: int delete(android.net.Uri,java.lang.String,java.lang.String[])
+androidx.appcompat.widget.SearchView: java.lang.CharSequence getQuery()
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.compose.ui.text.internal.InlineClassHelperKt: void throwIllegalStateException(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: int getFirstBaselineToTopHeight()
+com.topjohnwu.superuser.NoShellException: NoShellException(java.lang.String,java.lang.Throwable)
+androidx.appcompat.widget.ButtonBarLayout: int getMinimumHeight()
+androidx.core.view.WindowInsetsCompat$Impl: java.util.List getBoundingRects(int)
+androidx.compose.foundation.text.Handle: androidx.compose.foundation.text.Handle valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: void setTextFuture(java.util.concurrent.Future)
+androidx.compose.foundation.text.selection.CrossStatus: androidx.compose.foundation.text.selection.CrossStatus[] values()
+com.thenile.vault.state.Profile: void setDecoyPin(java.lang.String)
+androidx.appcompat.widget.ViewStubCompat: ViewStubCompat(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.Toolbar: void setSubtitleTextColor(android.content.res.ColorStateList)
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.core.view.ViewCompat$Api21Impl: void callCompatInsetAnimationCallback(android.view.WindowInsets,android.view.View)
+androidx.appcompat.widget.FitWindowsFrameLayout: FitWindowsFrameLayout(android.content.Context)
+com.topjohnwu.superuser.Shell$Job: void submit(com.topjohnwu.superuser.Shell$ResultCallback)
+androidx.core.widget.NestedScrollView: NestedScrollView(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.AppCompatCheckBox: void setSupportButtonTintMode(android.graphics.PorterDuff$Mode)
+com.topjohnwu.superuser.internal.SerialExecutorService: java.util.List shutdownNow()
+androidx.core.view.WindowInsetsCompat$Impl30: WindowInsetsCompat$Impl30(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl30)
+androidx.core.view.WindowInsetsCompat$Impl20: java.util.List getBoundingRectsIgnoringVisibility(int)
+com.topjohnwu.superuser.internal.Utils: Utils()
+androidx.emoji2.text.EmojiExclusions$EmojiExclusions_Api34: java.util.Set getExclusions()
+androidx.compose.ui.util.ListUtilsKt: void throwUnsupportedOperationException(java.lang.String)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl$1: void onAuthenticationError(int,java.lang.CharSequence)
+androidx.appcompat.widget.AppCompatTextViewAutoSizeHelper$Impl: boolean isHorizontallyScrollable(android.widget.TextView)
+androidx.compose.ui.platform.AbstractComposeView: void setParentContext(androidx.compose.runtime.CompositionContext)
+androidx.appcompat.widget.AppCompatSpinner: void setDropDownHorizontalOffset(int)
+com.topjohnwu.superuser.internal.ShellImpl: void execTask(com.topjohnwu.superuser.Shell$Task)
+androidx.core.view.WindowInsetsCompat$Impl: void copyWindowDataInto(androidx.core.view.WindowInsetsCompat)
+com.thenile.vault.root.StorageMountManager: boolean verifyPin(java.lang.String,java.lang.String)
+androidx.core.view.WindowInsetsCompat$BuilderImpl: void initTypeBoundingRects(androidx.core.view.WindowInsetsCompat)
+androidx.appcompat.widget.ActionBarContextView: void setSubtitle(java.lang.CharSequence)
+com.thenile.vault.state.DummyDir: java.lang.String getDummy()
+androidx.startup.InitializationProvider: boolean onCreate()
+androidx.appcompat.widget.LinearLayoutCompat: int getShowDividers()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivitySaveInstanceState(android.app.Activity,android.os.Bundle)
+androidx.core.view.WindowInsetsCompat$Impl20: void copyWindowDataInto(androidx.core.view.WindowInsetsCompat)
+androidx.biometric.BiometricFragment$Api21Impl: android.content.Intent createConfirmDeviceCredentialIntent(android.app.KeyguardManager,java.lang.CharSequence,java.lang.CharSequence)
+androidx.compose.ui.platform.AndroidComposeView: void setAccessibilityEventBatchIntervalMillis(long)
+androidx.activity.ComponentActivity: void setContentView(android.view.View)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidClipboardManager getClipboardManager()
+androidx.appcompat.widget.Toolbar: android.graphics.drawable.Drawable getLogo()
+com.topjohnwu.superuser.internal.WaitRunnable: void waitUntilDone()
+com.thenile.vault.state.DummyDir: boolean getEncrypt()
+androidx.appcompat.widget.FitWindowsFrameLayout: void setOnFitSystemWindowsListener(androidx.appcompat.widget.FitWindowsViewGroup$OnFitSystemWindowsListener)
+androidx.core.view.WindowInsetsCompat$BuilderImpl31: WindowInsetsCompat$BuilderImpl31(androidx.core.view.WindowInsetsCompat)
+androidx.appcompat.widget.SearchView$SearchAutoComplete: SearchView$SearchAutoComplete(android.content.Context,android.util.AttributeSet,int)
+androidx.compose.ui.unit.InlineClassHelperKt: void throwIllegalStateException(java.lang.String)
+com.thenile.vault.xposed.PackageManagerHook: void onPackageLoaded(io.github.libxposed.api.XposedModuleInterface$PackageLoadedParam)
+androidx.core.widget.NestedScrollView: void setNestedScrollingEnabled(boolean)
+androidx.biometric.BiometricFragment$Api28Impl: void setNegativeButton(android.hardware.biometrics.BiometricPrompt$Builder,java.lang.CharSequence,java.util.concurrent.Executor,android.content.DialogInterface$OnClickListener)
+androidx.compose.ui.platform.AndroidComposeView: int getImportantForAutofill()
+com.thenile.vault.Config: java.util.List getTARGET_PACKAGES()
+androidx.compose.ui.graphics.layer.ViewLayer: void setInvalidated(boolean)
+com.topjohnwu.superuser.internal.UiThreadHandler: void runAndWait(java.lang.Runnable)
+androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicWidthHeight: androidx.compose.ui.layout.MeasuringIntrinsics$IntrinsicWidthHeight[] values()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.view.WindowInsetsCompat consumeDisplayCutout()
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+com.topjohnwu.superuser.CallbackList: void lambda$add$0(java.lang.Object)
+androidx.core.view.WindowInsetsCompat$Impl20: boolean isTypeVisible(int)
+androidx.appcompat.widget.AppCompatButton: int[] getAutoSizeTextAvailableSizes()
+com.topjohnwu.superuser.internal.JobImpl: void close()
+androidx.compose.ui.focus.CustomDestinationResult: androidx.compose.ui.focus.CustomDestinationResult[] values()
+com.topjohnwu.superuser.internal.SerialExecutorService: SerialExecutorService()
+com.thenile.vault.state.Profile: boolean component6()
+androidx.appcompat.widget.ActionBarContextView: java.lang.CharSequence getTitle()
+androidx.appcompat.widget.SearchView: void setIconifiedByDefault(boolean)
+androidx.compose.ui.platform.AndroidComposeView: android.view.View getView()
+androidx.compose.ui.platform.ComposeView: java.lang.CharSequence getAccessibilityClassName()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.view.WindowInsetsCompat inset(int,int,int,int)
+androidx.appcompat.widget.Toolbar: int getContentInsetStartWithNavigation()
+androidx.lifecycle.Lifecycle$State: androidx.lifecycle.Lifecycle$State[] values()
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityStarted(android.app.Activity)
+androidx.appcompat.widget.SearchView: void setMaxWidth(int)
+androidx.appcompat.widget.ActionMenuView: android.view.Menu getMenu()
+androidx.appcompat.view.menu.ListMenuItemView: ListMenuItemView(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.SearchView: int getMaxWidth()
+androidx.core.view.WindowInsetsCompat$Impl21: androidx.core.view.WindowInsetsCompat consumeStableInsets()
+androidx.core.view.WindowInsetsCompat$Impl34: androidx.core.graphics.Insets getInsets(int)
+androidx.appcompat.widget.DialogTitle: DialogTitle(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.ActionBarContainer: ActionBarContainer(android.content.Context)
+androidx.core.view.WindowInsetsCompat$Impl29: androidx.core.view.WindowInsetsCompat inset(int,int,int,int)
+androidx.biometric.CancellationSignalProvider$Api16Impl: android.os.CancellationSignal create()
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: void setSystemGestureInsets(androidx.core.graphics.Insets)
+androidx.appcompat.widget.Toolbar: void setTitle(int)
+androidx.compose.foundation.text.KeyCommand: androidx.compose.foundation.text.KeyCommand[] values()
+androidx.appcompat.widget.SearchView$SearchAutoComplete: SearchView$SearchAutoComplete(android.content.Context,android.util.AttributeSet)
+androidx.core.view.WindowInsetsCompat$Impl20: void setOverriddenInsets(androidx.core.graphics.Insets[])
+com.topjohnwu.superuser.internal.JobImpl: java.util.concurrent.Future enqueue()
+androidx.appcompat.widget.ActionBarContextView: void setCustomView(android.view.View)
+androidx.appcompat.widget.AppCompatCheckBox: void setButtonDrawable(android.graphics.drawable.Drawable)
+androidx.compose.material3.tokens.MotionSchemeKeyTokens: androidx.compose.material3.tokens.MotionSchemeKeyTokens valueOf(java.lang.String)
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getFixedHeightMinor()
+com.topjohnwu.superuser.internal.MainShell: void get(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$GetShellCallback)
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.internal.ResultImpl exec0()
+com.topjohnwu.superuser.Shell$GetShellCallback: void onShell(com.topjohnwu.superuser.Shell)
+androidx.core.view.WindowInsetsCompat$Impl34: WindowInsetsCompat$Impl34(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.compose.material3.tokens.ColorSchemeKeyTokens: androidx.compose.material3.tokens.ColorSchemeKeyTokens[] values()
+androidx.appcompat.widget.ActionBarContainer: android.view.View getTabContainer()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidComposeView$ViewTreeOwners get_viewTreeOwners()
+androidx.appcompat.widget.AppCompatSpinner: void setPopupBackgroundResource(int)
+androidx.appcompat.widget.Toolbar: void setTitleTextColor(int)
+androidx.appcompat.widget.Toolbar: int getContentInsetStart()
+android.support.v4.app.RemoteActionCompatParcelizer: RemoteActionCompatParcelizer()
+androidx.compose.ui.platform.AndroidComposeView: void setLastMatrixRecalculationAnimationTime$ui(long)
+com.topjohnwu.superuser.internal.StreamGobbler$ERR: java.lang.Void call()
+com.topjohnwu.superuser.internal.JobImpl: void run(java.io.OutputStream,java.io.InputStream,java.io.InputStream)
+androidx.core.view.WindowInsetsCompat$Impl29: androidx.core.graphics.Insets getSystemGestureInsets()
+androidx.appcompat.widget.AppCompatMultiAutoCompleteTextView: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+com.topjohnwu.superuser.internal.SerialExecutorService: boolean awaitTermination(long,java.util.concurrent.TimeUnit)
+androidx.appcompat.widget.Toolbar: void setTitleMarginTop(int)
+com.topjohnwu.superuser.CallbackList: CallbackList(java.util.List)
+androidx.graphics.path.PathIteratorPreApi34Impl: int internalPathIteratorNext(long,float[],int)
+androidx.profileinstaller.FileSectionType: androidx.profileinstaller.FileSectionType[] values()
+androidx.compose.ui.internal.InlineClassHelperKt: java.lang.Void throwIllegalStateExceptionForNullCheck(java.lang.String)
+androidx.appcompat.widget.AppCompatSpinner: void setAdapter(android.widget.SpinnerAdapter)
+androidx.biometric.KeyguardUtils$Api23Impl: boolean isDeviceSecure(android.app.KeyguardManager)
+androidx.appcompat.widget.AppCompatCheckedTextView: void setCustomSelectionActionModeCallback(android.view.ActionMode$Callback)
+androidx.appcompat.widget.AppCompatImageView: android.graphics.PorterDuff$Mode getSupportImageTintMode()
+androidx.appcompat.widget.Toolbar: java.lang.CharSequence getSubtitle()
+androidx.lifecycle.Lifecycle$Event: androidx.lifecycle.Lifecycle$Event valueOf(java.lang.String)
+com.thenile.vault.xposed.PackageManagerHook: void triggerOneTimeUnlock$lambda$0(java.lang.ClassLoader,int)
+com.topjohnwu.superuser.Shell: void setDefaultBuilder(com.topjohnwu.superuser.Shell$Builder)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.Clipboard getClipboard()
+com.topjohnwu.superuser.internal.SerialExecutorService: java.lang.Object call()
+androidx.compose.ui.platform.Api35Impl: void setRequestedFrameRate(android.view.View,float)
+androidx.core.view.ViewCompat$Api28Impl: boolean isScreenReaderFocusable(android.view.View)
+kotlin.time.DurationUnit: kotlin.time.DurationUnit valueOf(java.lang.String)
+androidx.compose.foundation.text.contextmenu.modifier.ToolbarHandlerState: androidx.compose.foundation.text.contextmenu.modifier.ToolbarHandlerState[] values()
+com.topjohnwu.superuser.internal.ShellImpl: int getStatus()
+androidx.core.widget.NestedScrollView: int getMaxScrollAmount()
+com.topjohnwu.superuser.Shell$Job: com.topjohnwu.superuser.Shell$Job to(java.util.List,java.util.List)
+androidx.biometric.PackageUtils$Api29Impl: boolean hasSystemFeatureIris(android.content.pm.PackageManager)
+androidx.appcompat.widget.AppCompatImageView: void setImageBitmap(android.graphics.Bitmap)
+androidx.compose.material3.tokens.TypographyKeyTokens: androidx.compose.material3.tokens.TypographyKeyTokens[] values()
+androidx.fragment.app.DefaultSpecialEffectsController$Api24Impl: long totalDuration(android.animation.AnimatorSet)
+androidx.appcompat.widget.AppCompatImageView: void setImageDrawable(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.internal.JobImpl: void submit(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback)
+com.topjohnwu.superuser.internal.InputStreamSource: InputStreamSource(java.io.InputStream)
+kotlin.LazyThreadSafetyMode: kotlin.LazyThreadSafetyMode[] values()
+androidx.core.view.WindowInsetsCompat$TypeImpl30: int toPlatformType(int)
+com.thenile.vault.xposed.PackageManagerHook: java.lang.String pkgNameOf(java.lang.Object)
+androidx.compose.ui.text.AnnotationType: androidx.compose.ui.text.AnnotationType valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatCheckBox: android.content.res.ColorStateList getSupportButtonTintList()
+androidx.biometric.AuthenticationCallbackProvider$Api30Impl: int getAuthenticationType(android.hardware.biometrics.BiometricPrompt$AuthenticationResult)
+androidx.appcompat.widget.AppCompatImageView: android.content.res.ColorStateList getSupportImageTintList()
+androidx.compose.foundation.gestures.DragDetectionState$AwaitDown$AwaitTouchSlop: androidx.compose.foundation.gestures.DragDetectionState$AwaitDown$AwaitTouchSlop valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.NOPList: com.topjohnwu.superuser.internal.NOPList getInstance()
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: void onActivityCreated(android.app.Activity,android.os.Bundle)
+com.topjohnwu.superuser.Shell: java.lang.Boolean isAppGrantedRoot()
+com.topjohnwu.superuser.internal.MainShell: void setCached(com.topjohnwu.superuser.internal.ShellImpl)
+com.topjohnwu.superuser.internal.PendingJob: void lambda$submit$1(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback,com.topjohnwu.superuser.Shell)
+kotlin.coroutines.intrinsics.CoroutineSingletons: kotlin.coroutines.intrinsics.CoroutineSingletons valueOf(java.lang.String)
+androidx.compose.ui.platform.AndroidComposeView: void setOnViewTreeOwnersAvailable(kotlin.jvm.functions.Function1)
+androidx.compose.foundation.layout.internal.InlineClassHelperKt: void throwIllegalStateException(java.lang.String)
+androidx.appcompat.widget.ActionMenuView: ActionMenuView(android.content.Context)
+com.thenile.vault.xposed.PackageManagerHook$Companion: PackageManagerHook$Companion(kotlin.jvm.internal.DefaultConstructorMarker)
+com.thenile.vault.state.Profile: void setDirectories(java.util.List)
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+com.thenile.vault.Config: java.util.List getHIDDEN_PACKAGES()
+androidx.compose.ui.graphics.layer.view.DrawChildContainer: int getChildCount()
+androidx.appcompat.widget.FitWindowsFrameLayout: FitWindowsFrameLayout(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.view.menu.ActionMenuItemView: ActionMenuItemView(android.content.Context)
+androidx.compose.material3.tokens.TypographyKeyTokens: androidx.compose.material3.tokens.TypographyKeyTokens valueOf(java.lang.String)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: ReportFragment$LifecycleCallbacks()
+androidx.appcompat.widget.AppCompatRadioButton: android.content.res.ColorStateList getSupportButtonTintList()
+com.topjohnwu.superuser.CallbackList: java.lang.Object get(int)
+androidx.appcompat.view.menu.ActionMenuItemView: void setExpandedFormat(boolean)
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell getShell()
+com.topjohnwu.superuser.ShellUtils: java.lang.String fastCmd(java.lang.String[])
+androidx.compose.ui.platform.AndroidComposeView: boolean getShowLayoutBounds()
+androidx.compose.ui.node.Invalidation: androidx.compose.ui.node.Invalidation[] values()
+androidx.appcompat.widget.Toolbar: void setCollapseIcon(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.internal.NOPList: java.lang.Object set(int,java.lang.Object)
+androidx.fragment.app.strictmode.FragmentStrictMode$Flag: androidx.fragment.app.strictmode.FragmentStrictMode$Flag[] values()
+com.topjohnwu.superuser.Shell$Result: Shell$Result()
+com.topjohnwu.superuser.Shell$Result: java.util.List getOut()
+androidx.appcompat.widget.ActionMenuView: void setPresenter(androidx.appcompat.widget.ActionMenuPresenter)
+com.thenile.vault.backup.BackupManager: java.lang.String encryptPayloadNative(java.lang.String,java.lang.String,byte[],java.lang.String)
+com.thenile.vault.state.Profile: Profile(java.lang.String,java.lang.String,java.util.List,java.util.List,java.util.List,boolean,boolean,java.lang.String,int,kotlin.jvm.internal.DefaultConstructorMarker)
+androidx.fragment.app.DefaultSpecialEffectsController$Api26Impl: void setCurrentPlayTime(android.animation.AnimatorSet,long)
+androidx.core.view.WindowInsetsCompat$BuilderImpl30: void setInsets(int,androidx.core.graphics.Insets)
+androidx.compose.ui.platform.AbstractComposeView: void setPreviousAttachedWindowToken(android.os.IBinder)
+androidx.loader.app.LoaderManagerImpl$LoaderViewModel: LoaderManagerImpl$LoaderViewModel()
+androidx.core.view.WindowInsetsCompat$Impl29: WindowInsetsCompat$Impl29(androidx.core.view.WindowInsetsCompat,android.view.WindowInsets)
+androidx.compose.runtime.SlotTableKt: void throwConcurrentModificationException()
+androidx.emoji2.text.EmojiCompatInitializer: EmojiCompatInitializer()
+com.topjohnwu.superuser.internal.StreamGobbler: StreamGobbler(java.io.InputStream,java.util.List)
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell build()
+androidx.appcompat.widget.AppCompatTextView: void setAutoSizeTextTypeWithDefaults(int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.spatial.RectManager getRectManager()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.AndroidComposeView getOutOfFrameExecutor()
+androidx.appcompat.widget.Toolbar: void setTitle(java.lang.CharSequence)
+androidx.appcompat.widget.Toolbar: int getTitleMarginTop()
+com.thenile.vault.xposed.PackageManagerHook: kotlin.Triple decoyHideDataFor(java.lang.String)
+androidx.appcompat.widget.AppCompatImageButton: void setImageURI(android.net.Uri)
+kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState: kotlinx.coroutines.scheduling.CoroutineScheduler$WorkerState[] values()
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getMinWidthMajor()
+androidx.compose.foundation.gestures.Orientation: androidx.compose.foundation.gestures.Orientation valueOf(java.lang.String)
+com.thenile.vault.state.Profile: java.lang.String component8()
+com.topjohnwu.superuser.internal.UiThreadHandler: void run(java.lang.Runnable)
+androidx.core.view.WindowInsetsCompat$Impl20: void copyRootViewBounds(android.view.View)
+androidx.biometric.CryptoObjectUtils$Api23Impl: android.security.keystore.KeyGenParameterSpec$Builder createKeyGenParameterSpecBuilder(java.lang.String,int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.LifecycleRetainedValuesStoreOwner$FrameEndScheduler getFrameEndScheduler$ui()
+com.topjohnwu.superuser.internal.JobImpl: com.topjohnwu.superuser.Shell$Job add(java.io.InputStream)
+com.topjohnwu.superuser.internal.NOPList: java.lang.Object remove(int)
+com.topjohnwu.superuser.Shell$Job: Shell$Job()
+androidx.appcompat.widget.AppCompatTextView: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.view.WindowInsetsCompat consumeStableInsets()
+com.topjohnwu.superuser.internal.ShellTerminatedException: ShellTerminatedException()
+androidx.appcompat.widget.AppCompatSpinner: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.runtime.retain.RetainedValuesStore getRetainedValuesStore()
+androidx.core.widget.NestedScrollView: float getTopFadingEdgeStrength()
+androidx.activity.EdgeToEdgeApi23: void setUp(androidx.activity.SystemBarStyle,androidx.activity.SystemBarStyle,android.view.Window,android.view.View,boolean,boolean)
+androidx.compose.ui.layout.IntrinsicMinMax: androidx.compose.ui.layout.IntrinsicMinMax[] values()
+com.topjohnwu.superuser.internal.ShellImpl: boolean isAlive()
+androidx.compose.animation.core.MutatePriority: androidx.compose.animation.core.MutatePriority valueOf(java.lang.String)
+androidx.appcompat.widget.LinearLayoutCompat: int getDividerPadding()
+com.thenile.vault.state.DummyDir: boolean component3()
+androidx.profileinstaller.FileSectionType: androidx.profileinstaller.FileSectionType valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatButton: android.content.res.ColorStateList getSupportBackgroundTintList()
+androidx.compose.ui.node.LayoutNode$UsageByParent: androidx.compose.ui.node.LayoutNode$UsageByParent[] values()
+com.topjohnwu.superuser.internal.StreamGobbler$OUT: StreamGobbler$OUT(java.io.InputStream,java.util.List)
+androidx.compose.ui.graphics.layer.ViewLayer: void setCanUseCompositingLayer$ui_graphics(boolean)
+androidx.compose.ui.platform.actionmodecallback.MenuItemOption: androidx.compose.ui.platform.actionmodecallback.MenuItemOption valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl30: androidx.core.graphics.Insets getInsets(int)
+com.topjohnwu.superuser.Shell$Result: int getCode()
+androidx.appcompat.widget.AppCompatImageButton: void setImageResource(int)
+com.thenile.vault.receivers.SecretCodeReceiver: SecretCodeReceiver()
+androidx.appcompat.widget.SearchView: SearchView(android.content.Context,android.util.AttributeSet,int)
+androidx.lifecycle.ProcessLifecycleOwner$attach$1$onActivityPreCreated$1: ProcessLifecycleOwner$attach$1$onActivityPreCreated$1(androidx.lifecycle.ProcessLifecycleOwner)
+androidx.compose.ui.node.LookaheadPassDelegate$PlacedState: androidx.compose.ui.node.LookaheadPassDelegate$PlacedState valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatTextView: void setBackgroundResource(int)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setActionBarVisibilityCallback(androidx.appcompat.widget.ActionBarOverlayLayout$ActionBarVisibilityCallback)
+com.topjohnwu.superuser.internal.NOPList: void add(int,java.lang.Object)
+androidx.core.view.WindowInsetsCompat$BuilderImpl34: void setInsets(int,androidx.core.graphics.Insets)
+androidx.activity.EdgeToEdgeApi28: void adjustLayoutInDisplayCutoutMode(android.view.Window)
+com.topjohnwu.superuser.internal.SerialExecutorService: boolean isTerminated()
+androidx.lifecycle.LifecycleDispatcher$DispatcherActivityCallback: void onActivityCreated(android.app.Activity,android.os.Bundle)
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.view.DisplayShapeCompat createDisplayShape(android.view.View)
+kotlin.LazyThreadSafetyMode: kotlin.LazyThreadSafetyMode valueOf(java.lang.String)
+androidx.graphics.path.ConicConverter: int internalConicToQuadratics(float[],int,float[],float,float)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl$1: void onAuthenticationSucceeded(android.hardware.biometrics.BiometricPrompt$AuthenticationResult)
+com.topjohnwu.superuser.ShellUtils: void cleanInputStream(java.io.InputStream)
+androidx.biometric.FingerprintDialogFragment$Api21Impl: void startAnimation(android.graphics.drawable.Drawable)
+androidx.core.view.WindowInsetsCompat$Impl: void setStableInsets(androidx.core.graphics.Insets)
+androidx.appcompat.widget.ActionBarContainer: void setStackedBackground(android.graphics.drawable.Drawable)
+androidx.appcompat.widget.AppCompatSpinner: android.graphics.drawable.Drawable getPopupBackground()
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void startRearDisplayPresentationSession(android.app.Activity,androidx.window.extensions.core.util.function.Consumer)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.OutOfFrameExecutor getOutOfFrameExecutor()
+androidx.appcompat.view.menu.ExpandedMenuView: ExpandedMenuView(android.content.Context,android.util.AttributeSet)
+androidx.appcompat.widget.Toolbar: android.view.MenuInflater getMenuInflater()
+androidx.compose.foundation.layout.IntrinsicSize: androidx.compose.foundation.layout.IntrinsicSize[] values()
+com.topjohnwu.superuser.R: R()
+androidx.appcompat.widget.LinearLayoutCompat: void setBaselineAligned(boolean)
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: androidx.core.view.WindowInsetsCompat build()
+androidx.fragment.app.strictmode.FragmentStrictMode$Flag: androidx.fragment.app.strictmode.FragmentStrictMode$Flag valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl20: androidx.core.graphics.Insets getRootStableInsets()
+com.thenile.vault.state.Profile: com.thenile.vault.state.Profile copy(java.lang.String,java.lang.String,java.util.List,java.util.List,java.util.List,boolean,boolean,java.lang.String)
+androidx.appcompat.widget.ActionMenuView: void setOnMenuItemClickListener(androidx.appcompat.widget.ActionMenuView$OnMenuItemClickListener)
+androidx.appcompat.widget.ActionMenuView: void setOverflowIcon(android.graphics.drawable.Drawable)
+com.topjohnwu.superuser.internal.BuilderImpl: void setInitializersImpl(java.lang.Class[])
+androidx.compose.ui.text.input.TextInputServiceAndroid$TextInputCommand: androidx.compose.ui.text.input.TextInputServiceAndroid$TextInputCommand valueOf(java.lang.String)
+androidx.appcompat.widget.AppCompatEditText: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.compose.animation.core.AnimationEndReason: androidx.compose.animation.core.AnimationEndReason valueOf(java.lang.String)
+com.topjohnwu.superuser.Shell$ResultCallback: void onResult(com.topjohnwu.superuser.Shell$Result)
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell build(java.lang.Process)
+com.topjohnwu.superuser.internal.ShellImpl$NoCloseOutputStream: void close()
+androidx.core.view.WindowInsetsCompat$Impl34: boolean isVisible(int)
+androidx.appcompat.widget.AppCompatCheckBox: void setBackgroundResource(int)
+androidx.compose.ui.platform.AbstractComposeView: void setParentCompositionContext(androidx.compose.runtime.CompositionContext)
+com.topjohnwu.superuser.internal.BuilderImpl: com.topjohnwu.superuser.Shell$Builder setTimeout(long)
+androidx.compose.runtime.retain.impl.PreconditionsKt: void throwIllegalStateException(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl20: void setTypeMaxBoundingRectsMap(android.graphics.Rect[][])
+com.thenile.vault.state.Profile: java.lang.String toString()
+androidx.appcompat.widget.AppCompatRadioButton: void setBackgroundDrawable(android.graphics.drawable.Drawable)
+androidx.core.widget.EdgeEffectCompat$Api31Impl: float getDistance(android.widget.EdgeEffect)
+kotlin.DeprecationLevel: kotlin.DeprecationLevel[] values()
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getMandatorySystemGestureInsets()
+androidx.core.view.WindowInsetsCompat$Impl20: void initDisplayShape(android.view.View)
+androidx.appcompat.widget.AppCompatImageButton: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.core.view.WindowInsetsCompat$BuilderImpl35: void setInsets(int,androidx.core.graphics.Insets)
+androidx.appcompat.widget.ViewStubCompat: void setLayoutResource(int)
+com.topjohnwu.superuser.ShellUtils: boolean fastCmdResult(java.lang.String[])
+androidx.core.view.WindowInsetsCompat$Impl: void setSystemUiVisibility(int)
+androidx.core.view.WindowInsetsCompat$Impl: androidx.core.graphics.Insets getSystemWindowInsets()
+com.topjohnwu.superuser.internal.MainShell: com.topjohnwu.superuser.Shell$Job newJob(boolean,java.io.InputStream)
+androidx.core.view.WindowInsetsCompat$Impl21: void setStableInsets(androidx.core.graphics.Insets)
+androidx.window.area.reflectionguard.ExtensionWindowAreaPresentationRequirements: android.content.Context getPresentationContext()
+com.thenile.vault.xposed.PackageManagerHook: int oneTimeUnlockUsedCount()
+androidx.appcompat.widget.ButtonBarLayout: void setAllowStacking(boolean)
+androidx.compose.ui.window.PopupLayout: kotlin.jvm.functions.Function2 getContent()
+androidx.compose.ui.window.PopupLayout: android.view.View getViewRoot()
+com.topjohnwu.superuser.Shell$Job: void submit(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback)
+androidx.appcompat.view.menu.ActionMenuItemView: void setTitle(java.lang.CharSequence)
+androidx.biometric.CryptoObjectUtils$Api23Impl: void initKeyGenerator(javax.crypto.KeyGenerator,android.security.keystore.KeyGenParameterSpec)
+androidx.compose.ui.text.style.ResolvedTextDirection: androidx.compose.ui.text.style.ResolvedTextDirection[] values()
+androidx.appcompat.widget.ActionBarContextView: ActionBarContextView(android.content.Context,android.util.AttributeSet)
+androidx.compose.ui.state.ToggleableState: androidx.compose.ui.state.ToggleableState[] values()
+androidx.appcompat.widget.Toolbar: void setPopupTheme(int)
+androidx.appcompat.view.menu.ListMenuItemView: void setChecked(boolean)
+androidx.compose.ui.window.PopupLayout: android.view.WindowManager$LayoutParams getParams$ui()
+androidx.appcompat.widget.AppCompatRadioButton: int getCompoundPaddingLeft()
+androidx.appcompat.widget.AppCompatTextView: android.graphics.PorterDuff$Mode getSupportCompoundDrawablesTintMode()
+androidx.appcompat.widget.ActionBarContextView: void setTitleOptional(boolean)
+com.thenile.vault.Config: java.util.Set getKNOWN_CODES()
+androidx.core.graphics.drawable.IconCompatParcelizer: void write(androidx.core.graphics.drawable.IconCompat,androidx.versionedparcelable.VersionedParcel)
+androidx.compose.ui.internal.InlineClassHelperKt: void throwIllegalStateException(java.lang.String)
+androidx.profileinstaller.ProfileInstallReceiver: ProfileInstallReceiver()
+androidx.window.area.reflectionguard.WindowAreaComponentApi3Requirements: void removeRearDisplayPresentationStatusListener(androidx.window.extensions.core.util.function.Consumer)
+androidx.appcompat.widget.ActionBarContainer: void setTransitioning(boolean)
+androidx.core.widget.NestedScrollView: androidx.core.view.ScrollFeedbackProviderCompat getScrollFeedbackProvider()
+androidx.compose.foundation.text.TextContextMenuItems: androidx.compose.foundation.text.TextContextMenuItems[] values()
+com.topjohnwu.superuser.Shell: com.topjohnwu.superuser.Shell$Job su(java.lang.String[])
+androidx.compose.ui.autofill.AutofillType: androidx.compose.ui.autofill.AutofillType valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.PendingJob: void submit(java.util.concurrent.Executor,com.topjohnwu.superuser.Shell$ResultCallback)
+com.topjohnwu.superuser.NoShellException: NoShellException(java.lang.String)
+androidx.appcompat.widget.AppCompatButton: int getAutoSizeMinTextSize()
+androidx.appcompat.widget.AppCompatButton: int getAutoSizeTextType()
+com.thenile.vault.state.Profile: void setActive(boolean)
+com.topjohnwu.superuser.internal.Utils: void log(java.lang.String,java.lang.Object)
+androidx.core.view.WindowInsetsCompat$Impl34: void initDisplayShape(android.view.View)
+androidx.core.view.WindowInsetsCompat$Impl30: androidx.core.graphics.Insets getInsetsIgnoringVisibility(int)
+androidx.compose.ui.platform.AndroidComposeView: void setContentCaptureManager$ui(androidx.compose.ui.contentcapture.AndroidContentCaptureManager)
+androidx.appcompat.widget.ActionBarContextView: int getContentHeight()
+com.topjohnwu.superuser.Shell$Job: com.topjohnwu.superuser.Shell$Job add(java.lang.String[])
+androidx.compose.ui.platform.AbstractComposeView: void setShowLayoutBounds(boolean)
+android.support.v4.app.RemoteActionCompatParcelizer: androidx.core.app.RemoteActionCompat read(androidx.versionedparcelable.VersionedParcel)
+androidx.core.view.ViewCompat$Api20Impl: android.view.WindowInsets dispatchApplyWindowInsets(android.view.View,android.view.WindowInsets)
+androidx.compose.runtime.Recomposer$State: androidx.compose.runtime.Recomposer$State[] values()
+androidx.appcompat.widget.Toolbar: void setTitleMarginEnd(int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.platform.ViewConfiguration getViewConfiguration()
+androidx.compose.ui.window.PopupLayout: androidx.compose.ui.unit.LayoutDirection getParentLayoutDirection()
+androidx.appcompat.widget.Toolbar: int getContentInsetEnd()
+com.thenile.vault.xposed.PackageManagerHook: java.lang.Object filterResult(java.lang.Class,java.lang.Object)
+com.topjohnwu.superuser.ShellUtils: java.lang.String fastCmd(com.topjohnwu.superuser.Shell,java.lang.String[])
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: void setStableInsets(androidx.core.graphics.Insets)
+androidx.lifecycle.ProcessLifecycleOwner$attach$1$onActivityPreCreated$1: void onActivityPostResumed(android.app.Activity)
+androidx.appcompat.widget.AppCompatEditText: java.lang.CharSequence getText()
+com.topjohnwu.superuser.Shell$Builder: com.topjohnwu.superuser.Shell$Builder setTimeout(long)
+androidx.appcompat.widget.SearchView$SearchAutoComplete: void setImeVisibility(boolean)
+androidx.appcompat.widget.AppCompatTextView: void setSupportBackgroundTintList(android.content.res.ColorStateList)
+androidx.appcompat.view.menu.ActionMenuItemView: void setItemInvoker(androidx.appcompat.view.menu.MenuBuilder$ItemInvoker)
+androidx.appcompat.widget.Toolbar: void setNavigationIcon(android.graphics.drawable.Drawable)
+androidx.appcompat.widget.AppCompatSpinner: int getDropDownHorizontalOffset()
+androidx.compose.animation.core.AnimationEndReason: androidx.compose.animation.core.AnimationEndReason[] values()
+androidx.compose.ui.window.Api28Impl: void setLayoutInDisplayCutout(android.view.WindowManager$LayoutParams)
+androidx.biometric.BiometricFragment$Api28Impl: void authenticate(android.hardware.biometrics.BiometricPrompt,android.os.CancellationSignal,java.util.concurrent.Executor,android.hardware.biometrics.BiometricPrompt$AuthenticationCallback)
+androidx.compose.material3.internal.InputPhase: androidx.compose.material3.internal.InputPhase valueOf(java.lang.String)
+androidx.compose.runtime.Recomposer$State: androidx.compose.runtime.Recomposer$State valueOf(java.lang.String)
+androidx.core.view.WindowInsetsCompat$Impl20: boolean isVisible(int)
+androidx.compose.ui.window.SecureFlagPolicy: androidx.compose.ui.window.SecureFlagPolicy valueOf(java.lang.String)
+androidx.appcompat.widget.ActionMenuView: int getWindowAnimations()
+androidx.core.view.WindowInsetsCompat$Impl20: boolean systemBarVisibilityEquals(int,int)
+androidx.compose.runtime.collection.MutableVectorKt: void throwOutOfRangeException(int,int)
+com.thenile.vault.state.Profile: java.lang.String component2()
+com.topjohnwu.superuser.Shell: void getShell(com.topjohnwu.superuser.Shell$GetShellCallback)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setIcon(int)
+androidx.appcompat.widget.Toolbar: android.graphics.drawable.Drawable getNavigationIcon()
+androidx.core.view.ViewCompat$Api21Impl$1: ViewCompat$Api21Impl$1(android.view.View,androidx.core.view.OnApplyWindowInsetsListener)
+androidx.biometric.BiometricFragment$Api28Impl: void setSubtitle(android.hardware.biometrics.BiometricPrompt$Builder,java.lang.CharSequence)
+androidx.appcompat.widget.ActionBarOverlayLayout: void setActionBarHideOffset(int)
+androidx.appcompat.widget.Toolbar: int getTitleMarginBottom()
+androidx.appcompat.widget.ViewStubCompat: android.view.LayoutInflater getLayoutInflater()
+androidx.compose.material3.internal.TextFieldType: androidx.compose.material3.internal.TextFieldType valueOf(java.lang.String)
+com.topjohnwu.superuser.internal.Utils: java.util.Set newArraySet()
+androidx.appcompat.widget.AppCompatImageView: void setSupportBackgroundTintMode(android.graphics.PorterDuff$Mode)
+com.thenile.vault.state.Profile: com.thenile.vault.state.Profile copy$default(com.thenile.vault.state.Profile,java.lang.String,java.lang.String,java.util.List,java.util.List,java.util.List,boolean,boolean,java.lang.String,int,java.lang.Object)
+androidx.appcompat.widget.SearchView: SearchView(android.content.Context,android.util.AttributeSet)
+androidx.biometric.AuthenticationCallbackProvider$Api28Impl$1: AuthenticationCallbackProvider$Api28Impl$1(androidx.biometric.AuthenticationCallbackProvider$Listener)
+androidx.compose.ui.node.LookaheadPassDelegate$PlacedState: androidx.compose.ui.node.LookaheadPassDelegate$PlacedState[] values()
+androidx.core.view.WindowInsetsCompat$Impl: int hashCode()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.unit.Density getDensity()
+kotlinx.coroutines.flow.SharingCommand: kotlinx.coroutines.flow.SharingCommand[] values()
+androidx.appcompat.widget.Toolbar: Toolbar(android.content.Context,android.util.AttributeSet,int)
+androidx.appcompat.widget.ContentFrameLayout: android.util.TypedValue getFixedWidthMinor()
+androidx.appcompat.widget.ActionMenuView: void setExpandedActionViewsExclusive(boolean)
+androidx.compose.material3.internal.TextFieldType: androidx.compose.material3.internal.TextFieldType[] values()
+androidx.startup.InitializationProvider: InitializationProvider()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.node.OwnerSnapshotObserver getSnapshotObserver()
+androidx.appcompat.widget.ActionBarOverlayLayout: ActionBarOverlayLayout(android.content.Context)
+androidx.appcompat.widget.LinearLayoutCompat: void setOrientation(int)
+androidx.lifecycle.ReportFragment$LifecycleCallbacks: void onActivityPrePaused(android.app.Activity)
+android.support.v4.app.RemoteActionCompatParcelizer: void write(androidx.core.app.RemoteActionCompat,androidx.versionedparcelable.VersionedParcel)
+androidx.appcompat.widget.AppCompatAutoCompleteTextView: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.compose.runtime.collection.MutableVectorKt: void throwListIndexOutOfBoundsException(int,int)
+androidx.appcompat.widget.Toolbar: androidx.appcompat.widget.DecorToolbar getWrapper()
+androidx.appcompat.widget.Toolbar: java.lang.CharSequence getLogoDescription()
+androidx.appcompat.widget.ActionBarContainer: ActionBarContainer(android.content.Context,android.util.AttributeSet)
+androidx.compose.material.ripple.RippleHostView: void setRippleState(boolean)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.modifier.ModifierLocalManager getModifierLocalManager()
+androidx.compose.foundation.text.selection.CrossStatus: androidx.compose.foundation.text.selection.CrossStatus valueOf(java.lang.String)
+androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicWidthHeight: androidx.compose.ui.node.NodeMeasuringIntrinsics$IntrinsicWidthHeight[] values()
+com.thenile.vault.state.DummyDir: DummyDir(java.lang.String,java.lang.String,boolean)
+com.thenile.vault.xposed.PackageManagerHook: PackageManagerHook()
+androidx.tracing.TraceApi29Impl: boolean isEnabled()
+androidx.biometric.CryptoObjectUtils$Api28Impl: java.security.Signature getSignature(android.hardware.biometrics.BiometricPrompt$CryptoObject)
+androidx.appcompat.widget.AppCompatEditText: android.graphics.PorterDuff$Mode getSupportBackgroundTintMode()
+androidx.core.view.WindowInsetsCompat$Impl34: WindowInsetsCompat$Impl34(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl34)
+androidx.activity.EdgeToEdgeApi35: void setUp(androidx.activity.SystemBarStyle,androidx.activity.SystemBarStyle,android.view.Window,android.view.View,boolean,boolean)
+androidx.appcompat.widget.ViewStubCompat: ViewStubCompat(android.content.Context,android.util.AttributeSet,int)
+com.topjohnwu.superuser.ShellUtils: boolean fastCmdResult(com.topjohnwu.superuser.Shell,java.lang.String[])
+com.thenile.vault.state.Profile: void setHideOnDecoy(boolean)
+androidx.core.view.WindowInsetsCompat$Impl: void copyRootViewBounds(android.view.View)
+androidx.core.view.WindowInsetsCompat$Impl35: java.util.List getBoundingRectsIgnoringVisibility(int)
+androidx.core.view.WindowInsetsCompat$BuilderImpl29: WindowInsetsCompat$BuilderImpl29()
+androidx.appcompat.widget.AppCompatSpinner: android.content.res.ColorStateList getSupportBackgroundTintList()
+com.thenile.vault.xposed.PackageManagerHook: void hookCalculatorTrigger(java.lang.ClassLoader)
+androidx.core.view.WindowInsetsCompat$BuilderImpl31: WindowInsetsCompat$BuilderImpl31()
+androidx.compose.ui.platform.Api30Impl: boolean isShowingLayoutBounds(android.view.View)
+androidx.core.widget.NestedScrollView: int getScrollRange()
+androidx.compose.ui.platform.AndroidComposeView: android.content.res.Configuration getConfiguration()
+androidx.appcompat.widget.ViewStubCompat: void setInflatedId(int)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.semantics.SemanticsOwner getSemanticsOwner()
+androidx.core.view.WindowInsetsCompat$Impl: WindowInsetsCompat$Impl(androidx.core.view.WindowInsetsCompat)
+androidx.core.view.WindowInsetsCompat$Impl31: WindowInsetsCompat$Impl31(androidx.core.view.WindowInsetsCompat,androidx.core.view.WindowInsetsCompat$Impl31)
+androidx.appcompat.widget.AppCompatButton: int getAutoSizeMaxTextSize()
+androidx.compose.foundation.gestures.IndirectPointerInputDragCycleDetector$DragDetectionState$AwaitDown$AwaitTouchSlop: androidx.compose.foundation.gestures.IndirectPointerInputDragCycleDetector$DragDetectionState$AwaitDown$AwaitTouchSlop[] values()
+androidx.compose.foundation.text.selection.SelectionHandleAnchor: androidx.compose.foundation.text.selection.SelectionHandleAnchor valueOf(java.lang.String)
+com.thenile.vault.state.DummyDir: com.thenile.vault.state.DummyDir copy$default(com.thenile.vault.state.DummyDir,java.lang.String,java.lang.String,boolean,int,java.lang.Object)
+androidx.appcompat.widget.ActionMenuView: int getPopupTheme()
+androidx.lifecycle.ProcessLifecycleOwner$attach$1: void onActivityStopped(android.app.Activity)
+androidx.appcompat.widget.LinearLayoutCompat: int getBaseline()
+androidx.core.graphics.drawable.IconCompatParcelizer: androidx.core.graphics.drawable.IconCompat read(androidx.versionedparcelable.VersionedParcel)
+androidx.compose.ui.platform.ComposeView: void setContent(kotlin.jvm.functions.Function2)
+androidx.lifecycle.ReportFragment: ReportFragment()
+androidx.compose.ui.platform.TextToolbarStatus: androidx.compose.ui.platform.TextToolbarStatus[] values()
+com.topjohnwu.superuser.CallbackList: java.lang.Object set(int,java.lang.Object)
+androidx.lifecycle.ProcessLifecycleInitializer: ProcessLifecycleInitializer()
+com.thenile.vault.state.VaultState: com.thenile.vault.state.VaultState[] values()
+com.topjohnwu.superuser.Shell$Job: com.topjohnwu.superuser.Shell$Result exec()
+androidx.appcompat.widget.AppCompatTextView: void setTextMetricsParamsCompat(androidx.core.text.PrecomputedTextCompat$Params)
+androidx.compose.ui.text.internal.InlineClassHelperKt: java.lang.Void throwIllegalStateExceptionForNullCheck(java.lang.String)
+com.thenile.vault.state.DummyDir: DummyDir(java.lang.String,java.lang.String,boolean,int,kotlin.jvm.internal.DefaultConstructorMarker)
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.autofill.AutofillManager getAutofillManager()
+androidx.compose.ui.platform.AndroidComposeView: androidx.compose.ui.autofill.AndroidAutofillManager get_autofillManager$ui()
