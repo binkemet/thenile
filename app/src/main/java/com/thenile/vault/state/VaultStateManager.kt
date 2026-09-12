@@ -25,6 +25,7 @@ class VaultStateManager(private val context: Context) {
         if (newState == VaultState.UNLOCKED) editor.putLong("lastRealUnlockAt", System.currentTimeMillis())
         editor.commit()
         _currentState.value = newState
+        if (newState == VaultState.UNLOCKED) com.thenile.vault.root.AuditLog.record(context, "Real vault unlocked")
         // debug.* is shell-writable by design (no root needed) — works under Shizuku too. Under
         // PrivilegeTier.NONE this just fails silently, same as everything else that needs it
         // (PackageManagerHook can't run without root/Zygisk at all, so nothing reads this prop then).
@@ -88,7 +89,9 @@ class VaultStateManager(private val context: Context) {
     /** WrongPinSwitch's counter — driven by NileDeviceAdminReceiver watching the REAL Android
      *  lock screen (onPasswordFailed/onPasswordSucceeded), not Nile's own PIN screen above. */
     fun recordWrongDeviceLockAttempt() {
-        prefs.edit().putInt("wrongPinAttempts", wrongPinAttempts() + 1).commit()
+        val n = wrongPinAttempts() + 1
+        prefs.edit().putInt("wrongPinAttempts", n).commit()
+        com.thenile.vault.root.AuditLog.record(context, "Wrong device lock-screen attempt (#$n)")
     }
 
     fun resetWrongPinAttempts() {

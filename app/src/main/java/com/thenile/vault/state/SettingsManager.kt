@@ -376,6 +376,47 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getStringSet("usbSwitchVaultIds", emptySet()) ?: emptySet()
         set(value) { prefs.edit().putStringSet("usbSwitchVaultIds", value).commit() }
 
+    /** Scheduled lock: hides the selected vaults during a daily clock-time window — see
+     *  ScheduledLockSwitch.kt. Start/end are minutes since midnight (0-1439). */
+    var scheduledLockEnabled: Boolean
+        get() = prefs.getBoolean("scheduledLockEnabled", false)
+        set(value) { prefs.edit().putBoolean("scheduledLockEnabled", value).commit() }
+
+    var scheduledLockStartMinute: Int
+        get() = prefs.getInt("scheduledLockStartMinute", 23 * 60)
+        set(value) { prefs.edit().putInt("scheduledLockStartMinute", value).commit() }
+
+    var scheduledLockEndMinute: Int
+        get() = prefs.getInt("scheduledLockEndMinute", 6 * 60)
+        set(value) { prefs.edit().putInt("scheduledLockEndMinute", value).commit() }
+
+    var scheduledLockVaultIds: Set<String>
+        get() = prefs.getStringSet("scheduledLockVaultIds", emptySet()) ?: emptySet()
+        set(value) { prefs.edit().putStringSet("scheduledLockVaultIds", value).commit() }
+
+    /** Device tamper lockdown: hides the selected vaults if airplane mode gets turned on or the
+     *  SIM card is swapped/removed — see DeviceTamperSwitch.kt. tamperSimSerialBaseline is the SIM
+     *  serial captured the first time the switch runs after being enabled; empty means "not yet
+     *  captured". */
+    var tamperSwitchEnabled: Boolean
+        get() = prefs.getBoolean("tamperSwitchEnabled", false)
+        set(value) { prefs.edit().putBoolean("tamperSwitchEnabled", value).commit() }
+
+    var tamperSwitchVaultIds: Set<String>
+        get() = prefs.getStringSet("tamperSwitchVaultIds", emptySet()) ?: emptySet()
+        set(value) { prefs.edit().putStringSet("tamperSwitchVaultIds", value).commit() }
+
+    var tamperSimSerialBaseline: String
+        get() = prefs.getString("tamperSimSerialBaseline", "") ?: ""
+        set(value) { prefs.edit().putString("tamperSimSerialBaseline", value).commit() }
+
+    /** FLAG_SECURE on Nile's own screens: blocks screenshots, screen recording, and the recents
+     *  thumbnail. On by default — but user-disableable, since it also blocks legitimate screen
+     *  sharing and some accessibility/screen-mirroring tools. */
+    var blockScreenshots: Boolean
+        get() = prefs.getBoolean("blockScreenshots", true)
+        set(value) { prefs.edit().putBoolean("blockScreenshots", value).commit() }
+
     /** "off" | "fake_wrong_pin" | "one_time_unlock" | "switch_user". Default off: this hooks the real Android
      *  keyguard, so it stays inert until explicitly enabled. */
     var decoyLockScreenMode: String

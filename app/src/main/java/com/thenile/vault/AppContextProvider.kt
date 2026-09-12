@@ -30,14 +30,22 @@ class AppContextProvider : ContentProvider() {
         // broadcasts history`. A context-registered receiver still only fires while the process is
         // alive, but that's the best a stealth app (no foreground service) can do for an instant
         // reaction; see UsbPluggedSwitch for the other half.
-        val receiver = com.thenile.vault.receivers.UsbPluggedReceiver()
-        val filter = IntentFilter(Intent.ACTION_POWER_CONNECTED)
+        register(com.thenile.vault.receivers.UsbPluggedReceiver(), IntentFilter(Intent.ACTION_POWER_CONNECTED))
+
+        // Same restriction applies to both of these — see DeviceTamperSwitch.
+        register(com.thenile.vault.receivers.DeviceTamperReceiver(), IntentFilter().apply {
+            addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+            addAction("android.intent.action.SIM_STATE_CHANGED")
+        })
+        return true
+    }
+
+    private fun register(receiver: android.content.BroadcastReceiver, filter: IntentFilter) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             appContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
         } else {
             appContext.registerReceiver(receiver, filter)
         }
-        return true
     }
 
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?, selectionArgs: Array<out String>?, sortOrder: String?): Cursor? = null

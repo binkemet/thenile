@@ -63,6 +63,7 @@ object DeadManSwitch {
         val targetIds = settings.deadManSwitchVaultIds
         if (targetIds.isEmpty()) return
         Log.w(TAG, "dead man's switch fired: hiding $targetIds")
+        AuditLog.record(context, "Dead man's switch fired (inactive ${settings.deadManSwitchHours}h) — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)
         }

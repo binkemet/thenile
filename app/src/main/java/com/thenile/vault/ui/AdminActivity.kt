@@ -462,6 +462,7 @@ class AdminActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        applySecureFlag(this)
 
         setContent {
             val context = LocalContext.current
@@ -1895,6 +1896,21 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var wrongPinSwitchVaultIds by remember { mutableStateOf(settings.wrongPinSwitchVaultIds) }
                 var usbSwitchEnabled by remember { mutableStateOf(settings.usbSwitchEnabled) }
                 var usbSwitchVaultIds by remember { mutableStateOf(settings.usbSwitchVaultIds) }
+                fun minuteToHhMm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+                fun hhMmToMinuteOrNull(s: String): Int? {
+                    val parts = s.split(":")
+                    val h = parts.getOrNull(0)?.toIntOrNull()
+                    val mi = parts.getOrNull(1)?.toIntOrNull()
+                    return if (h != null && mi != null && h in 0..23 && mi in 0..59) h * 60 + mi else null
+                }
+                var scheduledLockEnabled by remember { mutableStateOf(settings.scheduledLockEnabled) }
+                var scheduledLockStartText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockStartMinute)) }
+                var scheduledLockEndText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockEndMinute)) }
+                var scheduledLockVaultIds by remember { mutableStateOf(settings.scheduledLockVaultIds) }
+                var tamperSwitchEnabled by remember { mutableStateOf(settings.tamperSwitchEnabled) }
+                var tamperSwitchVaultIds by remember { mutableStateOf(settings.tamperSwitchVaultIds) }
+                var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
+                var isAuditLogOpen by remember { mutableStateOf(false) }
 
                 var androidUsers by remember { mutableStateOf<List<AndroidUser>>(emptyList()) }
                 var showCreateUserDialog by remember { mutableStateOf(false) }
@@ -2729,6 +2745,49 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 // --- Category: Security & Auth ---
                 if (target == "Security & Auth") {
                     SectionHeaderCard(
+                        title = "Screen Privacy",
+                        subtitle = "Controls whether Nile's own screens can be captured",
+                        icon = Icons.Filled.Screenshot,
+                        iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Block Screenshots & Recording",
+                            subtitle = "Applies FLAG_SECURE to the PIN screen and this admin panel, so they can't be screenshotted, screen-recorded, or shown in the recents thumbnail. Turn it off if you need screen sharing or a mirroring tool to see these screens.",
+                            icon = Icons.Filled.Screenshot,
+                            checked = blockScreenshots,
+                            onCheckedChange = { blockScreenshots = it }
+                        )
+                    }
+
+                    SectionHeaderCard(
+                        title = "Audit Log",
+                        subtitle = "Encrypted record of unlocks, wrong attempts, and auto-hide triggers",
+                        icon = Icons.Filled.History,
+                        iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ) {
+                        Text(
+                            "See what happened while you were away — every real unlock, wrong device-lock attempt, and automatic vault hide is timestamped and stored encrypted on-device.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        OutlinedButton(
+                            onClick = { isAuditLogOpen = true },
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.History, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("View Audit Log")
+                        }
+                    }
+
+                    if (isAuditLogOpen) {
+                        AuditLogDialog(onDismiss = { isAuditLogOpen = false })
+                    }
+
+                    SectionHeaderCard(
                         title = "Dead Man's Switch",
                         subtitle = "Auto-hides selected vaults if the real vault goes unopened too long",
                         icon = Icons.Filled.Timer,
@@ -2766,6 +2825,60 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                     checked = v.id in deadManSwitchVaultIds,
                                     onCheckedChange = { checked ->
                                         deadManSwitchVaultIds = if (checked) deadManSwitchVaultIds + v.id else deadManSwitchVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Scheduled Lockdown",
+                        subtitle = "Auto-hides selected vaults during a daily time window (e.g. overnight)",
+                        icon = Icons.Filled.Schedule,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Enable Scheduled Lockdown",
+                            subtitle = "Hides the vaults checked below every day between the start and end times (checked every ~15 min, so the trigger can lag by that much).",
+                            icon = Icons.Filled.Schedule,
+                            checked = scheduledLockEnabled,
+                            onCheckedChange = { scheduledLockEnabled = it }
+                        )
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = scheduledLockStartText,
+                                onValueChange = { scheduledLockStartText = it },
+                                label = { Text("Start (HH:mm)") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                            OutlinedTextField(
+                                value = scheduledLockEndText,
+                                onValueChange = { scheduledLockEndText = it },
+                                label = { Text("End (HH:mm)") },
+                                modifier = Modifier.weight(1f),
+                                shape = RoundedCornerShape(16.dp)
+                            )
+                        }
+                        Text(
+                            "Vaults to hide during the window:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    scheduledLockVaultIds = if (v.id in scheduledLockVaultIds)
+                                        scheduledLockVaultIds - v.id else scheduledLockVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in scheduledLockVaultIds,
+                                    onCheckedChange = { checked ->
+                                        scheduledLockVaultIds = if (checked) scheduledLockVaultIds + v.id else scheduledLockVaultIds - v.id
                                     }
                                 )
                                 Text(v.name)
@@ -2842,6 +2955,77 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                     checked = v.id in wrongPinSwitchVaultIds,
                                     onCheckedChange = { checked ->
                                         wrongPinSwitchVaultIds = if (checked) wrongPinSwitchVaultIds + v.id else wrongPinSwitchVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Device Tamper Lockdown",
+                        subtitle = "Auto-hides selected vaults on airplane mode or a SIM swap/removal",
+                        icon = Icons.Filled.SimCard,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        var hasPhonePermission by remember(privilegeTick) {
+                            mutableStateOf(
+                                androidx.core.content.ContextCompat.checkSelfPermission(
+                                    context, android.Manifest.permission.READ_PHONE_STATE
+                                ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+                            )
+                        }
+                        val requestPhonePermission = rememberLauncherForActivityResult(
+                            ActivityResultContracts.RequestPermission()
+                        ) { granted -> hasPhonePermission = granted }
+
+                        PreferenceSwitchRow(
+                            title = "Enable Device Tamper Lockdown",
+                            subtitle = "Hides the vaults checked below the moment airplane mode is switched on, or the SIM card is swapped or pulled out — both common signs the phone has been taken.",
+                            icon = Icons.Filled.SimCard,
+                            checked = tamperSwitchEnabled,
+                            onCheckedChange = { tamperSwitchEnabled = it }
+                        )
+                        if (!hasPhonePermission) {
+                            OutlinedButton(
+                                onClick = { requestPhonePermission.launch(android.Manifest.permission.READ_PHONE_STATE) },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.SimCard, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Grant Phone Permission (for SIM detection)")
+                            }
+                            Text(
+                                "Without it, only the airplane-mode trigger works.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        } else {
+                            Text(
+                                "Phone permission granted — SIM changes are watched.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        Text(
+                            "Vaults to hide when triggered:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    tamperSwitchVaultIds = if (v.id in tamperSwitchVaultIds)
+                                        tamperSwitchVaultIds - v.id else tamperSwitchVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in tamperSwitchVaultIds,
+                                    onCheckedChange = { checked ->
+                                        tamperSwitchVaultIds = if (checked) tamperSwitchVaultIds + v.id else tamperSwitchVaultIds - v.id
                                     }
                                 )
                                 Text(v.name)
@@ -3107,6 +3291,15 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.wrongPinSwitchVaultIds = wrongPinSwitchVaultIds
                         settings.usbSwitchEnabled = usbSwitchEnabled
                         settings.usbSwitchVaultIds = usbSwitchVaultIds
+                        settings.scheduledLockEnabled = scheduledLockEnabled
+                        settings.scheduledLockStartMinute = hhMmToMinuteOrNull(scheduledLockStartText) ?: settings.scheduledLockStartMinute
+                        settings.scheduledLockEndMinute = hhMmToMinuteOrNull(scheduledLockEndText) ?: settings.scheduledLockEndMinute
+                        settings.scheduledLockVaultIds = scheduledLockVaultIds
+                        com.thenile.vault.root.ScheduledLockSwitch.reschedule(context)
+                        settings.tamperSwitchEnabled = tamperSwitchEnabled
+                        settings.tamperSwitchVaultIds = tamperSwitchVaultIds
+                        settings.blockScreenshots = blockScreenshots
+                        applySecureFlag(context)
                         Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -3216,6 +3409,43 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
             }
         }
     }
+}
+
+@Composable
+fun AuditLogDialog(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+    var entries by remember { mutableStateOf(com.thenile.vault.root.AuditLog.read(context)) }
+    val fmt = remember { java.text.SimpleDateFormat("MMM d, HH:mm:ss", java.util.Locale.getDefault()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Audit Log", fontWeight = FontWeight.Bold) },
+        text = {
+            if (entries.isEmpty()) {
+                Text("No events recorded yet.")
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    items(entries) { entry ->
+                        Column {
+                            Text(
+                                fmt.format(java.util.Date(entry.timestampMillis)),
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(entry.event, style = MaterialTheme.typography.bodyMedium)
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("Close") } },
+        dismissButton = {
+            TextButton(onClick = {
+                com.thenile.vault.root.AuditLog.clear(context)
+                entries = emptyList()
+            }) { Text("Clear") }
+        }
+    )
 }
 
 @Composable

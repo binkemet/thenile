@@ -26,6 +26,7 @@ object WrongPinSwitch {
         val targetIds = settings.wrongPinSwitchVaultIds
         if (targetIds.isEmpty()) return
         Log.w(TAG, "wrong-PIN switch fired: $attempts attempts, hiding $targetIds")
+        AuditLog.record(context, "Wrong PIN lockdown fired ($attempts wrong device unlocks) — hid ${targetIds.size} vault(s)")
         for (vault in settings.vaults.filter { it.id in targetIds }) {
             StorageMountManager.unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, context = context)
         }

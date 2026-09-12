@@ -42,6 +42,8 @@ out/
 .codex/
 .cursor/
 .superpowers/
+.serena/
 graphify-out/
 scratchpad/
+scratch_prefs.xml
 BUILD_PROGRESS.md

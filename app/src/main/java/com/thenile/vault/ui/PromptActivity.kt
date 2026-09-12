@@ -56,6 +56,7 @@ class PromptActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        applySecureFlag(this)
 
         if (intent.getBooleanExtra("COVER_ONLY", false)) {
             // Launched from PackageManagerHook.triggerSwitchUser (real-lockscreen decoy PIN) purely

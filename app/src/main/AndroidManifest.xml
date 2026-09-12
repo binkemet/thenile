@@ -15,6 +15,8 @@
     <!-- Vault Accounts: list + remove device accounts. Doesn't grant visibility into accounts the
          owner hasn't shared with Nile (Android 8+) — see AccountPickerDialog. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <!-- Device Tamper Lockdown: SIM-change detection reads the SIM serial number. -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 
     <application
         android:allowBackup="false"
@@ -160,6 +162,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="com.thenile.vault.action.DEAD_MAN_SWITCH_CHECK" />
+            </intent-filter>
+        </receiver>
+
+        <receiver
+            android:name=".receivers.ScheduledLockReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.thenile.vault.action.SCHEDULED_LOCK_CHECK" />
             </intent-filter>
         </receiver>
 
