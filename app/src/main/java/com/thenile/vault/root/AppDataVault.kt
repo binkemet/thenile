@@ -184,10 +184,15 @@ object AppDataVault {
         PrivilegedShell.exec("rm -f '$encScratch'")
         if (!dec) { PrivilegedShell.exec("rm -rf '$dir' '$tmp'"); return false }
         PrivilegedShell.exec("rm -rf '$dir'", "mkdir -p '$dir'", "tar -xf '$tmp' -C '$dir'")
-        // Shell glob expands the split set; install-multiple accepts base + splits atomically.
-        val ok = PrivilegedShell.exec("cd '$dir' && pm install-multiple *.apk").isSuccess
+        // `pm install-multiple` doesn't exist on this Android build (confirmed on-device: "Unknown
+        // command"). Plain `pm install PATH [SPLIT...]` accepts a base + splits directly — base.apk
+        // must come first positionally, so it's named explicitly and excluded from the glob for the
+        // rest rather than relying on "b" sorting before whatever a split happens to be named.
+        val ok = PrivilegedShell.exec(
+            "cd '$dir' && pm install base.apk \$(ls *.apk | grep -v '^base\\.apk\$')"
+        ).isSuccess
         PrivilegedShell.exec("rm -rf '$dir' '$tmp'")
-        if (!ok) Log.e(TAG, "restoreApks: install-multiple failed")
+        if (!ok) Log.e(TAG, "restoreApks: pm install failed")
         return ok
     }
 
