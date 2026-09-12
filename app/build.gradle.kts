@@ -11,8 +11,24 @@ android {
         applicationId = "com.thenile.vault"
         minSdk = 24
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
+    }
+
+    // Two editions from one codebase:
+    //  - xposed: sideloaded APK, includes the LSPosed hook (real-lockscreen decoy trigger). Default.
+    //  - aosp:   root-only, no Xposed. For baking into an AOSP ROM (GrapheneOS etc.) as a system
+    //            app — same appId so it can replace the sideloaded build. The hook source, assets,
+    //            and manifest meta-data live in src/xposed/ and are simply absent here.
+    flavorDimensions += "edition"
+    productFlavors {
+        create("xposed") {
+            dimension = "edition"
+            isDefault = true
+        }
+        create("aosp") {
+            dimension = "edition"
+        }
     }
 
     buildTypes {
@@ -29,7 +45,10 @@ android {
     }
     buildFeatures {
       compose = true
-      aidl = false
+      // Needed for the Shizuku user-service AIDL interface (shizuku/IShellService.aidl) —
+      // Shizuku.newProcess isn't public API on the current shizuku-api version, so shell-UID
+      // commands run through a small self-hosted AIDL service instead (see ShizukuShell.kt).
+      aidl = true
       buildConfig = true
       shaders = false
     }
@@ -110,6 +129,10 @@ dependencies {
 
   // TheNile Dependencies
   implementation("com.github.topjohnwu.libsu:core:5.2.2")
-  compileOnly("io.github.libxposed:api:102.0.0")
+  // Xposed API only compiles into the xposed flavor; the aosp flavor has no hook source to build.
+  "xposedCompileOnly"("io.github.libxposed:api:102.0.0")
   implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")
+  // Shell-UID (ADB/wireless-debugging) privilege tier for devices without root, e.g. GrapheneOS.
+  implementation("dev.rikka.shizuku:api:13.1.5")
+  implementation("dev.rikka.shizuku:provider:13.1.5")
 }

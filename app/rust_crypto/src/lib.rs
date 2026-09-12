@@ -131,6 +131,142 @@ pub extern "system" fn Java_com_thenile_vault_backup_BackupManager_decryptPayloa
     env.new_string(plaintext).expect("new_string failed").into_raw()
 }
 
+#[no_mangle]
+pub extern "system" fn Java_com_thenile_vault_root_StorageMountManager_encryptFileNative<'local>(
+    mut env: JNIEnv<'local>,
+    _class: JClass<'local>,
+    pin: JString<'local>,
+    salt: JString<'local>,
+    src_path: JString<'local>,
+    dst_path: JString<'local>,
+) -> jboolean {
+    use rand_core::RngCore;
+    let pin_str: String = match env.get_string(&pin) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let salt_str: String = match env.get_string(&salt) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let src: String = match env.get_string(&src_path) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let dst: String = match env.get_string(&dst_path) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+
+    let data = match std::fs::read(&src) {
+        Ok(d) => d,
+        Err(_) => return JNI_FALSE,
+    };
+
+    let mut key = [0u8; 32];
+    if Argon2::default()
+        .hash_password_into(pin_str.as_bytes(), salt_str.as_bytes(), &mut key)
+        .is_err()
+    {
+        return JNI_FALSE;
+    }
+
+    let mut iv = [0u8; 12];
+    OsRng.fill_bytes(&mut iv);
+    let nonce = Nonce::from_slice(&iv);
+
+    let cipher = match Aes256Gcm::new_from_slice(&key) {
+        Ok(c) => c,
+        Err(_) => return JNI_FALSE,
+    };
+
+    let ciphertext = match cipher.encrypt(nonce, data.as_ref()) {
+        Ok(c) => c,
+        Err(_) => return JNI_FALSE,
+    };
+
+    // Format: [12 bytes IV] + [ciphertext + 16 bytes tag]
+    let mut output = Vec::with_capacity(12 + ciphertext.len());
+    output.extend_from_slice(&iv);
+    output.extend_from_slice(&ciphertext);
+
+    if let Some(parent) = std::path::Path::new(&dst).parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+
+    match std::fs::write(&dst, &output) {
+        Ok(_) => JNI_TRUE,
+        Err(_) => JNI_FALSE,
+    }
+}
+
+#[no_mangle]
+pub extern "system" fn Java_com_thenile_vault_root_StorageMountManager_decryptFileNative<'local>(
+    mut env: JNIEnv<'local>,
+    _class: JClass<'local>,
+    pin: JString<'local>,
+    salt: JString<'local>,
+    src_path: JString<'local>,
+    dst_path: JString<'local>,
+) -> jboolean {
+    let pin_str: String = match env.get_string(&pin) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let salt_str: String = match env.get_string(&salt) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let src: String = match env.get_string(&src_path) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+    let dst: String = match env.get_string(&dst_path) {
+        Ok(s) => s.into(),
+        Err(_) => return JNI_FALSE,
+    };
+
+    let payload = match std::fs::read(&src) {
+        Ok(p) => p,
+        Err(_) => return JNI_FALSE,
+    };
+
+    if payload.len() < 12 + 16 {
+        return JNI_FALSE;
+    }
+
+    let iv = &payload[0..12];
+    let ciphertext = &payload[12..];
+
+    let mut key = [0u8; 32];
+    if Argon2::default()
+        .hash_password_into(pin_str.as_bytes(), salt_str.as_bytes(), &mut key)
+        .is_err()
+    {
+        return JNI_FALSE;
+    }
+
+    let nonce = Nonce::from_slice(iv);
+    let cipher = match Aes256Gcm::new_from_slice(&key) {
+        Ok(c) => c,
+        Err(_) => return JNI_FALSE,
+    };
+
+    let plaintext = match cipher.decrypt(nonce, ciphertext) {
+        Ok(p) => p,
+        Err(_) => return JNI_FALSE,
+    };
+
+    if let Some(parent) = std::path::Path::new(&dst).parent() {
+        let _ = std::fs::create_dir_all(parent);
+    }
+
+    match std::fs::write(&dst, &plaintext) {
+        Ok(_) => JNI_TRUE,
+        Err(_) => JNI_FALSE,
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -2,7 +2,7 @@ package com.thenile.vault
 
 import com.thenile.vault.backup.BackupManager
 import com.thenile.vault.state.DummyDir
-import com.thenile.vault.state.Profile
+import com.thenile.vault.state.Vault
 import com.thenile.vault.state.SettingsManager
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -14,21 +14,25 @@ import java.io.ByteArrayOutputStream
 class BackupTest {
 
     private class MockSettingsManager : SettingsManager(android.content.ContextWrapper(null)) {
-        private var _profiles: MutableList<Profile>? = null
+        private var _vaults: MutableList<Vault>? = null
 
-        override var profiles: List<Profile>
-            get() = _profiles ?: emptyList()
+        override var vaults: List<Vault>
+            get() = _vaults ?: emptyList()
             set(value) {
-                _profiles = value.toMutableList()
+                _vaults = value.toMutableList()
             }
+
+        override fun syncToSystem() {
+            // No-op for unit test mock
+        }
     }
 
     @Test
     fun testBackupExportImportRoundtrip() {
-        val testProfiles = listOf(
-            Profile(
+        val testVaults = listOf(
+            Vault(
                 id = "id1",
-                name = "Work Profile",
+                name = "Work Vault",
                 packages = listOf("com.app.work"),
                 directories = listOf("/sdcard/doc"),
                 dummyDirectories = listOf(DummyDir("/sdcard/doc", "/sdcard/dummy_doc", true)),
@@ -39,7 +43,7 @@ class BackupTest {
         )
 
         val out = ByteArrayOutputStream()
-        val exportOk = BackupManager.exportBackup(testProfiles, "SecretPass123", out)
+        val exportOk = BackupManager.exportBackup(testVaults, "SecretPass123", out)
         assertTrue(exportOk)
 
         val backupBytes = out.toByteArray()
@@ -53,10 +57,10 @@ class BackupTest {
         val importedCount = BackupManager.importBackup(mockSettings, "SecretPass123", inputStream)
 
         assertEquals(1, importedCount)
-        assertEquals(1, mockSettings.profiles.size)
+        assertEquals(1, mockSettings.vaults.size)
 
-        val imported = mockSettings.profiles[0]
-        assertEquals("Work Profile", imported.name)
+        val imported = mockSettings.vaults[0]
+        assertEquals("Work Vault", imported.name)
         assertEquals(listOf("com.app.work"), imported.packages)
         assertEquals(listOf("/sdcard/doc"), imported.directories)
         assertEquals(1, imported.dummyDirectories.size)
@@ -70,16 +74,16 @@ class BackupTest {
 
     @Test
     fun testImportDuplicateIdGeneratesNewUuid() {
-        val testProfiles = listOf(
-            Profile("existing_id", "Existing", listOf("com.exist"), emptyList(), emptyList(), true, true, "")
+        val testVaults = listOf(
+            Vault(id = "existing_id", name = "Existing", packages = listOf("com.exist"), isActive = true, hideOnDecoy = true)
         )
 
         val out = ByteArrayOutputStream()
-        BackupManager.exportBackup(testProfiles, "Pass", out)
+        BackupManager.exportBackup(testVaults, "Pass", out)
 
         val mockSettings = MockSettingsManager().apply {
-            profiles = listOf(
-                Profile("existing_id", "Existing", listOf("com.exist"), emptyList(), emptyList(), true, true, "")
+            vaults = listOf(
+                Vault(id = "existing_id", name = "Existing", packages = listOf("com.exist"), isActive = true, hideOnDecoy = true)
             )
         }
 
@@ -87,7 +91,7 @@ class BackupTest {
         val count = BackupManager.importBackup(mockSettings, "Pass", inputStream)
 
         assertEquals(1, count)
-        assertEquals(2, mockSettings.profiles.size)
-        assertNotEquals(mockSettings.profiles[0].id, mockSettings.profiles[1].id)
+        assertEquals(2, mockSettings.vaults.size)
+        assertNotEquals(mockSettings.vaults[0].id, mockSettings.vaults[1].id)
     }
 }

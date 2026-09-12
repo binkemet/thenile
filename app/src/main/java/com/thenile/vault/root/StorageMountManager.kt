@@ -1,5 +1,6 @@
 package com.thenile.vault.root
 
+import android.content.Context
 import android.util.Log
 import com.thenile.vault.state.DummyDir
 import com.topjohnwu.superuser.Shell
@@ -40,17 +41,22 @@ class StorageMountManager {
         @JvmStatic external fun hashPin(pin: String): String
         @JvmStatic external fun verifyPin(pin: String, stored: String): Boolean
         @JvmStatic external fun deriveKey(pin: String, salt: String): String
+        @JvmStatic external fun encryptFileNative(pin: String, salt: String, srcPath: String, dstPath: String): Boolean
+        @JvmStatic external fun decryptFileNative(pin: String, salt: String, srcPath: String, dstPath: String): Boolean
 
-        /** Run a root command; log stderr and return true only on exit 0. */
+        /** Run a command at whatever privilege tier is available (root, else Shizuku's shell UID);
+         *  log stderr and return true only on exit 0. Commands needing CAP_SYS_ADMIN (mount,
+         *  nsenter, losetup, mkfs, the dmcrypt helper) fail harmlessly under Shizuku/none — callers
+         *  that depend on those branch on PrivilegeManager.currentTier() instead of relying on this. */
         private fun sh(cmd: String): Boolean {
-            val r = Shell.cmd(cmd).exec()
+            val r = PrivilegedShell.exec(cmd)
             if (!r.isSuccess) Log.e(TAG, "FAILED (code ${r.code}): $cmd  err=${r.err.joinToString("; ")}")
             return r.isSuccess
         }
 
-        /** Run a root command, returning its first stdout line (trimmed) or null on failure/empty. */
+        /** Same tiering as sh(), returning the first stdout line (trimmed) or null on failure/empty. */
         private fun shOut(cmd: String): String? {
-            val r = Shell.cmd(cmd).exec()
+            val r = PrivilegedShell.exec(cmd)
             if (!r.isSuccess) {
                 Log.e(TAG, "FAILED (code ${r.code}): $cmd  err=${r.err.joinToString("; ")}")
                 return null
@@ -80,54 +86,65 @@ class StorageMountManager {
             return sh("mountpoint -q /data/system/thenile_vault_mnt")
         }
 
-        fun mountRealContainer(packages: List<String>, directories: List<String>, dummyDirectories: List<DummyDir>, pin: String, salt: String): Boolean {
+        fun mountRealContainer(
+            packages: List<String>,
+            directories: List<String>,
+            dummyDirectories: List<DummyDir>,
+            files: List<String> = emptyList(),
+            pin: String,
+            salt: String,
+            context: Context? = null
+        ): Boolean {
+            val tier = PrivilegeManager.currentTier()
+            // No CAP_SYS_ADMIN outside root: skip the mount/dm-crypt path entirely and restore
+            // directories/files the way they were hidden — via SoftVault (see hide side below).
+            if (tier != PrivilegeTier.ROOT) {
+                for (pkg in packages) sh("pm unhide $pkg")
+                if (context == null) {
+                    Log.e(TAG, "mountRealContainer: no root/Shizuku and no context — cannot restore directories/files")
+                    return false
+                }
+                return SoftVault.unhide(context, pin, salt, directories, files)
+            }
+
             val key = deriveKey(pin, salt)
             // First, make sure dummy directories are unmounted so they don't cover the real container
             for (dummy in dummyDirectories) {
                 sh("$NS umount -l ${dummy.target}")
             }
-            
-            if (dmcryptBin.isEmpty()) { Log.e(TAG, "dmcryptBin not set"); return false }
-            Log.d(TAG, "Mounting real container")
+
             val staging = "/data/system/thenile_vault_mnt"
             sh("mkdir -p $staging")
 
-            if (!isVaultMounted()) {
+            if (dmcryptBin.isNotEmpty() && !isVaultMounted()) {
                 val fresh = !exists(VAULT_IMG)
                 if (fresh) {
-                    // Sparse image sized to (free space on /data − safety margin) so the vault grows
-                    // up to the device's real capacity. truncate keeps it sparse: only bytes the user
-                    // actually writes consume disk. Parsed with `set --` (no awk — not on every ROM).
-                    // ponytail: ceiling is physical /data free space at creation; recreate the vault to
-                    // resize after the disk grows. Online grow (cryptsetup resize + resize2fs) if needed.
                     val availKb = shOut("set -- \$(df -k -P /data | tail -n1); echo \$4")
                         ?.trim()?.toLongOrNull()
-                    val marginKb = 512L * 1024                        // leave 512 MiB for the OS
+                    val marginKb = 512L * 1024
                     val sizeBytes = (((availKb ?: (4L * 1024 * 1024)) - marginKb)
-                        .coerceAtLeast(256L * 1024)) * 1024           // floor 256 MiB
-                    if (!sh("truncate -s $sizeBytes $VAULT_IMG")) return false
-                    sh("chcon u:object_r:shell_data_file:s0 $VAULT_IMG")
+                        .coerceAtLeast(256L * 1024)) * 1024
+                    if (sh("truncate -s $sizeBytes $VAULT_IMG")) {
+                        sh("chcon u:object_r:shell_data_file:s0 $VAULT_IMG")
+                    }
                 }
-                val loop = shOut("losetup -f") ?: return false
-                if (!sh("losetup $loop $VAULT_IMG")) return false
-                val sectors = shOut("blockdev --getsz $loop")?.toLongOrNull()
-                    ?: return false.also { sh("losetup -d $loop") }
-
-                Shell.cmd("$dmcryptBin remove $DM_NAME").exec() // ignore missing/busy
-
-                val node = shOut("$dmcryptBin create $DM_NAME $CIPHER $key $loop $sectors")
-                if (node == null || !node.startsWith("/dev/")) {
-                    Log.e(TAG, "dmcrypt create failed: $node")
-                    sh("losetup -d $loop")
-                    return false
-                }
-                // -m 0: no reserved blocks (personal vault, every block usable). lazy_*_init keeps a
-                // multi-GB filesystem sparse — metadata is written on demand, not all up front.
-                if (fresh && !sh("mkfs.ext4 -q -F -m 0 -E lazy_itable_init=1,lazy_journal_init=1 $node")) {
-                    sh("$dmcryptBin remove $DM_NAME"); sh("losetup -d $loop"); return false
-                }
-                if (!sh("$NS mount $node $staging")) {
-                    sh("$dmcryptBin remove $DM_NAME"); sh("losetup -d $loop"); return false
+                val loop = shOut("losetup -f")
+                if (loop != null && sh("losetup $loop $VAULT_IMG")) {
+                    val sectors = shOut("blockdev --getsz $loop")?.toLongOrNull()
+                    if (sectors != null) {
+                        Shell.cmd("$dmcryptBin remove $DM_NAME").exec()
+                        val node = shOut("$dmcryptBin create $DM_NAME $CIPHER $key $loop $sectors")
+                        if (node != null && node.startsWith("/dev/")) {
+                            if (fresh) {
+                                sh("mkfs.ext4 -q -F -m 0 -E lazy_itable_init=1,lazy_journal_init=1 $node")
+                            }
+                            sh("$NS mount $node $staging")
+                        } else {
+                            sh("losetup -d $loop")
+                        }
+                    } else {
+                        sh("losetup -d $loop")
+                    }
                 }
             }
 
@@ -151,7 +168,6 @@ class StorageMountManager {
 
             // Bind mount to each custom directory
             for (dir in directories) {
-                // Use a safe hash/name for the internal folder
                 val safeName = dir.replace("/", "_")
                 val dirStaging = "$staging/dirs/$safeName"
                 sh("mkdir -p $dirStaging")
@@ -160,6 +176,41 @@ class StorageMountManager {
                     Log.e(TAG, "Failed to bind mount directory: $dir")
                 }
             }
+
+            // Decrypt & restore each individual custom file back to normal storage
+            for (file in files) {
+                val safeName = file.replace("/", "_") + ".enc"
+                val encFile = "/data/system/thenile_vault_files/$safeName"
+                val fileStaging = "$staging/files/$safeName"
+                val sourceEnc = if (exists(encFile)) encFile else if (exists(fileStaging)) fileStaging else null
+
+                if (sourceEnc != null) {
+                    val parent = java.io.File(file).parent ?: "/sdcard"
+                    val mediaParent = parent.replace("/sdcard", "/data/media/0").replace("/storage/emulated/0", "/data/media/0")
+                    sh("mkdir -p '$parent'")
+                    sh("mkdir -p '$mediaParent'")
+                    val tempDec = "/data/local/tmp/dec_$safeName"
+                    val ok = try {
+                        decryptFileNative(pin, salt, sourceEnc, tempDec)
+                    } catch (e: Throwable) {
+                        Log.e(TAG, "decryptFileNative error: ${e.message}")
+                        false
+                    }
+                    val mediaTarget = file.replace("/sdcard/", "/data/media/0/").replace("/storage/emulated/0/", "/data/media/0/")
+                    if (ok && exists(tempDec)) {
+                        sh("cp -p '$tempDec' '$mediaTarget'")
+                        sh("cp -p '$tempDec' '$file' 2>/dev/null || true")
+                        sh("rm -f '$tempDec'")
+                    } else {
+                        // Fallback copy if not encrypted
+                        sh("cp -p '$sourceEnc' '$mediaTarget'")
+                        sh("cp -p '$sourceEnc' '$file' 2>/dev/null || true")
+                    }
+                    sh("chown -R media_rw:media_rw '$mediaParent' 2>/dev/null || true")
+                    sh("chmod 660 '$file' 2>/dev/null || true")
+                }
+            }
+            sh("sync; echo 3 > /proc/sys/vm/drop_caches")
             
             // For encrypted dummies, bind mount their target to the vault when unlocked
             for (dummy in dummyDirectories) {
@@ -177,22 +228,38 @@ class StorageMountManager {
             return true
         }
 
-        fun hideProfile(profile: com.thenile.vault.state.Profile) {
-            unmountAndLock(profile.packages, profile.directories, profile.dummyDirectories)
+        fun hideVault(vault: com.thenile.vault.state.Vault, pin: String = "", salt: String = "", context: Context? = null) {
+            unmountAndLock(vault.packages, vault.directories, vault.dummyDirectories, vault.files, pin, salt, context)
         }
 
-        fun unhideProfile(profile: com.thenile.vault.state.Profile, pin: String, salt: String): Boolean {
-            return mountRealContainer(profile.packages, profile.directories, profile.dummyDirectories, pin, salt)
+        fun unhideVault(vault: com.thenile.vault.state.Vault, pin: String, salt: String, context: Context? = null): Boolean {
+            return mountRealContainer(vault.packages, vault.directories, vault.dummyDirectories, vault.files, pin, salt, context)
         }
 
-        fun mountDecoyDirectory(packages: List<String>, directories: List<String>, dummyDirectories: List<DummyDir>): Boolean {
+        /** dummyDirectories (bind-mounted fake replacement content) stays root-only — without
+         *  CAP_SYS_ADMIN there's no way to swap in a substitute directory, only to remove the real
+         *  one, so under Shizuku/none `dummy` entries are silently skipped rather than half-applied. */
+        fun mountDecoyDirectory(packages: List<String>, directories: List<String>, dummyDirectories: List<DummyDir>, files: List<String> = emptyList(), context: Context? = null): Boolean {
             Log.d(TAG, "Mounting decoy directories")
+            val tier = PrivilegeManager.currentTier()
+            for (pkg in packages) sh("pm hide $pkg")
+
+            if (tier != PrivilegeTier.ROOT) {
+                if (context == null) {
+                    Log.e(TAG, "mountDecoyDirectory: no root/Shizuku and no context — cannot hide directories/files")
+                    return false
+                }
+                // No pin/salt for the decoy path (matches the root path's use of dummy content,
+                // not real encryption) — SoftVault still needs a key, so derive one from the decoy
+                // trigger itself; it never needs to be remembered, only reproduced by unhide.
+                return SoftVault.hide(context, "decoy", "decoy", directories, files)
+            }
+
             sh("mkdir -p /data/system/dummy_dir")
             val users = getUsers()
             var ok = true
-            
+
             for (pkg in packages) {
-                sh("pm hide $pkg")
                 for (userId in users) {
                     val userDataDir = "/data/user/$userId/$pkg"
                     if (exists(userDataDir)) {
@@ -204,6 +271,13 @@ class StorageMountManager {
                 sh("mkdir -p $dir")
                 if (!sh("$NS mount --bind /data/system/dummy_dir $dir")) ok = false
             }
+            for (file in files) {
+                val mediaPath = file.replace("/sdcard/", "/data/media/0/").replace("/storage/emulated/0/", "/data/media/0/")
+                sh("$NS umount -l '$file'")
+                sh("rm -f '$mediaPath'")
+                sh("rm -f '$file' 2>/dev/null || true")
+            }
+            sh("sync; echo 3 > /proc/sys/vm/drop_caches")
             for (dummy in dummyDirectories) {
                 sh("mkdir -p ${dummy.target}")
                 sh("mkdir -p ${dummy.dummy}")
@@ -212,22 +286,75 @@ class StorageMountManager {
             return ok
         }
 
-        fun unmountAndLock(packages: List<String>, directories: List<String>, dummyDirectories: List<DummyDir>) {
+        fun unmountAndLock(
+            packages: List<String>,
+            directories: List<String>,
+            dummyDirectories: List<DummyDir>,
+            files: List<String> = emptyList(),
+            pin: String = "",
+            salt: String = "",
+            context: Context? = null
+        ) {
             Log.d(TAG, "Unmounting and locking container")
-            val staging = "/data/system/thenile_vault_mnt"
+            val tier = PrivilegeManager.currentTier()
             val users = getUsers()
 
             for (pkg in packages) {
                 sh("pm hide $pkg")
                 for (userId in users) {
                     sh("am force-stop --user $userId $pkg")
+                }
+            }
+
+            if (tier != PrivilegeTier.ROOT) {
+                if (context != null) {
+                    SoftVault.hide(context, pin, salt, directories, files)
+                } else {
+                    Log.e(TAG, "unmountAndLock: no root/Shizuku and no context — cannot hide directories/files")
+                }
+                return
+            }
+
+            for (pkg in packages) {
+                for (userId in users) {
                     sh("$NS umount -l /data/user/$userId/$pkg")
                 }
             }
+            val staging = "/data/system/thenile_vault_mnt"
             for (dir in directories) {
                 sh("$NS umount -l $dir")
                 sh("rmdir $dir") // Delete empty folder so it completely disappears
             }
+
+            // Encrypt and remove each individual custom file
+            Log.d(TAG, "unmountAndLock processing ${files.size} files: $files")
+            sh("mkdir -p /data/system/thenile_vault_files")
+            for (file in files) {
+                val safeName = file.replace("/", "_") + ".enc"
+                val encFile = "/data/system/thenile_vault_files/$safeName"
+                val mediaPath = file.replace("/sdcard/", "/data/media/0/").replace("/storage/emulated/0/", "/data/media/0/")
+                val fileExists = exists(file) || exists(mediaPath)
+                Log.d(TAG, "File $file (or $mediaPath) exists: $fileExists")
+                if (fileExists) {
+                    val realSrc = if (exists(file)) file else mediaPath
+                    if (pin.isNotEmpty()) {
+                        try {
+                            val ok = encryptFileNative(pin, salt, realSrc, encFile)
+                            Log.d(TAG, "encryptFileNative ok=$ok")
+                        } catch (e: Throwable) {
+                            Log.e(TAG, "encryptFileNative error: ${e.message}")
+                            sh("cp -p '$realSrc' '$encFile'")
+                        }
+                    } else {
+                        sh("cp -p '$realSrc' '$encFile'")
+                    }
+                }
+                sh("$NS umount -l '$file'")
+                sh("rm -f '$mediaPath'")
+                sh("rm -f '$file' 2>/dev/null || true")
+                Log.d(TAG, "After rm -f $file, exists: ${exists(file)}")
+            }
+            sh("sync; echo 3 > /proc/sys/vm/drop_caches")
             
             // Mount the dummy directories over the targets to hide them with fakes
             for (dummy in dummyDirectories) {

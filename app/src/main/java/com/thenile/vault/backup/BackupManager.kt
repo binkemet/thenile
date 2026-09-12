@@ -1,7 +1,7 @@
 package com.thenile.vault.backup
 
 import com.thenile.vault.state.DummyDir
-import com.thenile.vault.state.Profile
+import com.thenile.vault.state.Vault
 import com.thenile.vault.state.SettingsManager
 import org.json.JSONArray
 import org.json.JSONObject
@@ -60,9 +60,9 @@ object BackupManager {
         return String(plaintextBytes, Charsets.UTF_8)
     }
 
-    fun exportBackup(profiles: List<Profile>, password: String, outputStream: OutputStream): Boolean {
+    fun exportBackup(vaults: List<Vault>, password: String, outputStream: OutputStream): Boolean {
         val jsonArray = JSONArray()
-        profiles.forEach { p ->
+        vaults.forEach { p ->
             val obj = JSONObject()
             obj.put("id", p.id)
             obj.put("name", p.name)
@@ -81,6 +81,12 @@ object BackupManager {
                 dummyArr.put(dObj)
             }
             obj.put("dummyDirectories", dummyArr)
+            val hiddenAppsArr = JSONArray()
+            p.hiddenApps.forEach { hiddenAppsArr.put(it) }
+            obj.put("hiddenApps", hiddenAppsArr)
+            val uninstallAppsArr = JSONArray()
+            p.uninstallApps.forEach { uninstallAppsArr.put(it) }
+            obj.put("uninstallApps", uninstallAppsArr)
             obj.put("isActive", p.isActive)
             obj.put("hideOnDecoy", p.hideOnDecoy)
             obj.put("decoyPin", p.decoyPin)
@@ -88,7 +94,7 @@ object BackupManager {
         }
         val payload = JSONObject().apply {
             put("version", 1)
-            put("profiles", jsonArray)
+            put("vaults", jsonArray)
         }.toString()
 
         val saltBytes = ByteArray(16).also { SecureRandom().nextBytes(it) }
@@ -127,16 +133,16 @@ object BackupManager {
         val jsonPayloadStr = decryptPayload(password, saltHex, ivBytes, ciphertextHex)
 
         val payloadObj = JSONObject(jsonPayloadStr)
-        val jsonProfiles = payloadObj.getJSONArray("profiles")
-        val currentProfiles = settings.profiles.toMutableList()
-        val existingIds = currentProfiles.map { it.id }.toSet()
+        val jsonVaults = payloadObj.getJSONArray("vaults")
+        val currentVaults = settings.vaults.toMutableList()
+        val existingIds = currentVaults.map { it.id }.toSet()
         var importedCount = 0
 
-        for (i in 0 until jsonProfiles.length()) {
-            val pObj = jsonProfiles.getJSONObject(i)
-            var profileId = pObj.optString("id", UUID.randomUUID().toString())
-            if (profileId.isBlank() || existingIds.contains(profileId)) {
-                profileId = UUID.randomUUID().toString()
+        for (i in 0 until jsonVaults.length()) {
+            val pObj = jsonVaults.getJSONObject(i)
+            var vaultId = pObj.optString("id", UUID.randomUUID().toString())
+            if (vaultId.isBlank() || existingIds.contains(vaultId)) {
+                vaultId = UUID.randomUUID().toString()
             }
 
             val pkgs = mutableListOf<String>()
@@ -166,21 +172,27 @@ object BackupManager {
                 }
             }
 
-            val importedProfile = Profile(
-                id = profileId,
-                name = pObj.optString("name", "Imported Profile"),
+            val importedVault = Vault(
+                id = vaultId,
+                name = pObj.optString("name", "Imported Vault"),
                 packages = pkgs,
                 directories = dirs,
                 dummyDirectories = dummyDirs,
+                hiddenApps = mutableListOf<String>().also { l ->
+                    pObj.optJSONArray("hiddenApps")?.let { for (j in 0 until it.length()) l.add(it.getString(j)) }
+                },
+                uninstallApps = mutableListOf<String>().also { l ->
+                    pObj.optJSONArray("uninstallApps")?.let { for (j in 0 until it.length()) l.add(it.getString(j)) }
+                },
                 isActive = pObj.optBoolean("isActive", false),
                 hideOnDecoy = pObj.optBoolean("hideOnDecoy", true),
                 decoyPin = pObj.optString("decoyPin", "")
             )
-            currentProfiles.add(importedProfile)
+            currentVaults.add(importedVault)
             importedCount++
         }
 
-        settings.profiles = currentProfiles
+        settings.vaults = currentVaults
         return importedCount
     }
 }

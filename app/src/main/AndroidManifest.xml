@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
+    <!-- Shizuku's own runtime permission on API 34+; pre-34 it grants via its manager app dialog. -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23"/>
+    <!-- Root's file hiding runs entirely via a root shell, which bypasses scoped storage — no
+         permission needed there. SoftVault (Shizuku/no-root) runs plain java.io.File calls inside
+         Nile's own process, which scoped storage silently blocks for directories/files the app
+         didn't create itself (confirmed on-device: hide silently no-ops, no error). This is the
+         broad "All files access" grant instead of per-directory SAF trees — see SoftVault.kt. -->
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage"/>
+    <!-- Re-arms the dead man's switch alarm after reboot (AlarmManager alarms don't survive one). -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Vault Accounts: list + remove device accounts. Doesn't grant visibility into accounts the
+         owner hasn't shared with Nile (Android 8+) — see AccountPickerDialog. -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
 
     <application
         android:allowBackup="false"
@@ -11,16 +25,22 @@
         android:windowSoftInputMode="adjustResize"
         android:theme="@style/Theme.TheNile">
         
-        <meta-data
-            android:name="xposedmodule"
-            android:value="true" />
-        <meta-data
-            android:name="xposeddescription"
-            android:value="The Nile Stealth Engine" />
-        <meta-data
-            android:name="xposedminversion"
-            android:value="100" />
-            
+        <provider
+            android:name=".AppContextProvider"
+            android:authorities="${applicationId}.appctx"
+            android:exported="false" />
+
+        <!-- Lets the Shizuku app/manager bind to request+relay shell-UID privileges when this
+             device has no root (e.g. GrapheneOS) but does have Shizuku running via ADB/wireless
+             debugging. Standard rikka.shizuku-api boilerplate, values as documented upstream. -->
+        <provider
+            android:name="rikka.shizuku.ShizukuProvider"
+            android:authorities="${applicationId}.shizuku"
+            android:multiprocess="false"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
+
         <activity
             android:name=".ui.PromptActivity"
             android:exported="true"
@@ -56,6 +76,27 @@
             </intent-filter>
         </activity-alias>
 
+        <!-- Injects a "The Nile" tile into the AOSP Settings app under System. Only appears when
+             Nile is installed on the system image (priv-app) — AOSP's SettingsLib ignores injected
+             tiles from non-system apps, so this is inert for a normal APK install. A true top-level
+             Evolver-style dashboard entry needs a Settings source fork; this reuses AdminActivity. -->
+        <activity-alias
+            android:name=".ui.NileSettingsTile"
+            android:targetActivity=".ui.AdminActivity"
+            android:exported="true"
+            android:label="The Nile"
+            android:icon="@mipmap/ic_launcher">
+            <intent-filter>
+                <action android:name="com.android.settings.action.IA_SETTINGS" />
+            </intent-filter>
+            <meta-data android:name="com.android.settings.category"
+                android:value="com.android.settings.category.ia.system" />
+            <meta-data android:name="com.android.settings.title"
+                android:value="The Nile" />
+            <meta-data android:name="com.android.settings.summary"
+                android:value="Vault, decoy switching &amp; anti-forensics" />
+        </activity-alias>
+
         <service
             android:name=".services.NileTileService"
             android:exported="true"
@@ -84,10 +125,55 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.provider.Telephony.SECRET_CODE" />
+                <data android:scheme="android_secret_code" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SECRET_CODE" />
                 <data android:scheme="android_secret_code" android:host="1234" />
+                <data android:scheme="android_secret_code" android:host="8888" />
                 <data android:scheme="android_secret_code" android:host="9876" />
                 <data android:scheme="android_secret_code" android:host="1111" />
                 <data android:scheme="android_secret_code" android:host="3333" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Real-lockscreen decoy trigger for the AOSP edition. Fired by a ROM's patched Keyguard,
+             not by any app: the signature|privileged permission means only the platform (same
+             signer) or a priv-app can deliver it, so a normal app can't spoof a decoy trigger.
+             Inert unless the ROM is patched to send it. -->
+        <receiver
+            android:name=".receivers.LockscreenDecoyReceiver"
+            android:exported="true"
+            android:permission="android.permission.MANAGE_USERS">
+            <intent-filter>
+                <action android:name="com.thenile.vault.action.LOCKSCREEN_DECOY" />
+            </intent-filter>
+        </receiver>
+
+        <!-- Dead man's switch: periodic check (armed by DeadManSwitch.reschedule) plus a re-arm on
+             boot, since AlarmManager alarms don't survive a reboot. Not exported to other apps —
+             android:exported is left implicit-false, but BOOT_COMPLETED still requires the system
+             be able to deliver it, which it can regardless. -->
+        <receiver
+            android:name=".receivers.DeadManSwitchReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="com.thenile.vault.action.DEAD_MAN_SWITCH_CHECK" />
+            </intent-filter>
+        </receiver>
+
+        <!-- WrongPinSwitch's trigger source: onPasswordFailed()/onPasswordSucceeded() only fire
+             for an active device admin, granted by the user via the button in Admin > Security &
+             Auth (Settings.ACTION_ADD_DEVICE_ADMIN) — inert until then. android:permission is
+             required by the platform for every device admin receiver. -->
+        <receiver
+            android:name=".receivers.NileDeviceAdminReceiver"
+            android:exported="true"
+            android:permission="android.permission.BIND_DEVICE_ADMIN">
+            <meta-data android:name="android.app.device_admin" android:resource="@xml/device_admin_policies" />
+            <intent-filter>
+                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
             </intent-filter>
         </receiver>
 

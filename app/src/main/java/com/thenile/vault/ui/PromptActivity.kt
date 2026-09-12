@@ -37,12 +37,52 @@ import kotlinx.coroutines.launch
 
 class PromptActivity : ComponentActivity() {
 
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val secretCode = intent.getStringExtra("SECRET_CODE") ?: ""
+        if (secretCode.isNotEmpty()) {
+            val scope = kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO)
+            scope.launch {
+                val msg = handleSuccess(secretCode)
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    android.widget.Toast.makeText(this@PromptActivity, msg, android.widget.Toast.LENGTH_LONG).show()
+                    finish()
+                }
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        if (intent.getBooleanExtra("COVER_ONLY", false)) {
+            // Launched from PackageManagerHook.triggerSwitchUser (real-lockscreen decoy PIN) purely
+            // to visually cover Android's own switching dialog. The actual switchUser() call already
+            // happened in the hook before this launched — nothing to process here, just show the
+            // cover and get out of the way once the switch has had time to land.
+            setContent {
+                val context = LocalContext.current
+                val darkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+                val colorScheme = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
+                    if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+                } else {
+                    if (darkTheme) darkColorScheme() else lightColorScheme()
+                }
+                MaterialTheme(colorScheme = colorScheme) {
+                    DecoyBootScreen()
+                }
+                BackHandler { }
+                LaunchedEffect(Unit) {
+                    delay(3500)
+                    finish()
+                }
+            }
+            return
+        }
+
         val secretCode = intent.getStringExtra("SECRET_CODE") ?: ""
-        // dm-crypt helper lives in nativeLibraryDir (extracted, executable) and runs as root.
-        com.thenile.vault.root.StorageMountManager.dmcryptBin = "${applicationInfo.nativeLibraryDir}/libdmcrypt.so"
 
         setContent {
             val context = LocalContext.current
@@ -60,7 +100,7 @@ class PromptActivity : ComponentActivity() {
                 ) {
                     val stateManager = VaultStateManager.getInstance(context)
                     val settings = com.thenile.vault.state.SettingsManager.getInstance(context)
-                    val immediate = secretCode == settings.codeLock
+                    val immediate = secretCode.isNotEmpty() && (secretCode == settings.codeLock || secretCode == settings.codeUnlock || isDecoyCode(secretCode))
                     val decoy = isDecoyCode(secretCode)
                     var working by remember { mutableStateOf(immediate) }
                     val scope = rememberCoroutineScope()
@@ -140,21 +180,31 @@ class PromptActivity : ComponentActivity() {
             return if (ok) "Decoy active" else "Decoy state set, but mount failed (see logs)"
         }
 
+        val targetFiles = settings.targetFiles
+
         return when (code) {
             settings.codeLock -> {
                 stateManager.updateState(VaultState.LOCKED)
-                com.thenile.vault.root.StorageMountManager.unmountAndLock(targets, dirs, dummyDirs)
+                com.thenile.vault.root.StorageMountManager.unmountAndLock(targets, dirs, dummyDirs, targetFiles, context = this)
+                // Hidden apps: leave the anodyne data in place while locked, never the real data.
+                settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
+                    com.thenile.vault.root.HiddenAppManager.showDecoy(this, it, it.decoyPin)
+                }
                 targets.forEach { pkg ->
                     com.thenile.vault.root.TraceCleaner.cleanTraces(pkg)
                 }
                 "Locked"
             }
-            settings.codeUnlock -> {
+            settings.codeUnlock, "" -> {
                 val salt = stateManager.keySalt()
-                val ok = com.thenile.vault.root.StorageMountManager.mountRealContainer(targets, dirs, dummyDirs, lastPin, salt)
+                val ok = com.thenile.vault.root.StorageMountManager.mountRealContainer(targets, dirs, dummyDirs, targetFiles, lastPin, salt, this)
                 // Only claim UNLOCKED if the container actually mounted, so the hook doesn't
                 // reveal apps whose data never came online.
                 if (ok) {
+                    // Hidden apps: restore the real data (each snapshot decrypts only under this PIN).
+                    settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
+                        com.thenile.vault.root.HiddenAppManager.revealReal(this, it, lastPin)
+                    }
                     stateManager.updateState(VaultState.UNLOCKED)
                     "Unlocked"
                 } else {
@@ -184,7 +234,7 @@ class PromptActivity : ComponentActivity() {
     private fun isDecoyCode(code: String): Boolean {
         val settings = com.thenile.vault.state.SettingsManager.getInstance(this)
         return code == settings.codeDecoy ||
-            settings.profiles.any { it.decoyPin.isNotBlank() && it.decoyPin == code }
+            settings.vaults.any { it.decoyPin.isNotBlank() && it.decoyPin == code }
     }
 
     /** Drop to the launcher like a fresh boot — the decoy path uses this instead of a toast. */
@@ -200,17 +250,28 @@ class PromptActivity : ComponentActivity() {
     private var lastPin: String = ""
 }
 
-/** System-style "starting…" loading screen shown while the decoy state is set up: a themed circular
- *  spinner on the Material You background, standing in for the post-reboot first-unlock loader.
- *  ponytail: plain spinner; swap to M3 expressive LoadingIndicator (morphing shape) once material3
- *  exposes it as stable API in the pinned Compose BOM. */
+/** System-style "starting…" loading screen — mimics Android's own generic "{model} is starting…"
+ *  multi-user transition screen (text + a horizontal indeterminate bar), the one shown after any
+ *  user switch while that vault's apps come up. Used two ways: (1) standing in for the
+ *  post-reboot first-unlock loader while the decoy state is set up via Nile's own PIN pad, and (2)
+ *  as a cover launched from the real-lockscreen decoy hook (PackageManagerHook.triggerSwitchUser)
+ *  over Android's own "Switching to <user>…" dialog, which can't be suppressed on this build (no
+ *  working path into system_server — see that function's own comment) — so instead of fighting to
+ *  hide it, this shows something that reads as the same ordinary transition covering it. */
 @Composable
 fun DecoyBootScreen() {
     Box(
         Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center,
     ) {
-        CircularProgressIndicator()
+        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
+            Text(
+                "${android.os.Build.MODEL} is starting…",
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            LinearProgressIndicator(modifier = Modifier.width(180.dp))
+        }
     }
 }
 

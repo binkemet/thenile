@@ -4,88 +4,420 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.widget.Toast
-import com.topjohnwu.superuser.Shell
-import androidx.fragment.app.FragmentActivity
-import androidx.biometric.BiometricPrompt
-import androidx.core.content.ContextCompat
-import com.thenile.vault.state.VaultStateManager
-import com.thenile.vault.state.VaultState
-import com.thenile.vault.root.StorageMountManager
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.biometric.BiometricPrompt
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Launch
+import androidx.compose.material.icons.automirrored.filled.List
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.automirrored.filled.Launch
-import androidx.compose.ui.res.painterResource
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.topjohnwu.superuser.Shell
 import com.thenile.vault.R
 import com.thenile.vault.backup.BackupManager
-import com.thenile.vault.state.Profile
+import com.thenile.vault.root.PrivilegeManager
+import com.thenile.vault.root.PrivilegeTier
+import com.thenile.vault.root.StorageMountManager
+import com.thenile.vault.state.Vault
 import com.thenile.vault.state.SettingsManager
+import com.thenile.vault.state.VaultState
+import com.thenile.vault.state.VaultStateManager
+import rikka.shizuku.Shizuku
 import java.util.UUID
+import kotlinx.coroutines.delay
 
-// The only four hosts SecretCodeReceiver's manifest intent-filter declares — Android's dialer
-// won't deliver android.provider.Telephony.SECRET_CODE for any host that isn't statically
-// declared there, so these can't be freely retyped; users may only reassign which action each
-// fires (see DialCodeDropdown below).
-val FIXED_DIAL_CODES = listOf("1234", "9876", "1111", "3333")
+// -------------------------------------------------------------------------------------------------
+// System Android Users
+// -------------------------------------------------------------------------------------------------
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class AndroidUser(
+    val id: Int,
+    val name: String,
+    val isOwner: Boolean
+)
+
+fun fetchAndroidUsers(): List<AndroidUser> {
+    return try {
+        val res = Shell.cmd("pm list users").exec()
+        if (!res.isSuccess) return emptyList()
+        res.out.mapNotNull { line ->
+            // Match UserInfo{0:Owner:4c13} or UserInfo{10:Decoy:410}
+            val match = "UserInfo\\{([0-9]+):([^:]+):".toRegex().find(line)
+            if (match != null) {
+                val id = match.groupValues[1].toIntOrNull() ?: return@mapNotNull null
+                val name = match.groupValues[2]
+                AndroidUser(id = id, name = name, isOwner = id == 0)
+            } else null
+        }
+    } catch (e: Exception) {
+        emptyList()
+    }
+}
+
+fun createDecoyAndroidUser(name: String = "Decoy"): Int? {
+    return try {
+        Shell.cmd("setprop fw.max_users 8; setprop config.fw_max_users 8; settings put global fw_max_users 8").exec()
+        val res = Shell.cmd("pm create-user '$name'").exec()
+        if (res.isSuccess) {
+            // Output: "Success: created user id 10"
+            val match = "([0-9]+)".toRegex().find(res.out.joinToString(" "))
+            match?.groupValues?.get(1)?.toIntOrNull()
+        } else null
+    } catch (e: Exception) {
+        null
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Dial Code Text Field
+// -------------------------------------------------------------------------------------------------
+
 @Composable
-fun DialCodeDropdown(
+fun DialCodeTextField(
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    selected: String,
-    onSelect: (String) -> Unit
+    icon: ImageVector,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-        OutlinedTextField(
-            value = "*#$selected#",
-            onValueChange = {},
-            readOnly = true,
-            label = { Text(label) },
-            leadingIcon = { Icon(icon, contentDescription = null) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            modifier = Modifier.fillMaxWidth().menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true)
-        )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            FIXED_DIAL_CODES.forEach { code ->
-                DropdownMenuItem(
-                    text = { Text("*#$code#") },
-                    onClick = { onSelect(code); expanded = false }
+    OutlinedTextField(
+        value = value,
+        onValueChange = { input ->
+            val cleaned = input
+                .removePrefix("*#")
+                .removeSuffix("#")
+                .trim()
+            onValueChange(cleaned)
+        },
+        label = { Text(label) },
+        prefix = { Text("*#", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
+        suffix = { Text("#", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        placeholder = { Text("e.g. 1234") },
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
+// -------------------------------------------------------------------------------------------------
+// KernelSU-Next Inspired Floating Navigation Bar & Expressive UI Components
+// -------------------------------------------------------------------------------------------------
+
+@Composable
+fun FloatingNavigationBar(
+    currentTab: Int,
+    onTabSelected: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val haptic = LocalHapticFeedback.current
+
+    Surface(
+        modifier = modifier
+            .shadow(
+                elevation = 16.dp,
+                shape = CircleShape,
+                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.35f),
+                ambientColor = MaterialTheme.colorScheme.surfaceTint.copy(alpha = 0.2f)
+            )
+            .clip(CircleShape),
+        shape = CircleShape,
+        color = MaterialTheme.colorScheme.surfaceContainerHighest,
+        tonalElevation = 6.dp,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            val tabs = listOf(
+                Triple(0, "Vaults", Icons.Filled.Shield),
+                Triple(1, "Settings", Icons.Filled.Settings)
+            )
+
+            tabs.forEach { (index, label, icon) ->
+                val isSelected = currentTab == index
+                val scale by animateFloatAsState(
+                    targetValue = if (isSelected) 1.04f else 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    ),
+                    label = "tab_scale_$index"
                 )
+                val backgroundColor by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
+                    animationSpec = tween(durationMillis = 220),
+                    label = "tab_bg_$index"
+                )
+                val contentColor by animateColorAsState(
+                    targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                    animationSpec = tween(durationMillis = 220),
+                    label = "tab_color_$index"
+                )
+
+                Surface(
+                    modifier = Modifier
+                        .graphicsLayer(scaleX = scale, scaleY = scale)
+                        .clip(CircleShape)
+                        .clickable {
+                            if (!isSelected) {
+                                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                onTabSelected(index)
+                            }
+                        },
+                    shape = CircleShape,
+                    color = backgroundColor
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = icon,
+                            contentDescription = label,
+                            tint = contentColor,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        AnimatedVisibility(
+                            visible = isSelected,
+                            enter = fadeIn(tween(180)) + expandHorizontally(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            ),
+                            exit = fadeOut(tween(120)) + shrinkHorizontally(animationSpec = tween(120))
+                        ) {
+                            Row {
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = label,
+                                    color = contentColor,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }
 }
+
+@Composable
+fun PreferenceSwitchRow(
+    title: String,
+    subtitle: String? = null,
+    icon: ImageVector? = null,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onCheckedChange(!checked) },
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceContainerLow
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            if (icon != null) {
+                Surface(
+                    shape = CircleShape,
+                    color = if (checked) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            icon,
+                            contentDescription = null,
+                            tint = if (checked) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                Spacer(modifier = Modifier.width(14.dp))
+            }
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (subtitle != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 16.sp
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.width(12.dp))
+            Switch(
+                checked = checked,
+                onCheckedChange = onCheckedChange
+            )
+        }
+    }
+}
+
+@Composable
+fun SelectableOptionCard(
+    title: String,
+    subtitle: String? = null,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .clickable { onClick() },
+        shape = RoundedCornerShape(16.dp),
+        color = if (selected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceContainerLow,
+        border = BorderStroke(
+            1.dp,
+            if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+        )
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            RadioButton(
+                selected = selected,
+                onClick = onClick
+            )
+            Spacer(modifier = Modifier.width(10.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+                    color = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                if (subtitle != null) {
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                        lineHeight = 16.sp
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun SectionHeaderCard(
+    title: String,
+    subtitle: String? = null,
+    icon: ImageVector,
+    iconContainerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    iconContentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer,
+    modifier: Modifier = Modifier,
+    trailingContent: (@Composable () -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit
+) {
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(28.dp),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+    ) {
+        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Surface(
+                    shape = CircleShape,
+                    color = iconContainerColor,
+                    modifier = Modifier.size(38.dp)
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(icon, contentDescription = null, tint = iconContentColor, modifier = Modifier.size(20.dp))
+                    }
+                }
+                Spacer(modifier = Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    if (subtitle != null) {
+                        Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+                if (trailingContent != null) {
+                    trailingContent()
+                }
+            }
+            content()
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Authentication
+// -------------------------------------------------------------------------------------------------
 
 fun authenticate(activity: FragmentActivity, settings: SettingsManager, requestCustomPin: () -> Unit, onSuccess: () -> Unit) {
     if (settings.adminLockMethod == "custom_pin") {
@@ -122,6 +454,10 @@ fun authenticate(activity: FragmentActivity, settings: SettingsManager, requestC
     biometricPrompt.authenticate(promptInfo)
 }
 
+// -------------------------------------------------------------------------------------------------
+// Activity Entry
+// -------------------------------------------------------------------------------------------------
+
 class AdminActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,7 +470,12 @@ class AdminActivity : FragmentActivity() {
             
             var isAuthenticated by remember { mutableStateOf(false) }
             var authCallback by remember { mutableStateOf<(() -> Unit)?>(null) }
-            var currentTab by remember { mutableStateOf(0) } // 0 = Profiles, 1 = Settings
+            var currentTab by remember { mutableStateOf(0) } // 0 = Vaults, 1 = Settings
+            // Back gesture returns to Vaults from Settings before exiting the app. The
+            // Settings-tab category sub-navigation has its own nested BackHandler (in
+            // AdminScreen) that takes priority while a category is open, so a single back
+            // press there closes the category first, and only a second press lands here.
+            BackHandler(enabled = currentTab != 0) { currentTab = 0 }
             var isFakeCrashBypassed by remember { mutableStateOf(!settings.enableFakeCrash) }
 
             // Only trigger auth AFTER fake crash is bypassed (or if fake crash is disabled)
@@ -148,23 +489,42 @@ class AdminActivity : FragmentActivity() {
             
             if (authCallback != null) {
                 var pinInput by remember { mutableStateOf("") }
+                var showPinInput by remember { mutableStateOf(false) }
                 AlertDialog(
-                    onDismissRequest = { authCallback = null },
-                    title = { Text("App Locked") },
+                    // Must match Cancel's behavior, not just clear the callback: the LaunchedEffect
+                    // that triggers authentication only fires once per activity instance, so a
+                    // back-press/outside-tap dismiss that leaves the activity alive strands the user
+                    // on a permanently blank screen (isAuthenticated=false, authCallback=null, no
+                    // path back to the dialog) — confirmed on-device, force-stop was the only way out.
+                    onDismissRequest = {
+                        authCallback = null
+                        if (!isAuthenticated) finish()
+                    },
+                    title = { Text("App Locked", fontWeight = FontWeight.Bold) },
                     text = {
                         OutlinedTextField(
                             value = pinInput,
                             onValueChange = { pinInput = it },
-                            label = { Text("Custom App PIN") }
+                            label = { Text("Admin Password") },
+                            visualTransformation = if (showPinInput) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                IconButton(onClick = { showPinInput = !showPinInput }) {
+                                    Icon(
+                                        if (showPinInput) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                        contentDescription = if (showPinInput) "Hide password" else "Show password"
+                                    )
+                                }
+                            },
+                            shape = RoundedCornerShape(16.dp)
                         )
                     },
                     confirmButton = {
-                        TextButton(onClick = {
+                        FilledTonalButton(onClick = {
                             if (pinInput == settings.adminCustomPin) {
                                 authCallback?.invoke()
                                 authCallback = null
                             } else {
-                                Toast.makeText(context, "Incorrect PIN", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Incorrect password", Toast.LENGTH_SHORT).show()
                             }
                         }) { Text("Unlock") }
                     },
@@ -184,10 +544,10 @@ class AdminActivity : FragmentActivity() {
             }
 
             MaterialTheme(colorScheme = colorScheme) {
-                Scaffold(
+                Surface(
                     modifier = Modifier.fillMaxSize(),
-                    containerColor = MaterialTheme.colorScheme.background
-                ) { innerPadding ->
+                    color = MaterialTheme.colorScheme.background
+                ) {
                     // Step 1: Fake crash screen (if enabled and not yet bypassed)
                     if (settings.enableFakeCrash && !isFakeCrashBypassed) {
                         FakeCrashScreen(
@@ -195,62 +555,19 @@ class AdminActivity : FragmentActivity() {
                             onExit = { this@AdminActivity.finish() }
                         )
                     } else if (isAuthenticated) {
-                        // Step 2: After bypass + auth, show admin UI
-                        Box(modifier = Modifier.fillMaxSize().padding(innerPadding)) {
+                        // Step 2: Main container with Floating Navigation Bar
+                        Box(modifier = Modifier.fillMaxSize()) {
                             AdminScreen(this@AdminActivity, settings, currentTab) { cb -> authCallback = cb }
-                            
-                            // Material 3 Expressive Icon-Only Floating Navigation Bar
-                            Surface(
+
+                            // Floating Navigation Bar (KernelSU-Next style)
+                            FloatingNavigationBar(
+                                currentTab = currentTab,
+                                onTabSelected = { currentTab = it },
                                 modifier = Modifier
                                     .align(Alignment.BottomCenter)
-                                    .padding(bottom = 24.dp)
-                                    .height(64.dp),
-                                shape = androidx.compose.foundation.shape.CircleShape,
-                                color = MaterialTheme.colorScheme.surfaceContainerHighest,
-                                shadowElevation = 16.dp,
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    listOf(
-                                        0 to Icons.Filled.AccountCircle,
-                                        1 to Icons.Filled.Settings
-                                    ).forEach { (tabIndex, icon) ->
-                                        val isSelected = currentTab == tabIndex
-                                        val animatedBg by animateColorAsState(
-                                            targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else androidx.compose.ui.graphics.Color.Transparent,
-                                            animationSpec = tween(300, easing = FastOutSlowInEasing)
-                                        )
-                                        val animatedIconColor by animateColorAsState(
-                                            targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                                            animationSpec = tween(300, easing = FastOutSlowInEasing)
-                                        )
-                                        val animatedScale by animateFloatAsState(
-                                            targetValue = if (isSelected) 1.15f else 1.0f,
-                                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium)
-                                        )
-
-                                        Surface(
-                                            onClick = { currentTab = tabIndex },
-                                            shape = androidx.compose.foundation.shape.CircleShape,
-                                            color = animatedBg,
-                                            modifier = Modifier.size(50.dp)
-                                        ) {
-                                            Box(contentAlignment = Alignment.Center) {
-                                                Icon(
-                                                    icon,
-                                                    contentDescription = if (tabIndex == 0) "Profiles" else "Settings",
-                                                    tint = animatedIconColor,
-                                                    modifier = Modifier.size(24.dp).graphicsLayer(scaleX = animatedScale, scaleY = animatedScale)
-                                                )
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                                    .navigationBarsPadding()
+                                    .padding(bottom = 16.dp)
+                            )
                         }
                     }
                 }
@@ -259,73 +576,77 @@ class AdminActivity : FragmentActivity() {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+// Dialogs
+// -------------------------------------------------------------------------------------------------
+
 @Composable
-fun ProfileListDialog(
-    profiles: List<Profile>,
-    currentProfileId: String,
-    onSelectProfile: (Profile) -> Unit,
-    onDeleteProfile: (Profile) -> Unit,
+fun VaultListDialog(
+    vaults: List<Vault>,
+    currentVaultId: String,
+    onSelectVault: (Vault) -> Unit,
+    onDeleteVault: (Vault) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var profileToDelete by remember { mutableStateOf<Profile?>(null) }
+    var vaultToDelete by remember { mutableStateOf<Vault?>(null) }
 
-    if (profileToDelete != null) {
+    if (vaultToDelete != null) {
         AlertDialog(
-            onDismissRequest = { profileToDelete = null },
-            title = { Text("Delete Profile") },
-            text = { Text("Are you sure you want to delete profile '${profileToDelete?.name}'?") },
+            onDismissRequest = { vaultToDelete = null },
+            title = { Text("Delete Vault", fontWeight = FontWeight.Bold) },
+            text = { Text("Are you sure you want to delete vault '${vaultToDelete?.name}'?") },
             confirmButton = {
                 TextButton(onClick = {
-                    profileToDelete?.let { onDeleteProfile(it) }
-                    profileToDelete = null
-                }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
+                    vaultToDelete?.let { onDeleteVault(it) }
+                    vaultToDelete = null
+                }) { Text("Delete", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold) }
             },
             dismissButton = {
-                TextButton(onClick = { profileToDelete = null }) { Text("Cancel") }
+                TextButton(onClick = { vaultToDelete = null }) { Text("Cancel") }
             }
         )
     }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Profiles") },
+        title = { Text("Manage Vaults", fontWeight = FontWeight.Bold) },
         text = {
-            if (profiles.isEmpty()) {
-                Text("No profiles available.", style = MaterialTheme.typography.bodyMedium)
+            if (vaults.isEmpty()) {
+                Text("No vaults available.", style = MaterialTheme.typography.bodyMedium)
             } else {
                 LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.fillMaxWidth()) {
-                    items(profiles, key = { it.id }) { profile ->
-                        val isSelected = profile.id == currentProfileId
-                        val containerColor by animateColorAsState(
-                            targetValue = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
-                            animationSpec = tween(durationMillis = 300)
-                        )
-                        val contentColor by animateColorAsState(
-                            targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-                            animationSpec = tween(durationMillis = 300)
-                        )
+                    items(vaults, key = { it.id }) { vault ->
+                        val isSelected = vault.id == currentVaultId
                         Surface(
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = MaterialTheme.shapes.medium,
-                            color = containerColor
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)),
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerLow,
+                            border = BorderStroke(
+                                1.dp,
+                                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f)
+                            )
                         ) {
                             Row(
                                 modifier = Modifier.padding(12.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text(profile.name, fontWeight = FontWeight.Bold, color = contentColor)
                                     Text(
-                                        if (profile.isActive) "Active (Hidden)" else "Inactive",
+                                        vault.name,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
+                                    )
+                                    Text(
+                                        if (vault.isActive) "Active (Hidden)" else "Inactive",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = contentColor.copy(alpha = 0.8f)
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f) else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
-                                IconButton(onClick = { onSelectProfile(profile) }) {
-                                    Icon(Icons.Filled.Edit, contentDescription = "Edit Profile", tint = MaterialTheme.colorScheme.primary)
+                                IconButton(onClick = { onSelectVault(vault) }) {
+                                    Icon(Icons.Filled.Edit, contentDescription = "Edit Vault", tint = MaterialTheme.colorScheme.primary)
                                 }
-                                IconButton(onClick = { profileToDelete = profile }) {
-                                    Icon(Icons.Filled.Delete, contentDescription = "Delete Profile", tint = MaterialTheme.colorScheme.error)
+                                IconButton(onClick = { vaultToDelete = vault }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Delete Vault", tint = MaterialTheme.colorScheme.error)
                                 }
                             }
                         }
@@ -334,7 +655,7 @@ fun ProfileListDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) { Text("Close") }
+            FilledTonalButton(onClick = onDismiss) { Text("Close") }
         }
     )
 }
@@ -347,55 +668,137 @@ fun UnsavedChangesDialog(
 ) {
     AlertDialog(
         onDismissRequest = onCancel,
-        title = { Text("Unsaved Changes") },
-        text = { Text("Do you want to save your profile before switching or creating a new one?") },
+        title = { Text("Unsaved Changes", fontWeight = FontWeight.Bold) },
+        text = { Text("Do you want to save your current vault changes before switching?") },
         confirmButton = {
-            TextButton(onClick = onSave) { Text("Save Profile") }
+            FilledTonalButton(onClick = onSave) { Text("Save") }
         },
         dismissButton = {
             Row {
                 TextButton(onClick = onDiscard) { Text("Discard", color = MaterialTheme.colorScheme.error) }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp))
                 TextButton(onClick = onCancel) { Text("Cancel") }
             }
         }
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun HelpStepRow(step: String, title: String, desc: String) {
+    Row(verticalAlignment = Alignment.Top) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.size(22.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Text(step, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onPrimary, fontWeight = FontWeight.Bold)
+            }
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Column {
+            Text(title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(desc, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+// Main Screen Router
+// -------------------------------------------------------------------------------------------------
+
 @Composable
 fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTab: Int, requestCustomAuth: ((() -> Unit) -> Unit)) {
     val context = LocalContext.current
+    val mainHandler = remember { Handler(Looper.getMainLooper()) }
 
-    var profiles by remember { mutableStateOf(settings.profiles) }
-    
-    // Ensure there is at least one profile to display
-    LaunchedEffect(Unit) {
-        if (profiles.isEmpty()) {
-            val defaultProfile = Profile(
-                id = UUID.randomUUID().toString(),
-                name = "Main Profile",
-                packages = emptyList(),
-                directories = emptyList(),
-                dummyDirectories = emptyList(),
-                isActive = true,
-                hideOnDecoy = true,
-                decoyPin = "1234"
-            )
-            profiles = listOf(defaultProfile)
-            settings.profiles = profiles
+    // Shizuku's permission grant happens in its own manager app, so the result comes back via
+    // this listener rather than an ActivityResultLauncher — bump privilegeTick so the status row
+    // below recomputes PrivilegeManager.currentTier() once it lands. The "All files access" grant
+    // (MANAGE_EXTERNAL_STORAGE) has no callback at all — it's a plain Settings screen — so that
+    // one's covered by the ON_RESUME observer below instead.
+    var privilegeTick by remember { mutableIntStateOf(0) }
+    DisposableEffect(Unit) {
+        val listener = Shizuku.OnRequestPermissionResultListener { _, _ -> privilegeTick++ }
+        Shizuku.addRequestPermissionResultListener(listener)
+        onDispose { Shizuku.removeRequestPermissionResultListener(listener) }
+    }
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) privilegeTick++
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+    val privilegeTier = remember(privilegeTick) { PrivilegeManager.currentTier() }
+    val manageStorageGranted = remember(privilegeTick) { PrivilegeManager.isManageStorageGranted() }
+
+    var softVaultDirUri by remember { mutableStateOf(settings.softVaultDirectoryUri) }
+    var showSoftVaultWarning by remember { mutableStateOf(false) }
+    val pickSoftVaultDir = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { uri ->
+        if (uri != null) {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (e: Exception) {
+                Log.w("AdminScreen", "takePersistableUriPermission failed: ${e.message}")
+            }
+            settings.softVaultDirectoryUri = uri.toString()
+            softVaultDirUri = uri.toString()
         }
     }
 
-    var selectedProfileId by remember { mutableStateOf(profiles.firstOrNull()?.id ?: "") }
-    var editingProfileState by remember(selectedProfileId) {
-        mutableStateOf(profiles.find { it.id == selectedProfileId } ?: (profiles.firstOrNull() ?: Profile(UUID.randomUUID().toString(), "New Profile", emptyList(), emptyList(), emptyList(), false, false, "")))
+    var vaults by remember { mutableStateOf(settings.vaults) }
+    
+    // Ensure there is at least one vault to display
+    LaunchedEffect(Unit) {
+        if (vaults.isEmpty()) {
+            val defaultVault = Vault(
+                id = UUID.randomUUID().toString(),
+                name = "Main Vault",
+                actionType = "switch_user",
+                targetUserId = 10,
+                decoyPin = "1234",
+                decoyDialerCode = "1234",
+                decoyCalculatorExpression = "47-87+23",
+                packages = emptyList(),
+                directories = emptyList(),
+                dummyDirectories = emptyList(),
+                files = emptyList(),
+                isActive = true,
+                hideOnDecoy = true
+            )
+            vaults = listOf(defaultVault)
+            settings.vaults = vaults
+        }
     }
-    var originalProfileState by remember(selectedProfileId) { mutableStateOf(editingProfileState.copy()) }
 
-    val isDirty by remember(editingProfileState, originalProfileState) { derivedStateOf { editingProfileState != originalProfileState } }
+    var selectedVaultId by remember { mutableStateOf(vaults.firstOrNull()?.id ?: "") }
+    var editingVaultState by remember(selectedVaultId) {
+        mutableStateOf(vaults.find { it.id == selectedVaultId } ?: (vaults.firstOrNull() ?: Vault(
+            id = UUID.randomUUID().toString(),
+            name = "New Vault",
+            actionType = "switch_user",
+            targetUserId = 10,
+            decoyPin = "",
+            decoyDialerCode = "",
+            decoyCalculatorExpression = "",
+            packages = emptyList(),
+            directories = emptyList(),
+            dummyDirectories = emptyList(),
+            files = emptyList(),
+            isActive = true,
+            hideOnDecoy = true
+        )))
+    }
+    var originalVaultState by remember(selectedVaultId) { mutableStateOf(editingVaultState.copy()) }
 
-    var showProfileListModal by remember { mutableStateOf(false) }
+    val isDirty by remember(editingVaultState, originalVaultState) { derivedStateOf { editingVaultState != originalVaultState } }
+
+    var showVaultListModal by remember { mutableStateOf(false) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
     var codeUnlock by remember { mutableStateOf(settings.codeUnlock) }
@@ -404,10 +807,43 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
     var codeAdmin by remember { mutableStateOf(settings.codeAdmin) }
     var decoyLockScreenMode by remember { mutableStateOf(settings.decoyLockScreenMode) }
     var decoyUnlockLimit by remember { mutableStateOf(settings.decoyUnlockLimit) }
+    var decoyUserId by remember { mutableStateOf(settings.decoyUserId) }
+    var suppressUserSwitchAnimation by remember { mutableStateOf(settings.suppressUserSwitchAnimation) }
+    var hideUserSwitcherInQuickSettings by remember { mutableStateOf(settings.hideUserSwitcherInQuickSettings) }
+    var hideUserSwitcherInSettings by remember { mutableStateOf(settings.hideUserSwitcherInSettings) }
 
     var isAppPickerOpen by remember { mutableStateOf(false) }
+    var isVaultAppPickerOpen by remember { mutableStateOf(false) }
+    var isAccountPickerOpen by remember { mutableStateOf(false) }
     var showAddDummyDialog by remember { mutableStateOf(false) }
-    var showPinPromptForProfile by remember { mutableStateOf(false) }
+    var showPinPromptForVault by remember { mutableStateOf(false) }
+    var showHowItWorks by remember { mutableStateOf(false) }
+
+    val filePickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris: List<Uri> ->
+        val newFiles = uris.mapNotNull { uri ->
+            val path = uri.path ?: return@mapNotNull null
+            if (path.contains("primary:")) {
+                "/sdcard/" + path.substringAfter("primary:")
+            } else if (path.contains("/document/")) {
+                val docId = path.substringAfter("/document/")
+                if (docId.startsWith("primary:")) {
+                    "/sdcard/" + docId.substringAfter("primary:")
+                } else {
+                    "/storage/" + docId.replace(":", "/")
+                }
+            } else if (path.contains("/tree/")) {
+                "/storage/" + path.replace("/tree/", "").replace(":", "/")
+            } else {
+                path
+            }
+        }
+        if (newFiles.isNotEmpty()) {
+            val combined = (editingVaultState.files + newFiles).distinct()
+            editingVaultState = editingVaultState.copy(files = combined)
+        }
+    }
 
     val dirPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree()
@@ -419,49 +855,76 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
             } else {
                 "/storage/" + path.replace("/tree/", "").replace(":", "/")
             }
-            if (!editingProfileState.directories.contains(absolutePath)) {
-                editingProfileState = editingProfileState.copy(directories = editingProfileState.directories + absolutePath)
+            if (!editingVaultState.directories.contains(absolutePath)) {
+                editingVaultState = editingVaultState.copy(directories = editingVaultState.directories + absolutePath)
             }
         }
     }
 
-    fun saveCurrentProfile() {
-        val updated = profiles.map { if (it.id == editingProfileState.id) editingProfileState else it }
-        val finalProfiles = if (updated.any { it.id == editingProfileState.id }) updated else updated + editingProfileState
-        profiles = finalProfiles
-        settings.profiles = finalProfiles
-        originalProfileState = editingProfileState.copy()
-        Toast.makeText(context, "Profile saved", Toast.LENGTH_SHORT).show()
+    fun saveCurrentVault() {
+        val updated = vaults.map { if (it.id == editingVaultState.id) editingVaultState else it }
+        val finalVaults = if (updated.any { it.id == editingVaultState.id }) updated else updated + editingVaultState
+        vaults = finalVaults
+        settings.vaults = finalVaults
+        originalVaultState = editingVaultState.copy()
+        Toast.makeText(context, "Vault saved", Toast.LENGTH_SHORT).show()
     }
 
-    fun createNewProfile() {
-        val newProf = Profile(
+    fun createNewVault() {
+        val newIndex = vaults.size + 1
+        val newProf = Vault(
             id = UUID.randomUUID().toString(),
-            name = "New Profile",
+            name = "Decoy Vault $newIndex",
+            actionType = "switch_user",
+            targetUserId = 10,
+            decoyPin = "",
+            decoyDialerCode = "",
+            decoyCalculatorExpression = "",
             packages = emptyList(),
             directories = emptyList(),
             dummyDirectories = emptyList(),
+            files = emptyList(),
             isActive = true,
-            hideOnDecoy = false,
-            decoyPin = ""
+            hideOnDecoy = true
         )
-        profiles = profiles + newProf
-        settings.profiles = profiles
-        selectedProfileId = newProf.id
-        editingProfileState = newProf
-        originalProfileState = newProf.copy()
+        vaults = vaults + newProf
+        settings.vaults = vaults
+        selectedVaultId = newProf.id
+        editingVaultState = newProf
+        originalVaultState = newProf.copy()
+    }
+
+    var showHideTestWarning by remember { mutableStateOf(!settings.hideTestWarningAck) }
+    if (showHideTestWarning) {
+        AlertDialog(
+            onDismissRequest = { showHideTestWarning = false },
+            title = { Text("Test your vault before relying on it", fontWeight = FontWeight.Bold) },
+            text = {
+                Text(
+                    "Hiding can silently fail on some devices (root/Shizuku denied, scoped-storage limits, " +
+                        "OEM quirks). Before you trust a vault, trigger it once and confirm the files and apps " +
+                        "you hid are actually gone. Nile won't warn you at trigger time — it stays invisible on purpose."
+                )
+            },
+            confirmButton = {
+                FilledTonalButton(onClick = {
+                    settings.hideTestWarningAck = true
+                    showHideTestWarning = false
+                }) { Text("Got it") }
+            }
+        )
     }
 
     if (pendingAction != null) {
         UnsavedChangesDialog(
             onSave = {
-                saveCurrentProfile()
+                saveCurrentVault()
                 val action = pendingAction
                 pendingAction = null
                 action?.invoke()
             },
             onDiscard = {
-                editingProfileState = originalProfileState.copy()
+                editingVaultState = originalVaultState.copy()
                 val action = pendingAction
                 pendingAction = null
                 action?.invoke()
@@ -472,71 +935,106 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
         )
     }
 
-    if (showProfileListModal) {
-        ProfileListDialog(
-            profiles = profiles,
-            currentProfileId = selectedProfileId,
-            onSelectProfile = { prof ->
-                selectedProfileId = prof.id
-                editingProfileState = prof.copy()
-                originalProfileState = prof.copy()
-                showProfileListModal = false
+    if (showVaultListModal) {
+        VaultListDialog(
+            vaults = vaults,
+            currentVaultId = selectedVaultId,
+            onSelectVault = { prof ->
+                selectedVaultId = prof.id
+                editingVaultState = prof.copy()
+                originalVaultState = prof.copy()
+                showVaultListModal = false
             },
-            onDeleteProfile = { prof ->
-                profiles = profiles.filter { it.id != prof.id }
-                settings.profiles = profiles
-                if (selectedProfileId == prof.id) {
-                    val nextProf = profiles.firstOrNull()
+            onDeleteVault = { prof ->
+                vaults = vaults.filter { it.id != prof.id }
+                settings.vaults = vaults
+                if (selectedVaultId == prof.id) {
+                    val nextProf = vaults.firstOrNull()
                     if (nextProf != null) {
-                        selectedProfileId = nextProf.id
-                        editingProfileState = nextProf.copy()
-                        originalProfileState = nextProf.copy()
+                        selectedVaultId = nextProf.id
+                        editingVaultState = nextProf.copy()
+                        originalVaultState = nextProf.copy()
                     } else {
-                        createNewProfile()
+                        createNewVault()
                     }
                 }
             },
-            onDismiss = { showProfileListModal = false }
+            onDismiss = { showVaultListModal = false }
         )
     }
 
     if (isAppPickerOpen) {
         AppPickerDialog(
-            initialSelection = editingProfileState.packages,
+            initialSelection = editingVaultState.packages,
             onDismiss = { isAppPickerOpen = false },
             onConfirm = { selected ->
-                editingProfileState = editingProfileState.copy(packages = selected)
+                editingVaultState = editingVaultState.copy(packages = selected)
                 isAppPickerOpen = false
             }
         )
     }
-    
-    if (showPinPromptForProfile) {
+
+    if (isVaultAppPickerOpen) {
+        AppPickerDialog(
+            initialSelection = editingVaultState.hiddenApps + editingVaultState.uninstallApps,
+            onDismiss = { isVaultAppPickerOpen = false },
+            onConfirm = { selected ->
+                // Newly picked apps default to data-swap mode; deselected ones drop from both lists.
+                val sel = selected.toSet()
+                val known = (editingVaultState.hiddenApps + editingVaultState.uninstallApps).toSet()
+                val added = sel - known
+                editingVaultState = editingVaultState.copy(
+                    hiddenApps = (editingVaultState.hiddenApps + added).filter { it in sel },
+                    uninstallApps = editingVaultState.uninstallApps.filter { it in sel }
+                )
+                isVaultAppPickerOpen = false
+            }
+        )
+    }
+
+    if (isAccountPickerOpen) {
+        AccountPickerDialog(
+            initialSelection = editingVaultState.removeAccounts,
+            onDismiss = { isAccountPickerOpen = false },
+            onConfirm = { selected ->
+                editingVaultState = editingVaultState.copy(removeAccounts = selected)
+                isAccountPickerOpen = false
+            }
+        )
+    }
+
+    if (showPinPromptForVault) {
         var pinInput by remember { mutableStateOf("") }
         AlertDialog(
-            onDismissRequest = { showPinPromptForProfile = false },
-            title = { Text("Unlock Vault") },
+            onDismissRequest = { showPinPromptForVault = false },
+            title = { Text("Unlock Vault", fontWeight = FontWeight.Bold) },
             text = {
                 OutlinedTextField(
                     value = pinInput,
                     onValueChange = { pinInput = it },
-                    label = { Text("Vault PIN") }
+                    label = { Text("Vault PIN") },
+                    shape = RoundedCornerShape(16.dp)
                 )
             },
             confirmButton = {
-                TextButton(onClick = {
+                FilledTonalButton(onClick = {
                     val stateManager = VaultStateManager(context)
-                    val ok = StorageMountManager.unhideProfile(editingProfileState, pinInput, stateManager.keySalt())
-                    if (ok) {
-                        Toast.makeText(context, "Profile Unhidden", Toast.LENGTH_SHORT).show()
-                    } else {
-                        Toast.makeText(context, "Failed to unlock vault", Toast.LENGTH_SHORT).show()
-                    }
-                    showPinPromptForProfile = false
+                    val salt = stateManager.keySalt()
+                    val vault = editingVaultState
+                    val pin = pinInput
+                    showPinPromptForVault = false
+                    // Off main thread — see the Hide/Unhide Vault buttons' comment: blocking main
+                    // here self-deadlocks the Shizuku tier's bindUserService callback.
+                    Thread {
+                        val ok = StorageMountManager.unhideVault(vault, pin, salt, context)
+                        mainHandler.post {
+                            Toast.makeText(context, if (ok) "Vault Unhidden" else "Failed to unlock vault", Toast.LENGTH_SHORT).show()
+                        }
+                    }.start()
                 }) { Text("Unlock") }
             },
             dismissButton = {
-                TextButton(onClick = { showPinPromptForProfile = false }) { Text("Cancel") }
+                TextButton(onClick = { showPinPromptForVault = false }) { Text("Cancel") }
             }
         )
     }
@@ -590,18 +1088,19 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 pendingTargetFolder = null
                 pendingDummyFolder = null
             },
-            title = { Text("Add Dummy Folder Mapping") },
+            title = { Text("Add Dummy Folder Mapping", fontWeight = FontWeight.Bold) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                         OutlinedTextField(
                             value = targetPath,
                             onValueChange = { targetPath = it },
                             label = { Text("Folder to hide (Target)") },
                             placeholder = { Text("/sdcard/SecretFolder") },
+                            shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         IconButton(onClick = { dummyTargetPickerLauncher.launch(null) }) {
                             Icon(Icons.Filled.Folder, contentDescription = "Choose Target Folder", tint = MaterialTheme.colorScheme.primary)
                         }
@@ -613,9 +1112,10 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             onValueChange = { dummyPath = it },
                             label = { Text("Folder to show (Dummy)") },
                             placeholder = { Text("/sdcard/FakeFolder") },
+                            shape = RoundedCornerShape(16.dp),
                             modifier = Modifier.weight(1f)
                         )
-                        Spacer(modifier = Modifier.width(4.dp))
+                        Spacer(modifier = Modifier.width(6.dp))
                         IconButton(onClick = { dummyFolderPickerLauncher.launch(null) }) {
                             Icon(Icons.Filled.FolderSpecial, contentDescription = "Choose Dummy Folder", tint = MaterialTheme.colorScheme.secondary)
                         }
@@ -626,27 +1126,19 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Switch(
-                            checked = encrypt,
-                            onCheckedChange = { encrypt = it }
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Column {
-                            Text("Encrypt original contents", style = MaterialTheme.typography.bodyMedium)
-                            Text(
-                                "Moves the Target folder into the encrypted Vault.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-                    }
+                    
+                    PreferenceSwitchRow(
+                        title = "Encrypt original contents",
+                        subtitle = "Moves the Target folder into the encrypted Vault.",
+                        checked = encrypt,
+                        onCheckedChange = { encrypt = it }
+                    )
                 }
             },
             confirmButton = {
-                TextButton(onClick = {
+                FilledTonalButton(onClick = {
                     if (targetPath.isNotBlank() && dummyPath.isNotBlank()) {
-                        editingProfileState = editingProfileState.copy(dummyDirectories = editingProfileState.dummyDirectories + com.thenile.vault.state.DummyDir(targetPath, dummyPath, encrypt))
+                        editingVaultState = editingVaultState.copy(dummyDirectories = editingVaultState.dummyDirectories + com.thenile.vault.state.DummyDir(targetPath, dummyPath, encrypt))
                     }
                     showAddDummyDialog = false
                     pendingTargetFolder = null
@@ -663,707 +1155,1741 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
         )
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        AnimatedContent(
-            targetState = currentTab,
-            transitionSpec = {
-                if (targetState > initialState) {
-                    (slideInHorizontally { width -> width } + fadeIn(tween(250))).togetherWith(
-                        slideOutHorizontally { width -> -width } + fadeOut(tween(250))
+    AnimatedContent(
+        targetState = currentTab,
+        transitionSpec = {
+            if (targetState > initialState) {
+                (slideInHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)) { width -> width / 3 } + fadeIn(tween(220))).togetherWith(
+                    slideOutHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)) { width -> -width / 3 } + fadeOut(tween(180))
+                )
+            } else {
+                (slideInHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)) { width -> -width / 3 } + fadeIn(tween(220))).togetherWith(
+                    slideOutHorizontally(animationSpec = spring(stiffness = Spring.StiffnessMediumLow)) { width -> width / 3 } + fadeOut(tween(180))
+                )
+            }
+        },
+        label = "TabTransition"
+    ) { targetTab ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .verticalScroll(rememberScrollState())
+                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 120.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            if (targetTab == 0) {
+                // =================================================================================
+                // VAULTS TAB
+                // =================================================================================
+
+                // 1a. Branding Header (identity only — no actions live here)
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp)) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_nile_river_transparent),
+                        contentDescription = "The Nile Logo",
+                        modifier = Modifier.size(40.dp).clip(CircleShape)
                     )
-                } else {
-                    (slideInHorizontally { width -> -width } + fadeIn(tween(250))).togetherWith(
-                        slideOutHorizontally { width -> width } + fadeOut(tween(250))
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("The Nile", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                        Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(if (editingVaultState.isActive) "PROTECTED" else "INACTIVE", fontWeight = FontWeight.Bold, fontSize = 11.sp) },
+                        colors = SuggestionChipDefaults.suggestionChipColors(
+                            containerColor = if (editingVaultState.isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
+                            labelColor = if (editingVaultState.isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
+                        ),
+                        shape = CircleShape
                     )
                 }
-            },
-            label = "TabTransition"
-        ) { targetTab ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(16.dp)
-                    .padding(bottom = 100.dp) // Extra padding for the floating bar
-            ) {
-                if (targetTab == 0) {
-                    // Expressive Shield Header Card
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Box(contentAlignment = Alignment.Center) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.ic_nile_river_transparent),
-                                    contentDescription = "The Nile Logo",
-                                    modifier = Modifier.size(44.dp).clip(androidx.compose.foundation.shape.CircleShape)
-                                )
-                            }
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("The Nile", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            }
-                            AssistChip(
-                                onClick = {},
-                                label = { Text(if (editingProfileState.isActive) "ACTIVE" else "INACTIVE") },
-                                leadingIcon = {
-                                    Icon(if (editingProfileState.isActive) Icons.Filled.CheckCircle else Icons.Filled.Cancel, contentDescription = null, modifier = Modifier.size(16.dp))
-                                },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    containerColor = if (editingProfileState.isActive) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.errorContainer,
-                                    labelColor = if (editingProfileState.isActive) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onErrorContainer
-                                ),
-                                shape = androidx.compose.foundation.shape.CircleShape
-                            )
-                        }
-                    }
 
-                    // Profile Selection Banner
-                    Surface(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
-                        color = MaterialTheme.colorScheme.surfaceContainerLow,
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                // 1b. Currently editing which vault — switching/adding vaults, kept
+                // separate from the "Quick Actions" card below so it's clear this card is
+                // about NAVIGATING between vaults, not about doing anything to this one.
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 18.dp, vertical = 14.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text("CURRENT PROFILE", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-                                Text(editingProfileState.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            }
-                            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                FilledTonalButton(
-                                    onClick = {
-                                        if (isDirty) {
-                                            pendingAction = { showProfileListModal = true }
-                                        } else {
-                                            showProfileListModal = true
-                                        }
-                                    },
-                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
-                                ) {
-                                    Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Switch")
-                                }
-                                IconButton(
-                                    onClick = {
-                                        if (isDirty) {
-                                            pendingAction = { createNewProfile() }
-                                        } else {
-                                            createNewProfile()
-                                        }
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("EDITING VAULT", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            Text(editingVaultState.name, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        }
+                        Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            FilledTonalButton(
+                                onClick = {
+                                    if (isDirty) {
+                                        pendingAction = { showVaultListModal = true }
+                                    } else {
+                                        showVaultListModal = true
                                     }
-                                ) {
-                                    Icon(Icons.Filled.Add, contentDescription = "Add Profile", tint = MaterialTheme.colorScheme.primary)
+                                },
+                                shape = CircleShape,
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.List, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Switch")
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (isDirty) {
+                                        pendingAction = { createNewVault() }
+                                    } else {
+                                        createNewVault()
+                                    }
                                 }
+                            ) {
+                                Icon(Icons.Filled.Add, contentDescription = "Add User", tint = MaterialTheme.colorScheme.primary)
                             }
                         }
                     }
+                }
 
-                    // Single Profile Editor Card
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            
-                            OutlinedTextField(
-                                value = editingProfileState.name,
-                                onValueChange = { newName ->
-                                    editingProfileState = editingProfileState.copy(name = newName)
-                                },
-                                label = { Text("Profile Name") },
-                                modifier = Modifier.fillMaxWidth()
+                // 1c. Quick Actions — these apply immediately to this vault's saved hide
+                // targets, separate from the editing form below (which needs its own Save).
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                    elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
+                ) {
+                    Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        Column {
+                            Text("Quick Actions", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text(
+                                "Applies right now using this vault's saved hide targets — not a preview of unsaved edits below.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-
-                            OutlinedTextField(
-                                value = editingProfileState.decoyPin,
-                                onValueChange = { newDecoyPin ->
-                                    editingProfileState = editingProfileState.copy(decoyPin = newDecoyPin, hideOnDecoy = newDecoyPin.isNotBlank())
-                                },
-                                label = { Text("Decoy PIN for THIS profile") },
-                                placeholder = { Text("e.g. 1234") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text("Active (Hidden)", modifier = Modifier.weight(1f))
-                                Switch(
-                                    checked = editingProfileState.isActive,
-                                    onCheckedChange = { checked ->
-                                        editingProfileState = editingProfileState.copy(isActive = checked)
-                                    }
-                                )
-                            }
-
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                                FilledTonalButton(
-                                    onClick = {
-                                        saveCurrentProfile()
-                                        val stateManager = VaultStateManager.getInstance(context)
-                                        stateManager.updateState(VaultState.LOCKED)
-                                        authenticate(activity, settings, requestCustomPin = {
-                                            requestCustomAuth {
-                                                StorageMountManager.unmountAndLock(settings.targetPackages, settings.targetDirectories, settings.targetDummyDirectories)
-                                                Toast.makeText(context, "Profile and apps hidden", Toast.LENGTH_SHORT).show()
-                                            }
-                                        }) {
-                                            StorageMountManager.unmountAndLock(settings.targetPackages, settings.targetDirectories, settings.targetDummyDirectories)
-                                            Toast.makeText(context, "Profile and apps hidden", Toast.LENGTH_SHORT).show()
-                                        }
-                                    },
-                                    modifier = Modifier.weight(1f).padding(end = 8.dp)
-                                ) { 
-                                    Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Hide") 
-                                }
-                                
-                                FilledTonalButton(
-                                    onClick = {
-                                        saveCurrentProfile()
-                                        val stateManager = VaultStateManager.getInstance(context)
-                                        val onAuthSuccess = {
-                                            stateManager.updateState(VaultState.UNLOCKED)
-                                            val ok = StorageMountManager.mountRealContainer(settings.targetPackages, settings.targetDirectories, settings.targetDummyDirectories, "", stateManager.keySalt())
-                                            if (ok) {
-                                                Toast.makeText(context, "Profile and apps unhidden", Toast.LENGTH_SHORT).show()
-                                            } else {
-                                                showPinPromptForProfile = true
-                                            }
-                                        }
-                                        authenticate(activity, settings, requestCustomPin = {
-                                            requestCustomAuth(onAuthSuccess)
-                                        }, onSuccess = onAuthSuccess)
-                                    },
-                                    modifier = Modifier.weight(1f).padding(start = 8.dp)
-                                ) { 
-                                    Icon(Icons.Filled.LockOpen, contentDescription = null, modifier = Modifier.size(18.dp))
-                                    Spacer(modifier = Modifier.width(8.dp))
-                                    Text("Unhide") 
-                                }
-                            }
-
-                            // Hidden Apps Section
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Apps, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("Hidden Apps", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                                FilledTonalButton(onClick = { isAppPickerOpen = true }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)) {
-                                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Choose Apps")
-                                }
-                            }
-                            if (editingProfileState.packages.isEmpty()) {
-                                Text("No apps selected.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            } else {
-                                editingProfileState.packages.forEach { pkg ->
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                                        color = MaterialTheme.colorScheme.surfaceContainerLow
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                                            Icon(Icons.Filled.Android, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
-                                            Spacer(modifier = Modifier.width(10.dp))
-                                            Text(pkg, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                                            IconButton(onClick = { 
-                                                editingProfileState = editingProfileState.copy(packages = editingProfileState.packages.filter { p -> p != pkg })
-                                            }, modifier = Modifier.size(32.dp)) {
-                                                Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Hidden Directories Section
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("Hidden Directories", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                                FilledTonalButton(onClick = { dirPickerLauncher.launch(null) }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)) {
-                                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Choose Folder")
-                                }
-                            }
-                            if (editingProfileState.directories.isEmpty()) {
-                                Text("No directories selected.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            } else {
-                                editingProfileState.directories.forEach { dir ->
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                                        color = MaterialTheme.colorScheme.surfaceContainerLow
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                                            Icon(Icons.Filled.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
-                                            Spacer(modifier = Modifier.width(10.dp))
-                                            Text(dir, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
-                                            IconButton(onClick = { 
-                                                editingProfileState = editingProfileState.copy(directories = editingProfileState.directories.filter { d -> d != dir })
-                                            }, modifier = Modifier.size(32.dp)) {
-                                                Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            // Dummy Directories Section
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.FolderSpecial, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("Dummy Folders (Replace)", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
-                                FilledTonalButton(onClick = { showAddDummyDialog = true }, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)) {
-                                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(4.dp))
-                                    Text("Add Mapping")
-                                }
-                            }
-                            if (editingProfileState.dummyDirectories.isEmpty()) {
-                                Text("No dummy folders configured.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            } else {
-                                editingProfileState.dummyDirectories.forEach { dummy ->
-                                    Surface(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        shape = androidx.compose.foundation.shape.RoundedCornerShape(12.dp),
-                                        color = MaterialTheme.colorScheme.surfaceContainerLow
-                                    ) {
-                                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-                                            Column(modifier = Modifier.weight(1f)) {
-                                                Text("Target: ${dummy.target}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
-                                                Text("Dummy: ${dummy.dummy}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                            }
-                                            IconButton(onClick = { 
-                                                editingProfileState = editingProfileState.copy(dummyDirectories = editingProfileState.dummyDirectories.filter { d -> d != dummy })
-                                            }, modifier = Modifier.size(32.dp)) {
-                                                Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
+                        }
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             Button(
-                                onClick = { saveCurrentProfile() },
-                                modifier = Modifier.fillMaxWidth().height(48.dp),
-                                shape = androidx.compose.foundation.shape.CircleShape,
+                                onClick = {
+                                    saveCurrentVault()
+                                    val stateManager = VaultStateManager.getInstance(context)
+                                    stateManager.updateState(VaultState.LOCKED)
+                                    val packages = settings.targetPackages
+                                    val directories = settings.targetDirectories
+                                    val dummyDirectories = settings.targetDummyDirectories
+                                    val files = settings.targetFiles
+                                    // Off the main thread: under the Shizuku tier, PrivilegedShell blocks
+                                    // waiting for Shizuku's bindUserService callback, which Android delivers
+                                    // on the main thread — calling this from Compose's onClick (main thread)
+                                    // is a self-deadlock (confirmed on-device: every call times out at
+                                    // exactly the 5s bind limit). Root's blocking libsu shell call doesn't
+                                    // have this problem, but routes through the same call now, so keep both
+                                    // off main for consistency.
+                                    Thread {
+                                        StorageMountManager.unmountAndLock(packages, directories, dummyDirectories, files, context = context)
+                                        mainHandler.post { Toast.makeText(context, "Vault and files hidden", Toast.LENGTH_SHORT).show() }
+                                    }.start()
+                                },
+                                modifier = Modifier.weight(1f).height(50.dp),
+                                shape = RoundedCornerShape(20.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                             ) {
-                                Icon(Icons.Filled.Check, contentDescription = null)
+                                Icon(Icons.Filled.Lock, contentDescription = null, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Save Profile", fontWeight = FontWeight.Bold)
+                                Text("Hide Vault", fontWeight = FontWeight.Bold)
+                            }
+
+                            FilledTonalButton(
+                                onClick = {
+                                    saveCurrentVault()
+                                    val stateManager = VaultStateManager.getInstance(context)
+                                    val packages = settings.targetPackages
+                                    val directories = settings.targetDirectories
+                                    val dummyDirectories = settings.targetDummyDirectories
+                                    val files = settings.targetFiles
+                                    val salt = stateManager.keySalt()
+                                    Thread {
+                                        val ok = StorageMountManager.mountRealContainer(packages, directories, dummyDirectories, files, "", salt, context)
+                                        mainHandler.post {
+                                            if (ok) {
+                                                stateManager.updateState(VaultState.UNLOCKED)
+                                                Toast.makeText(context, "Vault and files unhidden", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                showPinPromptForVault = true
+                                            }
+                                        }
+                                    }.start()
+                                },
+                                modifier = Modifier.weight(1f).height(50.dp),
+                                shape = RoundedCornerShape(20.dp)
+                            ) {
+                                Icon(Icons.Filled.LockOpen, contentDescription = null, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Unhide Vault", fontWeight = FontWeight.Bold)
                             }
                         }
                     }
                 }
-                if (targetTab == 1) {
-                    var adminLockMethod by remember { mutableStateOf(settings.adminLockMethod) }
-                    var adminCustomPin by remember { mutableStateOf(settings.adminCustomPin) }
-                    var hideAppIcon by remember { mutableStateOf(settings.hideAppIcon) }
 
-                    // Header Card
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
-                    ) {
+                // 1b. Expandable Quick Guide Card
+                Surface(
+                    onClick = { showHowItWorks = !showHowItWorks },
+                    modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)),
+                    shape = RoundedCornerShape(24.dp),
+                    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.35f),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+                ) {
+                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         Row(
-                            modifier = Modifier.padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Surface(
-                                shape = androidx.compose.foundation.shape.CircleShape,
-                                color = MaterialTheme.colorScheme.primaryContainer,
-                                modifier = Modifier.size(44.dp)
-                            ) {
-                                Box(contentAlignment = Alignment.Center) {
-                                    Icon(Icons.Filled.Settings, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(24.dp))
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.secondaryContainer,
+                                    modifier = Modifier.size(32.dp)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Filled.Lightbulb, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column {
+                                    Text("How The Nile Works", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.onSurface)
+                                    Text(if (showHowItWorks) "Tap to hide guide" else "Tap to see how stealth vault protects you", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
-                            Spacer(modifier = Modifier.width(16.dp))
-                            Column {
-                                Text("Global Settings", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                                Text("Security, Dial Codes & Stealth", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Icon(
+                                if (showHowItWorks) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+
+                        AnimatedVisibility(visible = showHowItWorks) {
+                            Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(top = 8.dp)) {
+                                HelpStepRow(step = "1", title = "Choose what to hide", desc = "Add apps, individual files (photos, documents, videos), or entire folders into this vault below.")
+                                HelpStepRow(step = "2", title = "Set your decoy triggers", desc = "Configure Decoy PIN, dial code (*#1234#), or calculator trigger in Settings.")
+                                HelpStepRow(step = "3", title = "Stealth in action", desc = "Entering the decoy code secretly switches to a decoy vault or hides all trace under duress.")
+                                HelpStepRow(step = "4", title = "Switch back anytime", desc = "Dial *#8888# or type your Master PIN on the lockscreen to return to your main vault.")
+                            }
+                        }
+                    }
+                }
+
+                // 2. Vault Identity & Behavior
+                SectionHeaderCard(
+                    title = "Vault Identity & Behavior",
+                    subtitle = "Configure decoy mode, trigger PIN, dial code, and calculator math formula",
+                    icon = Icons.Filled.Badge
+                ) {
+                    OutlinedTextField(
+                        value = editingVaultState.name,
+                        onValueChange = { newName ->
+                            editingVaultState = editingVaultState.copy(name = newName)
+                        },
+                        label = { Text("Vault Name") },
+                        placeholder = { Text("e.g. Work Decoy, Casual Guest, Border Inspection") },
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Text(
+                        "Decoy Action on Trigger",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = editingVaultState.actionType == "switch_user",
+                            onClick = {
+                                editingVaultState = editingVaultState.copy(actionType = "switch_user")
+                            },
+                            label = { Text("👤 Switch to Android User") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        )
+
+                        FilterChip(
+                            selected = editingVaultState.actionType == "hide_inplace",
+                            onClick = {
+                                editingVaultState = editingVaultState.copy(actionType = "hide_inplace")
+                            },
+                            label = { Text("🔒 In-Place Hide") },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        )
+                    }
+
+                    AnimatedVisibility(visible = editingVaultState.actionType == "switch_user") {
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            OutlinedTextField(
+                                value = if (editingVaultState.targetUserId >= 0) editingVaultState.targetUserId.toString() else "",
+                                onValueChange = { input ->
+                                    val id = input.filter { it.isDigit() }.toIntOrNull() ?: 10
+                                    editingVaultState = editingVaultState.copy(targetUserId = id)
+                                },
+                                label = { Text("Target Android User ID") },
+                                placeholder = { Text("e.g. 10 or 11") },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            FilledTonalButton(
+                                onClick = {
+                                    Thread {
+                                        val newId = createDecoyAndroidUser(editingVaultState.name.ifBlank { "Decoy" })
+                                        (context as? android.app.Activity)?.runOnUiThread {
+                                            if (newId != null) {
+                                                editingVaultState = editingVaultState.copy(targetUserId = newId)
+                                                Toast.makeText(context, "Created User $newId successfully", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(context, "Failed to create user. Make sure root is enabled.", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }
+                                    }.start()
+                                },
+                                shape = RoundedCornerShape(14.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.PersonAdd, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Create New Android Secondary User")
                             }
                         }
                     }
 
-                    var enableTile by remember { mutableStateOf(settings.enableTile) }
-                    var enableDeepLink by remember { mutableStateOf(settings.enableDeepLink) }
-                    var enableVolumeKeys by remember { mutableStateOf(settings.enableVolumeKeys) }
-                    var enableCalculatorDecoy by remember { mutableStateOf(settings.enableCalculatorDecoy) }
-                    var calculatorTriggerExpression by remember { mutableStateOf(settings.calculatorTriggerExpression) }
-                    var enableFakeCrash by remember { mutableStateOf(settings.enableFakeCrash) }
+                    HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
 
-                    // Card 1: Admin Protection & Security
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+                    Text(
+                        "Secret Triggers for THIS Vault",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    OutlinedTextField(
+                        value = editingVaultState.decoyPin,
+                        onValueChange = { newDecoyPin ->
+                            editingVaultState = editingVaultState.copy(
+                                decoyPin = newDecoyPin,
+                                hideOnDecoy = newDecoyPin.isNotBlank(),
+                                decoyDialerCode = if (editingVaultState.decoyDialerCode.isBlank()) newDecoyPin else editingVaultState.decoyDialerCode
+                            )
+                        },
+                        label = { Text("🔢 Decoy Lockscreen PIN") },
+                        placeholder = { Text("e.g. 1234") },
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    DialCodeTextField(
+                        label = "📞 Secret Dialer Code",
+                        icon = Icons.Filled.Phone,
+                        value = editingVaultState.decoyDialerCode,
+                        onValueChange = { newCode ->
+                            editingVaultState = editingVaultState.copy(decoyDialerCode = newCode)
+                        }
+                    )
+
+                    OutlinedTextField(
+                        value = editingVaultState.decoyCalculatorExpression,
+                        onValueChange = { newExpr ->
+                            editingVaultState = editingVaultState.copy(decoyCalculatorExpression = newExpr)
+                        },
+                        label = { Text("🧮 Calculator Secret Formula") },
+                        placeholder = { Text("e.g. 12+34 or 47-87+23") },
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    PreferenceSwitchRow(
+                        title = "Active (Protection Enabled)",
+                        subtitle = "When enabled, this vault's triggers switch into this decoy state.",
+                        checked = editingVaultState.isActive,
+                        onCheckedChange = { checked ->
+                            editingVaultState = editingVaultState.copy(isActive = checked)
+                        }
+                    )
+                }
+
+                // 3. Hidden Applications
+                SectionHeaderCard(
+                    title = "Hidden Applications",
+                    subtitle = "${editingVaultState.packages.size} app(s) selected for stealth hiding",
+                    icon = Icons.Filled.Apps,
+                    trailingContent = {
+                        FilledTonalButton(
+                            onClick = { isAppPickerOpen = true },
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Choose")
+                        }
+                    }
+                ) {
+                    if (editingVaultState.packages.isEmpty()) {
+                        Text("No apps selected.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        editingVaultState.packages.forEach { pkg ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                                shape = RoundedCornerShape(14.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                    Icon(Icons.Filled.Android, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(pkg, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    IconButton(onClick = { 
+                                        editingVaultState = editingVaultState.copy(packages = editingVaultState.packages.filter { p -> p != pkg })
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
                                     }
                                 }
+                            }
+                        }
+                    }
+                }
+
+                // 3b. Vault Apps — copy-based: data-swap (app stays, data swaps) or uninstall (app removed)
+                SectionHeaderCard(
+                    title = "Vault Apps",
+                    subtitle = "${editingVaultState.hiddenApps.size + editingVaultState.uninstallApps.size} app(s): data-swap or full uninstall",
+                    icon = Icons.Filled.Lock,
+                    trailingContent = {
+                        FilledTonalButton(
+                            onClick = { isVaultAppPickerOpen = true },
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Choose")
+                        }
+                    }
+                ) {
+                    val vaultApps = editingVaultState.hiddenApps + editingVaultState.uninstallApps
+                    if (vaultApps.isEmpty()) {
+                        Text("No vault apps. Data-swap shows anodyne data on the decoy PIN; uninstall removes the app entirely.",
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        fun capture(pkg: String, block: () -> Boolean) {
+                            Toast.makeText(context, "Capturing $pkg…", Toast.LENGTH_SHORT).show()
+                            Thread {
+                                val ok = block()
+                                mainHandler.post { Toast.makeText(context, if (ok) "Captured $pkg" else "Capture failed (see logs)", Toast.LENGTH_SHORT).show() }
+                            }.start()
+                        }
+                        vaultApps.forEach { pkg ->
+                            val isUninstall = pkg in editingVaultState.uninstallApps
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                                shape = RoundedCornerShape(14.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Column(modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(Icons.Filled.Android, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                                        Spacer(modifier = Modifier.width(12.dp))
+                                        Text(pkg, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                        IconButton(onClick = {
+                                            editingVaultState = editingVaultState.copy(
+                                                hiddenApps = editingVaultState.hiddenApps.filter { it != pkg },
+                                                uninstallApps = editingVaultState.uninstallApps.filter { it != pkg }
+                                            )
+                                        }, modifier = Modifier.size(32.dp)) {
+                                            Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                        }
+                                    }
+                                    // Mode toggle
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        FilterChip(
+                                            selected = !isUninstall,
+                                            onClick = {
+                                                editingVaultState = editingVaultState.copy(
+                                                    hiddenApps = (editingVaultState.hiddenApps + pkg).distinct(),
+                                                    uninstallApps = editingVaultState.uninstallApps.filter { it != pkg }
+                                                )
+                                            },
+                                            label = { Text("Data swap") }
+                                        )
+                                        FilterChip(
+                                            selected = isUninstall,
+                                            onClick = {
+                                                editingVaultState = editingVaultState.copy(
+                                                    uninstallApps = (editingVaultState.uninstallApps + pkg).distinct(),
+                                                    hiddenApps = editingVaultState.hiddenApps.filter { it != pkg }
+                                                )
+                                            },
+                                            label = { Text("Uninstall") }
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                    // Capture buttons. Real PIN = the vault unlock code; decoy PIN = this vault's.
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        if (isUninstall) {
+                                            OutlinedButton(onClick = {
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureUninstall(context, pkg, settings.codeUnlock) }
+                                            }) { Text("Capture & remove") }
+                                        } else {
+                                            OutlinedButton(onClick = {
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureDecoy(context, pkg, editingVaultState.decoyPin) }
+                                            }) { Text("Capture decoy") }
+                                            OutlinedButton(onClick = {
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureReal(context, pkg, settings.codeUnlock) }
+                                            }) { Text("Capture real") }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 3c. Vault Accounts — a manual admin action (Remove Accounts Now), not a hide/decoy
+                // trigger: removal needs an Activity + generally shows the account's own system
+                // confirmation, so it can't run silently on the same root-shell path as the rest.
+                SectionHeaderCard(
+                    title = "Vault Accounts",
+                    subtitle = "${editingVaultState.removeAccounts.size} account(s) marked for removal",
+                    icon = Icons.Filled.AccountCircle,
+                    trailingContent = {
+                        FilledTonalButton(
+                            onClick = { isAccountPickerOpen = true },
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Choose")
+                        }
+                    }
+                ) {
+                    if (editingVaultState.removeAccounts.isEmpty()) {
+                        Text(
+                            "No accounts selected. Removal runs immediately below (not on a hide/decoy trigger) and may show that account's own \"Remove account?\" confirmation.",
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        editingVaultState.removeAccounts.forEach { accountName ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                                shape = RoundedCornerShape(14.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                    Icon(Icons.Filled.AccountCircle, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(accountName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    IconButton(onClick = {
+                                        editingVaultState = editingVaultState.copy(removeAccounts = editingVaultState.removeAccounts.filter { it != accountName })
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            }
+                        }
+                        Button(
+                            onClick = {
+                                val am = android.accounts.AccountManager.get(context)
+                                val targets = am.accounts.filter { it.name in editingVaultState.removeAccounts }
+                                if (targets.isEmpty()) {
+                                    Toast.makeText(context, "No matching device accounts found", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    targets.forEach { account ->
+                                        am.removeAccount(account, activity, { future ->
+                                            mainHandler.post {
+                                                val removed = try { future.result.getBoolean(android.accounts.AccountManager.KEY_BOOLEAN_RESULT) } catch (e: Exception) { false }
+                                                Toast.makeText(context, if (removed) "Removed ${account.name}" else "Could not remove ${account.name} (see logs)", Toast.LENGTH_SHORT).show()
+                                            }
+                                        }, null)
+                                    }
+                                }
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Remove Accounts Now")
+                        }
+                    }
+                }
+
+                // 4. Hidden Folders & Dummy Mappings
+                SectionHeaderCard(
+                    title = "Hidden Folders & Dummies",
+                    subtitle = "Folder encryption & decoy replacement mappings",
+                    icon = Icons.Filled.Folder,
+                    iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    iconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                ) {
+                    // Folders Action Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = { dirPickerLauncher.launch(null) },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Add Folder")
+                        }
+                        OutlinedButton(
+                            onClick = { showAddDummyDialog = true },
+                            modifier = Modifier.weight(1f),
+                            shape = RoundedCornerShape(14.dp)
+                        ) {
+                            Icon(Icons.Filled.FolderSpecial, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Add Dummy")
+                        }
+                    }
+
+                    if (editingVaultState.directories.isEmpty() && editingVaultState.dummyDirectories.isEmpty()) {
+                        Text("No directories or dummy mappings configured.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+
+                    // Directories List
+                    editingVaultState.directories.forEach { dir ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                Icon(Icons.Filled.Folder, contentDescription = null, tint = MaterialTheme.colorScheme.secondary, modifier = Modifier.size(20.dp))
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Text("Admin Authentication", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                                Text(dir, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                IconButton(onClick = { 
+                                    editingVaultState = editingVaultState.copy(directories = editingVaultState.directories.filter { d -> d != dir })
+                                }, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                }
                             }
+                        }
+                    }
 
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(selected = adminLockMethod == "biometric", onClick = { adminLockMethod = "biometric" })
-                                Text("Device Fingerprint / System Lock")
+                    // Dummy Mappings List
+                    editingVaultState.dummyDirectories.forEach { dummy ->
+                        Surface(
+                            modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                            shape = RoundedCornerShape(14.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow
+                        ) {
+                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                Icon(Icons.Filled.FolderSpecial, contentDescription = null, tint = MaterialTheme.colorScheme.tertiary, modifier = Modifier.size(20.dp))
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text("Target: ${dummy.target}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                    Text("Dummy: ${dummy.dummy}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                                IconButton(onClick = { 
+                                    editingVaultState = editingVaultState.copy(dummyDirectories = editingVaultState.dummyDirectories.filter { d -> d != dummy })
+                                }, modifier = Modifier.size(32.dp)) {
+                                    Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                }
                             }
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                RadioButton(selected = adminLockMethod == "custom_pin", onClick = { adminLockMethod = "custom_pin" })
-                                Text("Custom Admin PIN")
-                            }
+                        }
+                    }
+                }
 
-                            AnimatedVisibility(visible = adminLockMethod == "custom_pin") {
+                // 4b. Hidden Individual Files
+                SectionHeaderCard(
+                    title = "Hidden Individual Files",
+                    subtitle = "${editingVaultState.files.size} file(s) selected for encryption & stealth",
+                    icon = Icons.Filled.InsertDriveFile,
+                    iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    trailingContent = {
+                        FilledTonalButton(
+                            onClick = { filePickerLauncher.launch(arrayOf("*/*")) },
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Add Files")
+                        }
+                    }
+                ) {
+                    if (editingVaultState.files.isEmpty()) {
+                        Text("No individual files selected. Tap 'Add Files' to choose photos, videos, or documents to hide.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    } else {
+                        editingVaultState.files.forEach { filePath ->
+                            val fileName = filePath.substringAfterLast("/")
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                                shape = RoundedCornerShape(14.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                    Icon(Icons.Filled.Description, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(fileName, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
+                                        Text(filePath, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    }
+                                    IconButton(onClick = {
+                                        editingVaultState = editingVaultState.copy(files = editingVaultState.files.filter { f -> f != filePath })
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // 5. Save Vault Button
+                Button(
+                    onClick = { saveCurrentVault() },
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDirty) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.primary.copy(alpha = 0.8f)
+                    )
+                ) {
+                    Icon(Icons.Filled.Check, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (isDirty) "Save Vault Changes *" else "Save Vault", fontWeight = FontWeight.Bold)
+                }
+
+            } else {
+                // =================================================================================
+                // SETTINGS TAB
+                // =================================================================================
+
+                var adminLockMethod by remember { mutableStateOf(settings.adminLockMethod) }
+                var adminCustomPin by remember { mutableStateOf(settings.adminCustomPin) }
+                var hideAppIcon by remember { mutableStateOf(settings.hideAppIcon) }
+                var enableTile by remember { mutableStateOf(settings.enableTile) }
+                var enableDeepLink by remember { mutableStateOf(settings.enableDeepLink) }
+                var enableVolumeKeys by remember { mutableStateOf(settings.enableVolumeKeys) }
+                var enableCalculatorDecoy by remember { mutableStateOf(settings.enableCalculatorDecoy) }
+                var calculatorTriggerExpression by remember { mutableStateOf(settings.calculatorTriggerExpression) }
+                var enableFakeCrash by remember { mutableStateOf(settings.enableFakeCrash) }
+                var deadManSwitchEnabled by remember { mutableStateOf(settings.deadManSwitchEnabled) }
+                var deadManSwitchHoursText by remember { mutableStateOf(settings.deadManSwitchHours.toString()) }
+                var deadManSwitchVaultIds by remember { mutableStateOf(settings.deadManSwitchVaultIds) }
+                var wrongPinSwitchEnabled by remember { mutableStateOf(settings.wrongPinSwitchEnabled) }
+                var wrongPinSwitchLimitText by remember { mutableStateOf(settings.wrongPinSwitchLimit.toString()) }
+                var wrongPinSwitchVaultIds by remember { mutableStateOf(settings.wrongPinSwitchVaultIds) }
+
+                var androidUsers by remember { mutableStateOf<List<AndroidUser>>(emptyList()) }
+                var showCreateUserDialog by remember { mutableStateOf(false) }
+                var newUserNameInput by remember { mutableStateOf("Decoy") }
+                var isCreatingUser by remember { mutableStateOf(false) }
+                var showManualUserField by remember { mutableStateOf(false) }
+
+                fun refreshUsers() {
+                    androidUsers = fetchAndroidUsers()
+                    if (decoyUserId < 0) {
+                        val firstSecondary = androidUsers.firstOrNull { !it.isOwner }
+                        if (firstSecondary != null) {
+                            decoyUserId = firstSecondary.id
+                        }
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    refreshUsers()
+                }
+
+                if (showCreateUserDialog) {
+                    AlertDialog(
+                        onDismissRequest = { if (!isCreatingUser) showCreateUserDialog = false },
+                        title = { Text("New Decoy Android User", fontWeight = FontWeight.Bold) },
+                        text = {
+                            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Text(
+                                    "Choose a name for the new Android user. A new isolated user space will be created on your device.",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                                 OutlinedTextField(
-                                    value = adminCustomPin,
-                                    onValueChange = { adminCustomPin = it },
-                                    label = { Text("Custom App PIN") },
+                                    value = newUserNameInput,
+                                    onValueChange = { newUserNameInput = it },
+                                    label = { Text("User Name") },
+                                    placeholder = { Text("e.g. Decoy, Guest, Work") },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(16.dp),
                                     modifier = Modifier.fillMaxWidth()
                                 )
                             }
+                        },
+                        confirmButton = {
+                            FilledTonalButton(
+                                onClick = {
+                                    val nameToCreate = newUserNameInput.trim().ifEmpty { "Decoy" }
+                                    isCreatingUser = true
+                                    val newId = createDecoyAndroidUser(nameToCreate)
+                                    isCreatingUser = false
+                                    if (newId != null) {
+                                        decoyUserId = newId
+                                        refreshUsers()
+                                        showCreateUserDialog = false
+                                        newUserNameInput = "Decoy"
+                                        Toast.makeText(context, "Android user '$nameToCreate' created (User ID: $newId)", Toast.LENGTH_SHORT).show()
+                                    } else {
+                                        Toast.makeText(context, "Failed to create Android user. Ensure root access is granted.", Toast.LENGTH_LONG).show()
+                                    }
+                                },
+                                enabled = !isCreatingUser
+                            ) {
+                                if (isCreatingUser) {
+                                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Creating...")
+                                } else {
+                                    Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Create Vault")
+                                }
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { showCreateUserDialog = false },
+                                enabled = !isCreatingUser
+                            ) { Text("Cancel") }
+                        }
+                    )
+                }
+
+                // Settings land on this category menu first instead of dumping every section at
+                // once — each category opens into its own focused screen with a back button.
+                var selectedCategory by remember { mutableStateOf<String?>(null) }
+                BackHandler(enabled = selectedCategory != null) { selectedCategory = null }
+                data class SettingsCategory(val name: String, val subtitle: String, val icon: ImageVector)
+                val categoryList = listOf(
+                    SettingsCategory("Decoy & Stealth", "Lockscreen decoy PIN, switch behavior, one-time unlock", Icons.Filled.ShieldMoon),
+                    SettingsCategory("Triggers & Codes", "Dial codes and app launch disguises", Icons.Filled.Dialpad),
+                    SettingsCategory("Security & Auth", "Privilege, anti-forensics, admin authentication", Icons.Filled.LockPerson),
+                    SettingsCategory("Backup & Data", "Export or restore encrypted vault backups", Icons.Filled.Backup)
+                )
+
+                val settingsHaptic = LocalHapticFeedback.current
+                AnimatedContent(
+                    targetState = selectedCategory == null,
+                    transitionSpec = {
+                        if (targetState) {
+                            (slideInVertically(animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) { -it / 4 } + fadeIn(tween(220))).togetherWith(
+                                slideOutVertically(animationSpec = tween(160)) { it / 4 } + fadeOut(tween(140))
+                            )
+                        } else {
+                            (slideInVertically(animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)) { it / 4 } + fadeIn(tween(220))).togetherWith(
+                                slideOutVertically(animationSpec = tween(160)) { -it / 4 } + fadeOut(tween(140))
+                            )
+                        }
+                    },
+                    label = "SettingsMenuOrHeader"
+                ) { showingMenu ->
+                    if (showingMenu) {
+                        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            categoryList.forEachIndexed { index, cat ->
+                                var visible by remember { mutableStateOf(false) }
+                                LaunchedEffect(Unit) {
+                                    delay(index * 50L)
+                                    visible = true
+                                }
+                                AnimatedVisibility(
+                                    visible = visible,
+                                    enter = fadeIn(tween(280)) + slideInVertically(
+                                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)
+                                    ) { it / 3 }
+                                ) {
+                                    val interactionSource = remember { MutableInteractionSource() }
+                                    val isPressed by interactionSource.collectIsPressedAsState()
+                                    val cardScale by animateFloatAsState(
+                                        targetValue = if (isPressed) 0.96f else 1f,
+                                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium),
+                                        label = "cardScale_$index"
+                                    )
+                                    Surface(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .graphicsLayer(scaleX = cardScale, scaleY = cardScale)
+                                            .clip(RoundedCornerShape(18.dp))
+                                            .clickable(interactionSource = interactionSource, indication = null) {
+                                                settingsHaptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                                selectedCategory = cat.name
+                                            },
+                                        shape = RoundedCornerShape(18.dp),
+                                        color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                                    ) {
+                                        Row(
+                                            modifier = Modifier.padding(16.dp),
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Surface(
+                                                shape = CircleShape,
+                                                color = MaterialTheme.colorScheme.primaryContainer,
+                                                modifier = Modifier.size(44.dp)
+                                            ) {
+                                                Box(contentAlignment = Alignment.Center) {
+                                                    Icon(cat.icon, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer)
+                                                }
+                                            }
+                                            Spacer(modifier = Modifier.width(14.dp))
+                                            Column(modifier = Modifier.weight(1f)) {
+                                                Text(cat.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                                Text(cat.subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                            Icon(Icons.Filled.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                            IconButton(onClick = {
+                                settingsHaptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                                selectedCategory = null
+                            }) {
+                                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back to categories")
+                            }
+                            Text(selectedCategory ?: "", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         }
                     }
+                }
 
-                    // Card 2: Launch & Opening Methods
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+                Crossfade(targetState = selectedCategory, label = "SettingsCategoryContent", animationSpec = tween(260)) { target ->
+                Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                // --- Category: Decoy & Stealth ---
+                if (target == "Decoy & Stealth") {
+                    SectionHeaderCard(
+                        title = "Real Lock Screen Decoy",
+                        subtitle = "Decoy PIN triggers on the system Android lockscreen",
+                        icon = Icons.Filled.ShieldMoon,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.size(32.dp)) {
+                        Text(
+                            "Advanced. Entering the Master Decoy Code or any vault's decoy PIN on the ACTUAL Android lock screen triggers the stealth action.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            listOf(
+                                "off" to ("Off (default)" to "No action on real lock screen."),
+                                "fake_wrong_pin" to ("Fake wrong-PIN" to "Shows wrong PIN error, then real PIN unlocks normally."),
+                                "one_time_unlock" to ("One-time Unlock" to "Decoy unlocks once, then reverts to wrong PIN."),
+                                "switch_user" to ("Switch to Android User" to "Switches to an isolated secondary Android user."),
+                            ).forEach { (value, info) ->
+                                SelectableOptionCard(
+                                    title = info.first,
+                                    subtitle = info.second,
+                                    selected = decoyLockScreenMode == value,
+                                    onClick = { decoyLockScreenMode = value }
+                                )
+                            }
+                        }
+
+                        if (decoyLockScreenMode == "switch_user") {
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                            // Decoy User Selection Header & Actions (+ and refresh)
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Surface(
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.primaryContainer,
+                                    modifier = Modifier.size(36.dp)
+                                ) {
                                     Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.AutoMirrored.Filled.Launch, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(18.dp))
+                                        Icon(Icons.Filled.AccountCircle, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(20.dp))
                                     }
                                 }
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Text("Vault Opening Methods", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            }
-
-                            // Quick Settings Tile Toggle
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
                                 Column(modifier = Modifier.weight(1f)) {
-                                    Text("Quick Settings Tile", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                    Text("Add tile to notification shade for 1-tap open", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text("Decoy Android User", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                    Text("Choose or add an Android user to switch into", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
-                                Switch(checked = enableTile, onCheckedChange = { enableTile = it })
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-
-                            // Browser Deep Link Toggle
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Browser Deep Link (nile://admin)", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                    Text("Open vault by typing nile://admin in any browser", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Switch(checked = enableDeepLink, onCheckedChange = { enableDeepLink = it })
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-
-                            // Hardware Volume Buttons Toggle
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text("Volume Down Double-Tap", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                        Text("Double tap Volume Down key to open", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    FilledTonalButton(
+                                        onClick = { showCreateUserDialog = true },
+                                        shape = CircleShape,
+                                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                    ) {
+                                        Icon(Icons.Filled.Add, contentDescription = "Add User", modifier = Modifier.size(16.dp))
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                        Text("Add", fontWeight = FontWeight.Bold)
                                     }
-                                    Switch(checked = enableVolumeKeys, onCheckedChange = { enableVolumeKeys = it })
+                                    IconButton(onClick = { refreshUsers() }) {
+                                        Icon(Icons.Filled.Refresh, contentDescription = "Refresh Users", tint = MaterialTheme.colorScheme.primary)
+                                    }
                                 }
-                                AnimatedVisibility(visible = enableVolumeKeys) {
-                                    Column {
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        OutlinedButton(
-                                            onClick = {
-                                                context.startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
+                            }
+
+                            val secondaryUsers = androidUsers.filter { !it.isOwner }
+
+                            if (secondaryUsers.isNotEmpty()) {
+                                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    secondaryUsers.forEach { user ->
+                                        val isSelected = decoyUserId == user.id
+                                        Surface(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .clip(RoundedCornerShape(16.dp))
+                                                .clickable { decoyUserId = user.id },
+                                            shape = RoundedCornerShape(16.dp),
+                                            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) else MaterialTheme.colorScheme.surfaceContainerLow,
+                                            border = BorderStroke(
+                                                1.dp,
+                                                if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                                            )
                                         ) {
-                                            Icon(Icons.Filled.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Enable Nile Accessibility Service")
+                                            Row(
+                                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                                                verticalAlignment = Alignment.CenterVertically
+                                            ) {
+                                                RadioButton(
+                                                    selected = isSelected,
+                                                    onClick = { decoyUserId = user.id }
+                                                )
+                                                Spacer(modifier = Modifier.width(10.dp))
+                                                Column(modifier = Modifier.weight(1f)) {
+                                                    Text(
+                                                        text = user.name,
+                                                        style = MaterialTheme.typography.bodyLarge,
+                                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                                                    )
+                                                    Text(
+                                                        text = "Android User • ID: ${user.id}",
+                                                        style = MaterialTheme.typography.bodySmall,
+                                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    )
+                                                }
+                                                if (isSelected) {
+                                                    Surface(
+                                                        shape = CircleShape,
+                                                        color = MaterialTheme.colorScheme.primary,
+                                                        modifier = Modifier.size(24.dp)
+                                                    ) {
+                                                        Box(contentAlignment = Alignment.Center) {
+                                                            Icon(Icons.Filled.Check, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimary, modifier = Modifier.size(14.dp))
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                Surface(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+                                ) {
+                                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(Icons.Filled.PersonAdd, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(24.dp))
+                                            Spacer(modifier = Modifier.width(10.dp))
+                                            Column {
+                                                Text("No Decoy User Yet", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                                                Text("Create a decoy Android user to enable stealth user switching.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                            }
+                                        }
+
+                                        FilledTonalButton(
+                                            onClick = { showCreateUserDialog = true },
+                                            modifier = Modifier.fillMaxWidth(),
+                                            shape = RoundedCornerShape(14.dp)
+                                        ) {
+                                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                                            Spacer(modifier = Modifier.width(8.dp))
+                                            Text("Create Decoy Vault", fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 }
                             }
 
+                            // Optional Manual ID entry toggle for power users
+                            Row(
+                                modifier = Modifier.fillMaxWidth().clickable { showManualUserField = !showManualUserField },
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    if (showManualUserField) "Hide manual User ID input" else "Advanced: Enter custom User ID",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Icon(
+                                    if (showManualUserField) Icons.Filled.ExpandLess else Icons.Filled.ExpandMore,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            }
+
+                            AnimatedVisibility(visible = showManualUserField) {
+                                OutlinedTextField(
+                                    value = if (decoyUserId >= 0) decoyUserId.toString() else "",
+                                    onValueChange = { text ->
+                                        val n = text.filter { it.isDigit() }.toIntOrNull()
+                                        decoyUserId = n ?: -1
+                                    },
+                                    label = { Text("Manual User ID integer") },
+                                    placeholder = { Text("e.g. 10") },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(16.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+                            }
+
                             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
 
-                            // Calculator Decoy Trigger
-                            Column(modifier = Modifier.fillMaxWidth()) {
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                    Column(modifier = Modifier.weight(1f)) {
-                                        Text("Calculator Decoy Trigger", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                        Text(
-                                            "Hooks the REAL Calculator app (no fake app to spot) — typing the expression below opens Admin.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            // Vault Switching Triggers Section (Calculator, Dialer, PIN Code)
+                            Text(
+                                "Vault Switching Triggers",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Text(
+                                "Configure what actions switch the phone into this decoy vault. Entering master codes while in the decoy vault switches back to main user.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            // 1. Lock Screen PIN Trigger
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(Icons.Filled.Pin, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text("Lock Screen Decoy PIN", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                                            Text("Entering this Decoy PIN on Android lock screen switches vault", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                    OutlinedTextField(
+                                        value = editingVaultState.decoyPin,
+                                        onValueChange = { newPin ->
+                                            editingVaultState = editingVaultState.copy(decoyPin = newPin, hideOnDecoy = newPin.isNotBlank())
+                                        },
+                                        label = { Text("Decoy Lock Screen PIN") },
+                                        placeholder = { Text("e.g. 1234") },
+                                        leadingIcon = { Icon(Icons.Filled.Lock, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+                                        singleLine = true,
+                                        shape = RoundedCornerShape(14.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    )
+                                }
+                            }
+
+                            // 2. Phone Dialer Code Trigger
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = MaterialTheme.colorScheme.primaryContainer,
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(Icons.Filled.Phone, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text("Phone Dialer Secret Code", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                                            Text("Dialing *#<CODE># in Phone app switches vault", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
+                                    DialCodeTextField(
+                                        label = "Decoy Switch Dial Code",
+                                        icon = Icons.Filled.Dialpad,
+                                        value = codeDecoy,
+                                        onValueChange = { codeDecoy = it }
+                                    )
+                                }
+                            }
+
+                            // 3. Calculator App Trigger
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Column(modifier = Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = if (enableCalculatorDecoy) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceContainerHigh,
+                                            modifier = Modifier.size(32.dp)
+                                        ) {
+                                            Box(contentAlignment = Alignment.Center) {
+                                                Icon(Icons.Filled.Calculate, contentDescription = null, tint = if (enableCalculatorDecoy) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(18.dp))
+                                            }
+                                        }
+                                        Spacer(modifier = Modifier.width(10.dp))
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text("Calculator Decoy Trigger", fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyLarge)
+                                            Text("Typing formula or PIN in Calculator switches vault", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                        Switch(
+                                            checked = enableCalculatorDecoy,
+                                            onCheckedChange = { enableCalculatorDecoy = it }
                                         )
                                     }
-                                    Switch(checked = enableCalculatorDecoy, onCheckedChange = { enableCalculatorDecoy = it })
-                                }
-                                AnimatedVisibility(visible = enableCalculatorDecoy) {
-                                    Column {
-                                        Spacer(modifier = Modifier.height(6.dp))
+                                    AnimatedVisibility(visible = enableCalculatorDecoy) {
                                         OutlinedTextField(
                                             value = calculatorTriggerExpression,
                                             onValueChange = { calculatorTriggerExpression = it },
-                                            label = { Text("Trigger expression") },
+                                            label = { Text("Calculator Trigger Expression") },
+                                            placeholder = { Text("e.g. 1234= or 47-87+23=") },
+                                            leadingIcon = { Icon(Icons.Filled.Calculate, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
                                             singleLine = true,
+                                            shape = RoundedCornerShape(14.dp),
                                             modifier = Modifier.fillMaxWidth()
                                         )
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        Text(
-                                            "One-time setup: grant Nile Xposed scope on your Calculator app, then reboot. Works with Google Calculator and AOSP Calculator.",
-                                            style = MaterialTheme.typography.bodySmall,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                        Spacer(modifier = Modifier.height(6.dp))
-                                        OutlinedButton(
-                                            onClick = {
-                                                Thread {
-                                                    Shell.cmd(
-                                                        "/data/adb/modules/zygisk_vector/cli scope add com.thenile.vault " +
-                                                            "com.android.calculator2/0 com.google.android.calculator/0"
-                                                    ).exec()
-                                                }.start()
-                                                Toast.makeText(context, "Scope granted — reboot for it to take effect", Toast.LENGTH_LONG).show()
-                                            },
-                                            modifier = Modifier.fillMaxWidth()
-                                        ) {
-                                            Icon(Icons.Filled.Calculate, contentDescription = null, modifier = Modifier.size(16.dp))
-                                            Spacer(modifier = Modifier.width(6.dp))
-                                            Text("Grant Calculator App Access")
+                                    }
+                                }
+                            }
+
+                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                            Text(
+                                "Vault Stealth Options",
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+
+                            PreferenceSwitchRow(
+                                title = "Hide switching animation",
+                                subtitle = "Silently switches vaults without showing 'Switching to Decoy...'.",
+                                checked = suppressUserSwitchAnimation,
+                                onCheckedChange = { suppressUserSwitchAnimation = it }
+                            )
+
+                            PreferenceSwitchRow(
+                                title = "Hide switcher in Notifications & Quick Settings",
+                                subtitle = "Removes user switcher icon from Quick Settings shade.",
+                                checked = hideUserSwitcherInQuickSettings,
+                                onCheckedChange = { hideUserSwitcherInQuickSettings = it }
+                            )
+
+                            PreferenceSwitchRow(
+                                title = "Hide \"Users\" in Android Settings",
+                                subtitle = "Hides 'Multiple users' section and avatar from Settings app.",
+                                checked = hideUserSwitcherInSettings,
+                                onCheckedChange = { hideUserSwitcherInSettings = it }
+                            )
+                        }
+
+                        if (decoyLockScreenMode == "one_time_unlock") {
+                            val usedCount = settings.decoyUnlockUsedCount
+                            val unlimited = decoyUnlockLimit == 0
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.padding(14.dp)
+                                ) {
+                                    Text(
+                                        if (unlimited) "$usedCount used so far (unlimited)." else "$usedCount of $decoyUnlockLimit used.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    if (usedCount > 0) {
+                                        OutlinedButton(onClick = { settings.rearmDecoyOneTimeUnlock() }, shape = CircleShape) { Text("Re-arm") }
+                                    }
+                                }
+                            }
+                            PreferenceSwitchRow(
+                                title = "Unlimited uses",
+                                subtitle = "Allow decoy unlock indefinitely without reverting.",
+                                checked = unlimited,
+                                onCheckedChange = { checked -> decoyUnlockLimit = if (checked) 0 else 1 }
+                            )
+                        }
+                    }
+                }
+
+                // --- Category: Security & Auth ---
+                // (Privilege + Anti-Forensics moved out of "Decoy & Stealth" — they're about the
+                // app's overall security/privacy posture, not the decoy-switching mechanics.)
+                if (target == "Security & Auth") {
+                    SectionHeaderCard(
+                        title = "Privilege",
+                        subtitle = "What Nile can do on this device without root",
+                        icon = Icons.Filled.AdminPanelSettings
+                    ) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                Text(
+                                    when (privilegeTier) {
+                                        PrivilegeTier.ROOT -> "Root"
+                                        PrivilegeTier.SHIZUKU -> "Shizuku"
+                                        PrivilegeTier.NONE -> "None"
+                                    },
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Text(
+                                    when (privilegeTier) {
+                                        PrivilegeTier.ROOT -> "Full stealth: system-wide app hiding, decoy PIN on the real lock screen, encrypted vault mounting."
+                                        PrivilegeTier.SHIZUKU -> "User switching works. App hiding (pm hide) may fail on newer Android versions — it needs MANAGE_USERS, which shell doesn't have on Android 14+ (confirmed on API 35). No mount-based vault or real-lockscreen decoy PIN — directories/files are hidden via on-device encryption instead."
+                                        PrivilegeTier.NONE -> "No app hiding or user switching. Directories/files are still hidden via on-device encryption."
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                if (privilegeTier != PrivilegeTier.ROOT && PrivilegeManager.isShizukuAvailable() && !PrivilegeManager.isShizukuPermissionGranted()) {
+                                    FilledTonalButton(
+                                        onClick = { PrivilegeManager.requestShizukuPermission() },
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    ) { Text("Grant Shizuku access") }
+                                }
+                                if (privilegeTier != PrivilegeTier.ROOT && !manageStorageGranted) {
+                                    FilledTonalButton(
+                                        onClick = { PrivilegeManager.requestManageStoragePermission(context) },
+                                        modifier = Modifier.padding(top = 4.dp)
+                                    ) { Text("Grant All Files Access (needed to hide folders/files)") }
+                                }
+                            }
+                        }
+
+                        if (privilegeTier != PrivilegeTier.ROOT) {
+                            Surface(
+                                modifier = Modifier.fillMaxWidth(),
+                                shape = RoundedCornerShape(16.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Text("Vault storage location", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
+                                    Text(
+                                        softVaultDirUri?.let { "Custom folder: ${Uri.parse(it).lastPathSegment ?: it}" }
+                                            ?: "Nile's private storage (default — recommended)",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 4.dp)) {
+                                        FilledTonalButton(onClick = { showSoftVaultWarning = true }) { Text("Change") }
+                                        if (softVaultDirUri != null) {
+                                            TextButton(onClick = {
+                                                settings.softVaultDirectoryUri = null
+                                                softVaultDirUri = null
+                                            }) { Text("Reset to default") }
                                         }
                                     }
                                 }
                             }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-
-                            // Fake Crash Disguise Toggle
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Fake Crash Disguise", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                    Text("Show fake crash screen on app launch; long press 'Close app' to bypass", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Switch(checked = enableFakeCrash, onCheckedChange = { enableFakeCrash = it })
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
-
-                            // Hide App Icon Toggle
-                            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Hide Nile App Icon", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-                                    Text("Hides launcher icon; open via dialer, tile, or deep link", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
-                                Switch(checked = hideAppIcon, onCheckedChange = { hideAppIcon = it })
-                            }
-                        }
-                    }
-
-                    // Card 3: Secret Dial Codes
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.secondaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Dialpad, contentDescription = null, tint = MaterialTheme.colorScheme.onSecondaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("Secret Dial Codes", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            }
-
-                            Text(
-                                "Android only delivers a dial code to an app if that exact code is " +
-                                    "built into the app beforehand — so these four are fixed, you're " +
-                                    "just choosing which action each one triggers (*#<CODE>#). Picking " +
-                                    "a code already used elsewhere swaps the two.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            DialCodeDropdown(
-                                label = "Unlock Code",
-                                icon = Icons.Filled.LockOpen,
-                                selected = codeUnlock,
-                                onSelect = { new ->
-                                    val old = codeUnlock
-                                    codeUnlock = new
-                                    if (codeLock == new) codeLock = old
-                                    else if (codeDecoy == new) codeDecoy = old
-                                    else if (codeAdmin == new) codeAdmin = old
-                                }
-                            )
-                            DialCodeDropdown(
-                                label = "Lock Code",
-                                icon = Icons.Filled.Lock,
-                                selected = codeLock,
-                                onSelect = { new ->
-                                    val old = codeLock
-                                    codeLock = new
-                                    if (codeUnlock == new) codeUnlock = old
-                                    else if (codeDecoy == new) codeDecoy = old
-                                    else if (codeAdmin == new) codeAdmin = old
-                                }
-                            )
-                            DialCodeDropdown(
-                                label = "Master Decoy Code",
-                                icon = Icons.Filled.Shield,
-                                selected = codeDecoy,
-                                onSelect = { new ->
-                                    val old = codeDecoy
-                                    codeDecoy = new
-                                    if (codeUnlock == new) codeUnlock = old
-                                    else if (codeLock == new) codeLock = old
-                                    else if (codeAdmin == new) codeAdmin = old
-                                }
-                            )
-                            DialCodeDropdown(
-                                label = "Admin Code",
-                                icon = Icons.Filled.AdminPanelSettings,
-                                selected = codeAdmin,
-                                onSelect = { new ->
-                                    val old = codeAdmin
-                                    codeAdmin = new
-                                    if (codeUnlock == new) codeUnlock = old
-                                    else if (codeLock == new) codeLock = old
-                                    else if (codeDecoy == new) codeDecoy = old
-                                }
-                            )
-                        }
-                    }
-
-                    // Card 3b: Real Lock Screen Decoy
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.errorContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Warning, contentDescription = null, tint = MaterialTheme.colorScheme.onErrorContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text("Real Lock Screen Decoy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            }
-
-                            Text(
-                                "Advanced. Entering the Master Decoy Code or any profile's decoy PIN on the ACTUAL Android lock screen (not just Nile's own PIN pad) triggers the hide. A bug here risks getting locked out of your real phone — leave Off unless you understand that risk.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                                listOf(
-                                    "off" to "Off (default)",
-                                    "fake_wrong_pin" to "Fake wrong-PIN, then real PIN unlocks normally",
-                                    "one_time_unlock" to "Decoy also unlocks once, then reverts to a normal wrong PIN",
-                                ).forEach { (value, label) ->
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        modifier = Modifier.fillMaxWidth().clickable { decoyLockScreenMode = value }
-                                    ) {
-                                        RadioButton(selected = decoyLockScreenMode == value, onClick = { decoyLockScreenMode = value })
-                                        Text(label, style = MaterialTheme.typography.bodyMedium)
-                                    }
-                                }
-                            }
-
-                            if (decoyLockScreenMode == "one_time_unlock") {
-                                val usedCount = settings.decoyUnlockUsedCount
-                                val unlimited = decoyUnlockLimit == 0
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                    Text(
-                                        if (unlimited) "$usedCount used so far (unlimited)." else "$usedCount of $decoyUnlockLimit used.",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    if (usedCount > 0) {
-                                        OutlinedButton(onClick = { settings.rearmDecoyOneTimeUnlock() }) { Text("Re-arm") }
-                                    }
-                                }
-                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                                    Checkbox(
-                                        checked = unlimited,
-                                        onCheckedChange = { checked -> decoyUnlockLimit = if (checked) 0 else 1 }
-                                    )
-                                    Text("Unlimited uses", style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-                                    if (!unlimited) {
-                                        OutlinedTextField(
-                                            value = decoyUnlockLimit.toString(),
-                                            onValueChange = { text ->
-                                                val n = text.filter { it.isDigit() }.toIntOrNull()
-                                                if (n != null && n > 0) decoyUnlockLimit = n
-                                            },
-                                            label = { Text("Times") },
-                                            singleLine = true,
-                                            modifier = Modifier.width(90.dp)
+                            if (showSoftVaultWarning) {
+                                AlertDialog(
+                                    onDismissRequest = { showSoftVaultWarning = false },
+                                    title = { Text("Choose a folder for encrypted files", fontWeight = FontWeight.Bold) },
+                                    text = {
+                                        Text(
+                                            "By default, hidden files are encrypted into Nile's own private storage, which no other app can see. " +
+                                                "If you pick a different folder instead, the encrypted blob (not its contents — it's still unreadable " +
+                                                "without your PIN) will sit inside a folder that other apps with access to it, ADB, or a device backup " +
+                                                "could see and copy. Only choose a folder you trust."
                                         )
+                                    },
+                                    confirmButton = {
+                                        FilledTonalButton(onClick = {
+                                            showSoftVaultWarning = false
+                                            pickSoftVaultDir.launch(null)
+                                        }) { Text("Choose folder") }
+                                    },
+                                    dismissButton = {
+                                        TextButton(onClick = { showSoftVaultWarning = false }) { Text("Cancel") }
                                     }
-                                }
-                                Text(
-                                    "Uses an unsupported internal Android API to unlock (no sanctioned " +
-                                        "public API exists for this). Test thoroughly on the emulator " +
-                                        "before relying on it on your real phone.",
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
                     }
 
-                    // Card 4: Profile Backup & Restore
+                    SectionHeaderCard(
+                        title = "Anti-Forensics & Trace Scrubbing",
+                        subtitle = "Scrub launch history, recents, MediaStore DBs, and thumbnails",
+                        icon = Icons.Filled.CleaningServices,
+                        iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ) {
+                        Text(
+                            "The Nile actively wipes forensic traces in real-time so no evidence remains of hidden apps or files.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "UsageStats & Recents Cloaking",
+                            subtitle = "Hooks UsageStatsService and ActivityTaskManager to omit hidden apps from launch history.",
+                            icon = Icons.Filled.History,
+                            checked = true,
+                            onCheckedChange = { }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "Notification Cloaking",
+                            subtitle = "Silently drops push notifications for hidden packages while locked or in decoy mode.",
+                            icon = Icons.Filled.NotificationsOff,
+                            checked = true,
+                            onCheckedChange = { }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "MediaStore & Thumbnail Cleaner",
+                            subtitle = "Wipes MediaStore SQLite database rows, gallery caches, and .thumbnails on decoy trigger.",
+                            icon = Icons.Filled.HideImage,
+                            checked = true,
+                            onCheckedChange = { }
+                        )
+
+                        var isScrubbing by remember { mutableStateOf(false) }
+
+                        FilledTonalButton(
+                            onClick = {
+                                isScrubbing = true
+                                Thread {
+                                    com.thenile.vault.root.TraceCleaner.cleanAllTraces(
+                                        packages = settings.targetPackages,
+                                        directories = settings.targetDirectories,
+                                        files = settings.targetFiles
+                                    )
+                                    (context as? android.app.Activity)?.runOnUiThread {
+                                        isScrubbing = false
+                                        Toast.makeText(context, "🧹 All forensic traces and thumbnail caches scrubbed!", Toast.LENGTH_SHORT).show()
+                                    }
+                                }.start()
+                            },
+                            enabled = !isScrubbing,
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.DeleteSweep, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(if (isScrubbing) "Scrubbing Traces..." else "Scrub All Activity Traces Now")
+                        }
+                    }
+                }
+
+                // --- Category: Triggers & Codes ---
+                if (target == "Triggers & Codes") {
+                    SectionHeaderCard(
+                        title = "Secret Dial Codes",
+                        subtitle = "Dial *#<CODE># in Phone dialer to trigger actions",
+                        icon = Icons.Filled.Dialpad
+                    ) {
+                        Text(
+                            "Enter the numbers to dial in your Phone app. Dialing *#<CODE># in your dialer will immediately trigger the corresponding action:",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        DialCodeTextField(
+                            label = "Unlock Code",
+                            icon = Icons.Filled.LockOpen,
+                            value = codeUnlock,
+                            onValueChange = { codeUnlock = it }
+                        )
+
+                        DialCodeTextField(
+                            label = "Lock Code",
+                            icon = Icons.Filled.Lock,
+                            value = codeLock,
+                            onValueChange = { codeLock = it }
+                        )
+
+                        DialCodeTextField(
+                            label = "Master Decoy Code",
+                            icon = Icons.Filled.Shield,
+                            value = codeDecoy,
+                            onValueChange = { codeDecoy = it }
+                        )
+
+                        DialCodeTextField(
+                            label = "Admin Code",
+                            icon = Icons.Filled.AdminPanelSettings,
+                            value = codeAdmin,
+                            onValueChange = { codeAdmin = it }
+                        )
+                    }
+
+                    SectionHeaderCard(
+                        title = "App Launch Disguises",
+                        subtitle = "Stealth launch disguise options for The Nile",
+                        icon = Icons.AutoMirrored.Filled.Launch,
+                        iconContainerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onTertiaryContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Fake Crash Disguise",
+                            subtitle = "Shows fake crash dialog on app launch (long press 'Close app' to bypass).",
+                            icon = Icons.Filled.BugReport,
+                            checked = enableFakeCrash,
+                            onCheckedChange = { enableFakeCrash = it }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "Hide Nile App Icon",
+                            subtitle = "Hides launcher icon; access via dialer, tile, or calculator.",
+                            icon = Icons.Filled.VisibilityOff,
+                            checked = hideAppIcon,
+                            onCheckedChange = { hideAppIcon = it }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "Quick Settings Tile",
+                            subtitle = "Add 1-tap tile to notification shade.",
+                            icon = Icons.Filled.DashboardCustomize,
+                            checked = enableTile,
+                            onCheckedChange = { enableTile = it }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "Browser Deep Link (nile://admin)",
+                            subtitle = "Open vault by typing nile://admin in any browser.",
+                            icon = Icons.Filled.Link,
+                            checked = enableDeepLink,
+                            onCheckedChange = { enableDeepLink = it }
+                        )
+
+                        PreferenceSwitchRow(
+                            title = "Volume Down Double-Tap",
+                            subtitle = "Double tap Volume Down key to open vault.",
+                            icon = Icons.Filled.TouchApp,
+                            checked = enableVolumeKeys,
+                            onCheckedChange = { enableVolumeKeys = it }
+                        )
+
+                        AnimatedVisibility(visible = enableVolumeKeys) {
+                            OutlinedButton(
+                                onClick = {
+                                    context.startActivity(Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS))
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.Settings, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Enable Nile Accessibility Service")
+                            }
+                        }
+                    }
+                }
+
+                // --- Category: Security & Auth ---
+                if (target == "Security & Auth") {
+                    SectionHeaderCard(
+                        title = "Dead Man's Switch",
+                        subtitle = "Auto-hides selected vaults if the real vault goes unopened too long",
+                        icon = Icons.Filled.Timer,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Enable Dead Man's Switch",
+                            subtitle = "If you don't unlock the real vault within the window below, the vaults checked here get hidden automatically — same as tapping their Hide Vault action yourself.",
+                            icon = Icons.Filled.Timer,
+                            checked = deadManSwitchEnabled,
+                            onCheckedChange = { deadManSwitchEnabled = it }
+                        )
+                        OutlinedTextField(
+                            value = deadManSwitchHoursText,
+                            onValueChange = { deadManSwitchHoursText = it.filter(Char::isDigit) },
+                            label = { Text("Hours of inactivity before triggering") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        Text(
+                            "Vaults to hide when triggered:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    deadManSwitchVaultIds = if (v.id in deadManSwitchVaultIds)
+                                        deadManSwitchVaultIds - v.id else deadManSwitchVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in deadManSwitchVaultIds,
+                                    onCheckedChange = { checked ->
+                                        deadManSwitchVaultIds = if (checked) deadManSwitchVaultIds + v.id else deadManSwitchVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Wrong PIN Lockdown",
+                        subtitle = "Auto-hides selected vaults after too many wrong tries on the DEVICE lock screen",
+                        icon = Icons.Filled.Block,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        val devicePolicyManager = remember { context.getSystemService(android.content.Context.DEVICE_POLICY_SERVICE) as android.app.admin.DevicePolicyManager }
+                        val adminComponent = remember { android.content.ComponentName(context, com.thenile.vault.receivers.NileDeviceAdminReceiver::class.java) }
+                        var isAdminActive by remember(privilegeTick) { mutableStateOf(devicePolicyManager.isAdminActive(adminComponent)) }
+                        val requestAdmin = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                            isAdminActive = devicePolicyManager.isAdminActive(adminComponent)
+                        }
+
+                        PreferenceSwitchRow(
+                            title = "Enable Wrong PIN Lockdown",
+                            subtitle = "Counts wrong PIN/pattern/password entries on this device's own lock screen — not Nile's PIN screen. After the limit below, the vaults checked here get hidden automatically. A correct unlock resets the count.",
+                            icon = Icons.Filled.Block,
+                            checked = wrongPinSwitchEnabled,
+                            onCheckedChange = { wrongPinSwitchEnabled = it }
+                        )
+                        if (!isAdminActive) {
+                            OutlinedButton(
+                                onClick = {
+                                    val intent = Intent(android.app.admin.DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
+                                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent)
+                                        putExtra(android.app.admin.DevicePolicyManager.EXTRA_ADD_EXPLANATION,
+                                            "Needed so Nile can detect wrong PIN/password attempts on this device's lock screen.")
+                                    }
+                                    requestAdmin.launch(intent)
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(Icons.Filled.AdminPanelSettings, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Grant Device Admin (required)")
+                            }
+                        } else {
+                            Text(
+                                "Device admin active — watching the lock screen.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                        OutlinedTextField(
+                            value = wrongPinSwitchLimitText,
+                            onValueChange = { wrongPinSwitchLimitText = it.filter(Char::isDigit) },
+                            label = { Text("Wrong tries before triggering") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        )
+                        Text(
+                            "Vaults to hide when triggered:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    wrongPinSwitchVaultIds = if (v.id in wrongPinSwitchVaultIds)
+                                        wrongPinSwitchVaultIds - v.id else wrongPinSwitchVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in wrongPinSwitchVaultIds,
+                                    onCheckedChange = { checked ->
+                                        wrongPinSwitchVaultIds = if (checked) wrongPinSwitchVaultIds + v.id else wrongPinSwitchVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Admin Authentication",
+                        subtitle = "Choose how Vault Admin verifies your identity",
+                        icon = Icons.Filled.LockPerson
+                    ) {
+                        SelectableOptionCard(
+                            title = "Device Biometric / Screen Lock",
+                            subtitle = "Use fingerprint, face unlock, or device lockscreen PIN.",
+                            selected = adminLockMethod == "biometric",
+                            onClick = { adminLockMethod = "biometric" }
+                        )
+
+                        SelectableOptionCard(
+                            title = "Custom Admin Password",
+                            subtitle = "Set an independent password (any length, letters allowed — not just a 4-digit PIN) dedicated exclusively to Vault Admin.",
+                            selected = adminLockMethod == "custom_pin",
+                            onClick = { adminLockMethod = "custom_pin" }
+                        )
+
+                        AnimatedVisibility(visible = adminLockMethod == "custom_pin") {
+                            var showAdminPassword by remember { mutableStateOf(false) }
+                            OutlinedTextField(
+                                value = adminCustomPin,
+                                onValueChange = { adminCustomPin = it },
+                                label = { Text("Custom Admin Password") },
+                                visualTransformation = if (showAdminPassword) VisualTransformation.None else PasswordVisualTransformation(),
+                                trailingIcon = {
+                                    IconButton(onClick = { showAdminPassword = !showAdminPassword }) {
+                                        Icon(
+                                            if (showAdminPassword) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                            contentDescription = if (showAdminPassword) "Hide password" else "Show password"
+                                        )
+                                    }
+                                },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
+                    }
+                }
+
+                // --- Category: Backup & Data ---
+                if (target == "Backup & Data") {
                     var showExportPasswordDialog by remember { mutableStateOf(false) }
                     var showImportPasswordDialog by remember { mutableStateOf(false) }
                     var backupPassword by remember { mutableStateOf("") }
@@ -1376,7 +2902,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         uri?.let {
                             try {
                                 context.contentResolver.openOutputStream(it)?.use { stream ->
-                                    BackupManager.exportBackup(settings.profiles, backupPassword, stream)
+                                    BackupManager.exportBackup(settings.vaults, backupPassword, stream)
                                     Toast.makeText(context, "Backup exported successfully", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
@@ -1394,11 +2920,11 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             try {
                                 context.contentResolver.openInputStream(it)?.use { stream ->
                                     val count = BackupManager.importBackup(settings, backupPassword, stream)
-                                    profiles = settings.profiles
-                                    Toast.makeText(context, "Imported $count profiles successfully", Toast.LENGTH_SHORT).show()
+                                    vaults = settings.vaults
+                                    Toast.makeText(context, "Imported $count vaults successfully", Toast.LENGTH_SHORT).show()
                                 }
                             } catch (e: Exception) {
-                                Toast.makeText(context, "Import failed: ${e.message}", Toast.LENGTH_LONG).show()
+                                Toast.makeText(context, "Export failed: ${e.message}", Toast.LENGTH_LONG).show()
                             }
                             backupPassword = ""
                         }
@@ -1407,7 +2933,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                     if (showExportPasswordDialog) {
                         AlertDialog(
                             onDismissRequest = { showExportPasswordDialog = false; backupPassword = ""; backupPasswordConfirm = ""; backupError = null },
-                            title = { Text("Export Backup Password") },
+                            title = { Text("Export Encrypted Backup", fontWeight = FontWeight.Bold) },
                             text = {
                                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                     Text("Enter a password to encrypt your backup file.", style = MaterialTheme.typography.bodyMedium)
@@ -1415,12 +2941,14 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                         value = backupPassword,
                                         onValueChange = { backupPassword = it; backupError = null },
                                         label = { Text("Password") },
+                                        shape = RoundedCornerShape(16.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     OutlinedTextField(
                                         value = backupPasswordConfirm,
                                         onValueChange = { backupPasswordConfirm = it; backupError = null },
                                         label = { Text("Confirm Password") },
+                                        shape = RoundedCornerShape(16.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                     if (backupError != null) {
@@ -1429,7 +2957,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 }
                             },
                             confirmButton = {
-                                TextButton(onClick = {
+                                FilledTonalButton(onClick = {
                                     when {
                                         backupPassword.isBlank() -> backupError = "Password cannot be empty"
                                         backupPassword != backupPasswordConfirm -> backupError = "Passwords do not match"
@@ -1450,7 +2978,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                     if (showImportPasswordDialog) {
                         AlertDialog(
                             onDismissRequest = { showImportPasswordDialog = false; backupPassword = "" },
-                            title = { Text("Import Backup Password") },
+                            title = { Text("Import Encrypted Backup", fontWeight = FontWeight.Bold) },
                             text = {
                                 Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                                     Text("Enter the password used when exporting this backup.", style = MaterialTheme.typography.bodyMedium)
@@ -1458,12 +2986,13 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                         value = backupPassword,
                                         onValueChange = { backupPassword = it },
                                         label = { Text("Password") },
+                                        shape = RoundedCornerShape(16.dp),
                                         modifier = Modifier.fillMaxWidth()
                                     )
                                 }
                             },
                             confirmButton = {
-                                TextButton(onClick = {
+                                FilledTonalButton(onClick = {
                                     showImportPasswordDialog = false
                                     importLauncher.launch(arrayOf("*/*"))
                                 }) { Text("Import") }
@@ -1474,176 +3003,227 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         )
                     }
 
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+                    SectionHeaderCard(
+                        title = "Backup & Restore",
+                        subtitle = "Export or restore encrypted .nile vault backups",
+                        icon = Icons.Filled.CloudUpload
                     ) {
-                        Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Surface(shape = androidx.compose.foundation.shape.CircleShape, color = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.size(32.dp)) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.CloudUpload, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Profile Backup & Restore", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                                    Text("Export or import encrypted .nile vault backups", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                }
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedButton(
+                                onClick = { showExportPasswordDialog = true },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.Upload, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Export")
                             }
-
-                            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                OutlinedButton(
-                                    onClick = { showExportPasswordDialog = true },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(Icons.Filled.Upload, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Export Backup")
-                                }
-                                OutlinedButton(
-                                    onClick = { showImportPasswordDialog = true },
-                                    modifier = Modifier.weight(1f)
-                                ) {
-                                    Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(16.dp))
-                                    Spacer(modifier = Modifier.width(6.dp))
-                                    Text("Import Backup")
-                                }
+                            OutlinedButton(
+                                onClick = { showImportPasswordDialog = true },
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Import")
                             }
                         }
                     }
+                }
+                } // Column
+                } // Crossfade
 
-                    // Save Settings Button
-                    Button(
-                        onClick = {
-                            settings.profiles = profiles
-                            settings.codeUnlock = codeUnlock.trim()
-                            settings.codeLock = codeLock.trim()
-                            settings.codeDecoy = codeDecoy.trim()
-                            settings.codeAdmin = codeAdmin.trim()
-                            settings.decoyLockScreenMode = decoyLockScreenMode
-                            settings.decoyUnlockLimit = decoyUnlockLimit
-                            settings.adminLockMethod = adminLockMethod
-                            settings.adminCustomPin = adminCustomPin.trim()
-                            settings.hideAppIcon = hideAppIcon
-                            settings.enableTile = enableTile
-                            settings.enableDeepLink = enableDeepLink
-                            settings.enableVolumeKeys = enableVolumeKeys
-                            settings.enableCalculatorDecoy = enableCalculatorDecoy
-                            settings.calculatorTriggerExpression = calculatorTriggerExpression.trim()
-                            settings.enableFakeCrash = enableFakeCrash
-                            Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
-                        },
-                        modifier = Modifier.fillMaxWidth().height(52.dp),
-                        shape = androidx.compose.foundation.shape.CircleShape,
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
-                    ) {
-                        Icon(Icons.Filled.Check, contentDescription = null)
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Save Settings & Apply", fontWeight = FontWeight.Bold)
-                    }
+                // 6. Save Settings & Apply Button
+                Button(
+                    onClick = {
+                        val updatedVaults = vaults.map { if (it.id == editingVaultState.id) editingVaultState else it }
+                        vaults = updatedVaults
+                        settings.vaults = updatedVaults
+                        settings.codeUnlock = codeUnlock.trim()
+                        settings.codeLock = codeLock.trim()
+                        settings.codeDecoy = codeDecoy.trim()
+                        settings.codeAdmin = codeAdmin.trim()
+                        settings.decoyLockScreenMode = decoyLockScreenMode
+                        settings.decoyUnlockLimit = decoyUnlockLimit
+                        settings.decoyUserId = decoyUserId
+                        settings.suppressUserSwitchAnimation = suppressUserSwitchAnimation
+                        settings.hideUserSwitcherInQuickSettings = hideUserSwitcherInQuickSettings
+                        settings.hideUserSwitcherInSettings = hideUserSwitcherInSettings
+                        settings.adminLockMethod = adminLockMethod
+                        settings.adminCustomPin = adminCustomPin.trim()
+                        settings.hideAppIcon = hideAppIcon
+                        settings.enableTile = enableTile
+                        settings.enableDeepLink = enableDeepLink
+                        settings.enableVolumeKeys = enableVolumeKeys
+                        settings.enableCalculatorDecoy = enableCalculatorDecoy
+                        settings.calculatorTriggerExpression = calculatorTriggerExpression.trim()
+                        settings.enableFakeCrash = enableFakeCrash
+                        settings.deadManSwitchEnabled = deadManSwitchEnabled
+                        settings.deadManSwitchHours = deadManSwitchHoursText.toIntOrNull()?.coerceAtLeast(1) ?: 72
+                        settings.deadManSwitchVaultIds = deadManSwitchVaultIds
+                        com.thenile.vault.root.DeadManSwitch.reschedule(context)
+                        settings.wrongPinSwitchEnabled = wrongPinSwitchEnabled
+                        settings.wrongPinSwitchLimit = wrongPinSwitchLimitText.toIntOrNull()?.coerceAtLeast(1) ?: 5
+                        settings.wrongPinSwitchVaultIds = wrongPinSwitchVaultIds
+                        Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
+                    },
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(Icons.Filled.Check, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Save Settings & Apply", fontWeight = FontWeight.Bold)
+                }
 
-                    // About & Developer Card
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ElevatedCard(
-                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
-                        shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp),
-                        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+                // 7. About & Developer Card
+                ElevatedCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(24.dp),
+                    colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(20.dp).fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.padding(20.dp).fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_nile_river_transparent),
+                            contentDescription = "The Nile Logo",
+                            modifier = Modifier.size(48.dp).clip(CircleShape)
+                        )
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("The Nile", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Text("v1.1 \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 11.sp)
+                        }
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.fillMaxWidth().clickable {
+                                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/binkemet/thenile")))
+                            }
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.ic_nile_river_transparent),
-                                contentDescription = "The Nile Logo",
-                                modifier = Modifier.size(48.dp).clip(androidx.compose.foundation.shape.CircleShape)
-                            )
-                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("The Nile", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                Text("v1.0 \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Spacer(modifier = Modifier.height(2.dp))
-                                Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 11.sp)
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillMaxWidth().clickable {
-                                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/binkemet/thenile")))
-                                }
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.tertiaryContainer,
+                                modifier = Modifier.size(36.dp)
                             ) {
-                                Surface(
-                                    shape = androidx.compose.foundation.shape.CircleShape,
-                                    color = MaterialTheme.colorScheme.tertiaryContainer,
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Box(contentAlignment = Alignment.Center) {
-                                        Icon(Icons.Filled.Code, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(18.dp))
-                                    }
-                                }
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text("Developed by", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text("binkemet", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                    Text("github.com/binkemet/thenile", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                                Box(contentAlignment = Alignment.Center) {
+                                    Icon(Icons.Filled.Code, contentDescription = null, tint = MaterialTheme.colorScheme.onTertiaryContainer, modifier = Modifier.size(18.dp))
                                 }
                             }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
-
-                            Text("Donate", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-
-                            val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
-                            val btcAddress = "sp1qqdvl0u637wtyjf4paa2khvc4dgy4ehsf8grsaqqwpmsxcnzagc0tcqjffw6k4jvd5dwf454r9qrnmgp5g25w2fkkf76w5hz47zzmmgnkpgyvmxjy"
-                            val xmrAddress = "89Sd2SnrwCtJEzoens2R5T13uBoqe9ru5VVJDDfBR3Md14jEFA5fFkZB4D9CAdz7fHNS8fyKZK5DYXrMSXWpMnZcQnaqRuu"
-
-                            OutlinedButton(
-                                onClick = {
-                                    clipboard.setPrimaryClip(android.content.ClipData.newPlainText("BTC", btcAddress))
-                                    Toast.makeText(context, "Bitcoin address copied", Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                            ) {
-                                Text("\u20BF", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Bitcoin (BTC)", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
-                                Icon(Icons.Filled.ContentCopy, contentDescription = "Copy", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Developed by", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text("binkemet", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                                Text("github.com/binkemet/thenile", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                             }
-
-                            OutlinedButton(
-                                onClick = {
-                                    clipboard.setPrimaryClip(android.content.ClipData.newPlainText("XMR", xmrAddress))
-                                    Toast.makeText(context, "Monero address copied", Toast.LENGTH_SHORT).show()
-                                },
-                                modifier = Modifier.fillMaxWidth(),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
-                                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
-                            ) {
-                                Text("ɱ", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Monero (XMR)", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
-                                Icon(Icons.Filled.ContentCopy, contentDescription = "Copy", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
-                            }
-
-                            Text(
-                                "Free & open source \u2022 No ads \u2022 No tracking",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
-                                fontSize = 10.sp,
-                                textAlign = TextAlign.Center
-                            )
                         }
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f))
+
+                        Text("Donate", style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+
+                        val clipboard = context.getSystemService(android.content.ClipboardManager::class.java)
+                        val btcAddress = "sp1qqdvl0u637wtyjf4paa2khvc4dgy4ehsf8grsaqqwpmsxcnzagc0tcqjffw6k4jvd5dwf454r9qrnmgp5g25w2fkkf76w5hz47zzmmgnkpgyvmxjy"
+                        val xmrAddress = "89Sd2SnrwCtJEzoens2R5T13uBoqe9ru5VVJDDfBR3Md14jEFA5fFkZB4D9CAdz7fHNS8fyKZK5DYXrMSXWpMnZcQnaqRuu"
+
+                        OutlinedButton(
+                            onClick = {
+                                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("BTC", btcAddress))
+                                Toast.makeText(context, "Bitcoin address copied", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        ) {
+                            Text("\u20BF", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Bitcoin (BTC)", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                            Icon(Icons.Filled.ContentCopy, contentDescription = "Copy", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("XMR", xmrAddress))
+                                Toast.makeText(context, "Monero address copied", Toast.LENGTH_SHORT).show()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp),
+                            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
+                        ) {
+                            Text("ɱ", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Monero (XMR)", fontWeight = FontWeight.Medium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+                            Icon(Icons.Filled.ContentCopy, contentDescription = "Copy", tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                        }
+
+                        Text(
+                            "Free & open source \u2022 No ads \u2022 No tracking",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+                            fontSize = 10.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun AccountPickerDialog(
+    initialSelection: List<String>,
+    onDismiss: () -> Unit,
+    onConfirm: (List<String>) -> Unit
+) {
+    val context = LocalContext.current
+    // Accounts visible to a third-party app are whatever the account owner/authenticator granted
+    // visibility to (Android 8+) — GET_ACCOUNTS alone no longer guarantees seeing e.g. a Google
+    // account. Root doesn't help list them either; only the AccountManager API applies here (the
+    // actual removal further down needs it too, for the same reason).
+    val accounts = remember { android.accounts.AccountManager.get(context).accounts.toList() }
+    var selected by remember { mutableStateOf(initialSelection.toSet()) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Select Accounts to Remove", fontWeight = FontWeight.Bold) },
+        text = {
+            if (accounts.isEmpty()) {
+                Text("No accounts visible to Nile. Some accounts (e.g. Google) only become visible after you've granted Nile access in Settings > Accounts.")
+            } else {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    items(accounts) { account ->
+                        val isChecked = selected.contains(account.name)
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable { selected = if (isChecked) selected - account.name else selected + account.name },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isChecked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surface
+                        ) {
+                            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Checkbox(checked = isChecked, onCheckedChange = { checked -> selected = if (checked) selected + account.name else selected - account.name })
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Column {
+                                    Text(account.name, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    Text(account.type, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = { TextButton(onClick = { onConfirm(selected.toList()) }) { Text("Done") } },
+        dismissButton = { TextButton(onClick = onDismiss) { Text("Cancel") } }
+    )
 }
 
 @Composable
@@ -1673,63 +3253,72 @@ fun AppPickerDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Select Apps to Hide") },
+        title = { Text("Select Apps to Hide", fontWeight = FontWeight.Bold) },
         text = {
             Column {
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
                     placeholder = { Text("Search apps...") },
+                    shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
                     singleLine = true
                 )
-                LazyColumn {
+                LazyColumn(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     items(filteredApps) { app ->
-                    val pkg = app.packageName
-                    val name = pm.getApplicationLabel(app).toString()
-                    val isChecked = selected.contains(pkg)
-                    
-                    val iconBitmap = remember(pkg) {
-                        try {
-                            pm.getApplicationIcon(app).toBitmap(128, 128).asImageBitmap()
-                        } catch (e: Exception) {
-                            null
-                        }
-                    }
-                    
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                selected = if (isChecked) selected - pkg else selected + pkg
+                        val pkg = app.packageName
+                        val name = pm.getApplicationLabel(app).toString()
+                        val isChecked = selected.contains(pkg)
+                        
+                        val iconBitmap = remember(pkg) {
+                            try {
+                                pm.getApplicationIcon(app).toBitmap(128, 128).asImageBitmap()
+                            } catch (e: Exception) {
+                                null
                             }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Checkbox(
-                            checked = isChecked,
-                            onCheckedChange = null
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        if (iconBitmap != null) {
-                            Image(
-                                bitmap = iconBitmap,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp)
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
                         }
-                        Column {
-                            Text(name, fontWeight = FontWeight.Bold)
-                            Text(pkg, style = MaterialTheme.typography.bodySmall)
+                        
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .clickable {
+                                    selected = if (isChecked) selected - pkg else selected + pkg
+                                },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isChecked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f) else MaterialTheme.colorScheme.surface
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Checkbox(
+                                    checked = isChecked,
+                                    onCheckedChange = { checked ->
+                                        selected = if (checked) selected + pkg else selected - pkg
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                if (iconBitmap != null) {
+                                    Image(
+                                        bitmap = iconBitmap,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(36.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(name, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.bodyMedium)
+                                    Text(pkg, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
                         }
                     }
-                }
                 }
             }
         },
         confirmButton = {
-            TextButton(onClick = { onConfirm(selected.toList()) }) { Text("Save") }
+            FilledTonalButton(onClick = { onConfirm(selected.toList()) }) { Text("Done") }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancel") }

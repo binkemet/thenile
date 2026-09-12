@@ -1,0 +1,3 @@
+{
+  "entrypoint": "com.thenile.vault.xposed.PackageManagerHook"
+}
