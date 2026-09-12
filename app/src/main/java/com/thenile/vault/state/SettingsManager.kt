@@ -366,6 +366,16 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getStringSet("wrongPinSwitchVaultIds", emptySet()) ?: emptySet()
         set(value) { prefs.edit().putStringSet("wrongPinSwitchVaultIds", value).commit() }
 
+    /** USB switch: hides the selected vaults every time the phone is plugged in via USB —
+     *  see UsbPluggedSwitch.kt. Binary event, no threshold needed. */
+    var usbSwitchEnabled: Boolean
+        get() = prefs.getBoolean("usbSwitchEnabled", false)
+        set(value) { prefs.edit().putBoolean("usbSwitchEnabled", value).commit() }
+
+    var usbSwitchVaultIds: Set<String>
+        get() = prefs.getStringSet("usbSwitchVaultIds", emptySet()) ?: emptySet()
+        set(value) { prefs.edit().putStringSet("usbSwitchVaultIds", value).commit() }
+
     /** "off" | "fake_wrong_pin" | "one_time_unlock" | "switch_user". Default off: this hooks the real Android
      *  keyguard, so it stays inert until explicitly enabled. */
     var decoyLockScreenMode: String

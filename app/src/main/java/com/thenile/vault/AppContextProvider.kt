@@ -2,8 +2,12 @@ package com.thenile.vault
 
 import android.content.ContentProvider
 import android.content.ContentValues
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.database.Cursor
 import android.net.Uri
+import android.os.Build
 
 /** Captures the application Context at process start — providers attach before Application.onCreate
  *  runs — so privilege-tier singletons (PrivilegeManager, ShizukuShell) that live outside any
@@ -19,6 +23,20 @@ class AppContextProvider : ContentProvider() {
         // nativeLibraryDir (extracted, executable) and runs as root.
         com.thenile.vault.root.StorageMountManager.dmcryptBin =
             "${appContext.applicationInfo.nativeLibraryDir}/libdmcrypt.so"
+
+        // ACTION_POWER_CONNECTED isn't in Android 8+'s implicit-broadcast exemption list, so a
+        // manifest <receiver> for it is just silently skipped ("Background execution not allowed")
+        // whenever the app isn't already running — confirmed on-device via `dumpsys activity
+        // broadcasts history`. A context-registered receiver still only fires while the process is
+        // alive, but that's the best a stealth app (no foreground service) can do for an instant
+        // reaction; see UsbPluggedSwitch for the other half.
+        val receiver = com.thenile.vault.receivers.UsbPluggedReceiver()
+        val filter = IntentFilter(Intent.ACTION_POWER_CONNECTED)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            appContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            appContext.registerReceiver(receiver, filter)
+        }
         return true
     }
 

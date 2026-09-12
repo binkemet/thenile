@@ -1893,6 +1893,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var wrongPinSwitchEnabled by remember { mutableStateOf(settings.wrongPinSwitchEnabled) }
                 var wrongPinSwitchLimitText by remember { mutableStateOf(settings.wrongPinSwitchLimit.toString()) }
                 var wrongPinSwitchVaultIds by remember { mutableStateOf(settings.wrongPinSwitchVaultIds) }
+                var usbSwitchEnabled by remember { mutableStateOf(settings.usbSwitchEnabled) }
+                var usbSwitchVaultIds by remember { mutableStateOf(settings.usbSwitchVaultIds) }
 
                 var androidUsers by remember { mutableStateOf<List<AndroidUser>>(emptyList()) }
                 var showCreateUserDialog by remember { mutableStateOf(false) }
@@ -2848,6 +2850,44 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                     }
 
                     SectionHeaderCard(
+                        title = "USB Plugged Lockdown",
+                        subtitle = "Auto-hides selected vaults every time the phone is plugged in via USB",
+                        icon = Icons.Filled.Usb,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Enable USB Plugged Lockdown",
+                            subtitle = "Hides the vaults checked below as soon as a USB cable is plugged in (wireless/AC charging doesn't count).",
+                            icon = Icons.Filled.Usb,
+                            checked = usbSwitchEnabled,
+                            onCheckedChange = { usbSwitchEnabled = it }
+                        )
+                        Text(
+                            "Vaults to hide when plugged in:",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        vaults.forEach { v ->
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth().clickable {
+                                    usbSwitchVaultIds = if (v.id in usbSwitchVaultIds)
+                                        usbSwitchVaultIds - v.id else usbSwitchVaultIds + v.id
+                                }
+                            ) {
+                                Checkbox(
+                                    checked = v.id in usbSwitchVaultIds,
+                                    onCheckedChange = { checked ->
+                                        usbSwitchVaultIds = if (checked) usbSwitchVaultIds + v.id else usbSwitchVaultIds - v.id
+                                    }
+                                )
+                                Text(v.name)
+                            }
+                        }
+                    }
+
+                    SectionHeaderCard(
                         title = "Admin Authentication",
                         subtitle = "Choose how Vault Admin verifies your identity",
                         icon = Icons.Filled.LockPerson
@@ -3065,6 +3105,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.wrongPinSwitchEnabled = wrongPinSwitchEnabled
                         settings.wrongPinSwitchLimit = wrongPinSwitchLimitText.toIntOrNull()?.coerceAtLeast(1) ?: 5
                         settings.wrongPinSwitchVaultIds = wrongPinSwitchVaultIds
+                        settings.usbSwitchEnabled = usbSwitchEnabled
+                        settings.usbSwitchVaultIds = usbSwitchVaultIds
                         Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier.fillMaxWidth().height(52.dp),

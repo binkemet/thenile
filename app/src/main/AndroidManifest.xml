@@ -163,6 +163,12 @@
             </intent-filter>
         </receiver>
 
+        <!-- UsbPluggedSwitch's trigger source (UsbPluggedReceiver) is registered dynamically in
+             AppContextProvider instead of here: ACTION_POWER_CONNECTED is NOT in Android 8+'s
+             implicit-broadcast exemption list, so a manifest receiver for it is silently skipped
+             ("Background execution not allowed") whenever the app isn't already running —
+             confirmed on-device. -->
+
         <!-- WrongPinSwitch's trigger source: onPasswordFailed()/onPasswordSucceeded() only fire
              for an active device admin, granted by the user via the button in Admin > Security &
              Auth (Settings.ACTION_ADD_DEVICE_ADMIN) — inert until then. android:permission is
