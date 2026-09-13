@@ -2816,6 +2816,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = deadManSwitchEnabled,
                             onCheckedChange = { deadManSwitchEnabled = it }
                         )
+                        if (deadManSwitchEnabled) {
                         OutlinedTextField(
                             value = deadManSwitchHoursText,
                             onValueChange = { deadManSwitchHoursText = it.filter(Char::isDigit) },
@@ -2845,6 +2846,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -2861,6 +2863,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = scheduledLockEnabled,
                             onCheckedChange = { scheduledLockEnabled = it }
                         )
+                        if (scheduledLockEnabled) {
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             OutlinedTextField(
                                 value = scheduledLockStartText,
@@ -2899,6 +2902,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -2922,6 +2926,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = wrongPinSwitchEnabled,
                             onCheckedChange = { wrongPinSwitchEnabled = it }
                         )
+                        if (wrongPinSwitchEnabled) {
                         if (!isAdminActive) {
                             OutlinedButton(
                                 onClick = {
@@ -2975,6 +2980,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -2991,6 +2997,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = screenOffSwitchEnabled,
                             onCheckedChange = { screenOffSwitchEnabled = it }
                         )
+                        if (screenOffSwitchEnabled) {
                         OutlinedTextField(
                             value = screenOffTimeoutText,
                             onValueChange = { screenOffTimeoutText = it.filter(Char::isDigit) },
@@ -3020,6 +3027,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -3047,6 +3055,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = geofenceSwitchEnabled,
                             onCheckedChange = { geofenceSwitchEnabled = it }
                         )
+                        if (geofenceSwitchEnabled) {
                         if (!hasLocationPermission) {
                             OutlinedButton(
                                 onClick = {
@@ -3123,6 +3132,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -3150,6 +3160,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = tamperSwitchEnabled,
                             onCheckedChange = { tamperSwitchEnabled = it }
                         )
+                        if (tamperSwitchEnabled) {
                         if (!hasPhonePermission) {
                             OutlinedButton(
                                 onClick = { requestPhonePermission.launch(android.Manifest.permission.READ_PHONE_STATE) },
@@ -3194,6 +3205,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text(v.name)
                             }
                         }
+                        }
                     }
 
                     SectionHeaderCard(
@@ -3210,6 +3222,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             checked = usbSwitchEnabled,
                             onCheckedChange = { usbSwitchEnabled = it }
                         )
+                        if (usbSwitchEnabled) {
                         Text(
                             "Vaults to hide when plugged in:",
                             style = MaterialTheme.typography.labelLarge,
@@ -3231,6 +3244,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 )
                                 Text(v.name)
                             }
+                        }
                         }
                     }
 
