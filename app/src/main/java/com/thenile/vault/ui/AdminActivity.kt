@@ -816,6 +816,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
     var isAppPickerOpen by remember { mutableStateOf(false) }
     var isVaultAppPickerOpen by remember { mutableStateOf(false) }
     var isAccountPickerOpen by remember { mutableStateOf(false) }
+    var isRestoreAccountPickerOpen by remember { mutableStateOf(false) }
     var showAddDummyDialog by remember { mutableStateOf(false) }
     var showPinPromptForVault by remember { mutableStateOf(false) }
     var showHowItWorks by remember { mutableStateOf(false) }
@@ -1000,6 +1001,17 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
             onConfirm = { selected ->
                 editingVaultState = editingVaultState.copy(removeAccounts = selected)
                 isAccountPickerOpen = false
+            }
+        )
+    }
+
+    if (isRestoreAccountPickerOpen) {
+        AccountPickerDialog(
+            initialSelection = editingVaultState.restoreAccounts,
+            onDismiss = { isRestoreAccountPickerOpen = false },
+            onConfirm = { selected ->
+                editingVaultState = editingVaultState.copy(restoreAccounts = selected)
+                isRestoreAccountPickerOpen = false
             }
         )
     }
@@ -1728,6 +1740,68 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             Icon(Icons.Filled.Delete, contentDescription = null, modifier = Modifier.size(18.dp))
                             Spacer(modifier = Modifier.width(8.dp))
                             Text("Remove Accounts Now")
+                        }
+                    }
+                }
+
+                // 3d. Restore-on-Unlock Accounts — snapshotted into the hidden volume, removed in
+                // decoy/locked state, and brought back (with cached tokens) on real unlock. Applying
+                // these reboots the UI layer (framework restart to flush AccountManager's cache).
+                SectionHeaderCard(
+                    title = "Restore-on-Unlock Accounts",
+                    subtitle = "${editingVaultState.restoreAccounts.size} account(s) hidden then restored",
+                    icon = Icons.Filled.Restore,
+                    trailingContent = {
+                        FilledTonalButton(
+                            onClick = { isRestoreAccountPickerOpen = true },
+                            shape = CircleShape,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Choose")
+                        }
+                    }
+                ) {
+                    if (editingVaultState.restoreAccounts.isEmpty()) {
+                        Text(
+                            "No accounts selected. Chosen accounts vanish in decoy/locked state and come back on real unlock. Capture them first with \"Capture Real\". Note: reveal and hide each trigger a brief framework restart, and expired tokens may still force a re-login.",
+                            style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else {
+                        editingVaultState.restoreAccounts.forEach { accountName ->
+                            Surface(
+                                modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)),
+                                shape = RoundedCornerShape(14.dp),
+                                color = MaterialTheme.colorScheme.surfaceContainerLow
+                            ) {
+                                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp)) {
+                                    Icon(Icons.Filled.Restore, contentDescription = null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(22.dp))
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(accountName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+                                    IconButton(onClick = {
+                                        editingVaultState = editingVaultState.copy(restoreAccounts = editingVaultState.restoreAccounts.filter { it != accountName })
+                                    }, modifier = Modifier.size(32.dp)) {
+                                        Icon(Icons.Filled.Close, contentDescription = "Remove", tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(18.dp))
+                                    }
+                                }
+                            }
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                val snapshotVault = editingVaultState
+                                Toast.makeText(context, "Capturing accounts…", Toast.LENGTH_SHORT).show()
+                                Thread {
+                                    val ok = com.thenile.vault.root.HiddenAppManager.captureAccounts(context, snapshotVault, settings.codeUnlock)
+                                    mainHandler.post { Toast.makeText(context, if (ok) "Accounts captured" else "Capture failed (see logs)", Toast.LENGTH_SHORT).show() }
+                                }.start()
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Icon(Icons.Filled.Restore, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Capture Accounts Now")
                         }
                     }
                 }

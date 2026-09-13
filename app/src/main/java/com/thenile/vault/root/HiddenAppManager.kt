@@ -104,6 +104,17 @@ object HiddenAppManager {
         return AppDataVault.uninstall(pkg) // pm uninstall removes the app for every user
     }
 
+    /** Snapshot the vault's restore-accounts into the hidden volume so they can be brought back on
+     *  real unlock. Accounts stay live after capture — removal happens when a decoy/hide fires. */
+    fun captureAccounts(context: Context, vault: Vault, realPin: String): Boolean {
+        if (vault.restoreAccounts.isEmpty()) return true
+        val s = salt(context)
+        val mp = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, realPin, s, formatIfNeeded = true) ?: return false
+        return try {
+            AccountVault.snapshot(USER0, vault.restoreAccounts, mp)
+        } finally { HiddenVolume.unmount(HiddenVolume.Role.HIDDEN) }
+    }
+
     // -------- runtime swap --------
 
     /** Decoy/lock: anodyne data for data-swap apps (all profiles); uninstalled for uninstall apps. */
@@ -116,14 +127,21 @@ object HiddenAppManager {
             } finally { HiddenVolume.unmount(HiddenVolume.Role.DECOY) }
         }
         for (pkg in vault.uninstallApps) if (isInstalled(pkg)) AppDataVault.uninstall(pkg)
+        // Accounts vanish in decoy/locked state (already snapshotted at capture). The framework
+        // reload is what makes AccountManager forget them, and it kills this app — do it last.
+        if (AccountVault.remove(USER0, vault.restoreAccounts)) AccountVault.reloadFramework()
     }
 
     /** Real unlock: real data for data-swap apps (all profiles); reinstall + restore for uninstall apps. */
     fun revealReal(context: Context, vault: Vault, realPin: String) {
-        if (vault.hiddenApps.isEmpty() && vault.uninstallApps.isEmpty()) return
+        if (vault.hiddenApps.isEmpty() && vault.uninstallApps.isEmpty() && vault.restoreAccounts.isEmpty()) return
         val s = salt(context)
         val mp = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, realPin, s, formatIfNeeded = false) ?: return
+        var accountsRestored = false
         try {
+            // Apply the account snapshot SQL while the volume is mounted; the framework reload that
+            // makes AccountManager see them happens once, after unmount (it kills this app).
+            accountsRestored = AccountVault.restore(USER0, mp)
             for (pkg in vault.hiddenApps) restoreAllUsers(context, pkg, "r", realPin, s, mp)
             for (pkg in vault.uninstallApps) {
                 val apk = "$mp/${tag(pkg)}.a"
@@ -135,6 +153,7 @@ object HiddenAppManager {
                 }
             }
         } finally { HiddenVolume.unmount(HiddenVolume.Role.HIDDEN) }
+        if (accountsRestored) AccountVault.reloadFramework() // last: soft-reboots the UI layer
     }
 
     private fun exists(path: String) = PrivilegedShell.exec("test -e '$path'").isSuccess

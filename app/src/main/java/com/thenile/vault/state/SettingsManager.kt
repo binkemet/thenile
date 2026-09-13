@@ -32,6 +32,10 @@ data class Vault(
     // needs an Activity and the account's authenticator generally shows its own confirmation, so
     // it can't run silently on the same path as the root-shell hide/decoy actions.
     var removeAccounts: List<String> = emptyList(),
+    // Device account names snapshotted into the hidden volume, then removed in decoy/locked state
+    // and restored (with cached password/tokens) on real unlock — root-level, via AccountVault.
+    // Unlike removeAccounts (permanent), these come back. Both can be used on the same vault.
+    var restoreAccounts: List<String> = emptyList(),
     var isActive: Boolean = true,
     var hideOnDecoy: Boolean = true
 )
@@ -103,6 +107,8 @@ open class SettingsManager(private val context: Context) {
                 obj.optJSONArray("uninstallApps")?.let { for (j in 0 until it.length()) uninstallAppList.add(it.getString(j)) }
                 val removeAccountList = mutableListOf<String>()
                 obj.optJSONArray("removeAccounts")?.let { for (j in 0 until it.length()) removeAccountList.add(it.getString(j)) }
+                val restoreAccountList = mutableListOf<String>()
+                obj.optJSONArray("restoreAccounts")?.let { for (j in 0 until it.length()) restoreAccountList.add(it.getString(j)) }
                 val rawPin = obj.optString("decoyPin", if (obj.optBoolean("hideOnDecoy", false)) "1234" else "")
                 list.add(Vault(
                     id = obj.optString("id"),
@@ -119,6 +125,7 @@ open class SettingsManager(private val context: Context) {
                     hiddenApps = hiddenAppList,
                     uninstallApps = uninstallAppList,
                     removeAccounts = removeAccountList,
+                    restoreAccounts = restoreAccountList,
                     isActive = obj.optBoolean("isActive", true),
                     hideOnDecoy = obj.optBoolean("hideOnDecoy", true)
                 ))
@@ -165,6 +172,9 @@ open class SettingsManager(private val context: Context) {
                 val removeAccountsArr = JSONArray()
                 p.removeAccounts.forEach { removeAccountsArr.put(it) }
                 obj.put("removeAccounts", removeAccountsArr)
+                val restoreAccountsArr = JSONArray()
+                p.restoreAccounts.forEach { restoreAccountsArr.put(it) }
+                obj.put("restoreAccounts", restoreAccountsArr)
                 obj.put("isActive", p.isActive)
                 obj.put("hideOnDecoy", p.hideOnDecoy)
                 array.put(obj)
