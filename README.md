@@ -26,9 +26,9 @@
 ## Screenshots
 
 <p>
-  <img src="metadata/en-US/images/phoneScreenshots/1.png" width="250" alt="Profile management" />
-  <img src="metadata/en-US/images/phoneScreenshots/2.png" width="250" alt="Global settings" />
-  <img src="metadata/en-US/images/phoneScreenshots/3.png" width="250" alt="Secret dial codes" />
+  <img src="metadata/en-US/images/phoneScreenshots/1.png" width="250" alt="Vault management — decoy mode, quick hide/unhide, per-vault behavior" />
+  <img src="metadata/en-US/images/phoneScreenshots/2.png" width="250" alt="Settings — decoy & stealth, triggers, security, backups" />
+  <img src="metadata/en-US/images/phoneScreenshots/3.png" width="250" alt="Security automation — encrypted audit log and auto-hide triggers" />
 </p>
 
 ---

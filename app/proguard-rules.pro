@@ -28,3 +28,20 @@
 
 # Keep AndroidX Startup Provider (prevent ClassNotFoundException on launch)
 -keep class androidx.startup.InitializationProvider { *; }
+
+# Tink (via androidx.security-crypto, used for EncryptedSharedPreferences) references optional
+# build-time annotations that aren't on the runtime classpath — silence R8 (safe to omit).
+-dontwarn com.google.errorprone.annotations.CanIgnoreReturnValue
+-dontwarn com.google.errorprone.annotations.CheckReturnValue
+-dontwarn com.google.errorprone.annotations.Immutable
+-dontwarn com.google.errorprone.annotations.RestrictedApi
+-dontwarn javax.annotation.Nullable
+-dontwarn javax.annotation.concurrent.GuardedBy
+# Keep Tink so EncryptedSharedPreferences keeps working after minification.
+-keep class com.google.crypto.tink.** { *; }
+# Tink's optional remote-key downloader pulls in the Google HTTP client + joda-time, which we
+# don't ship or use (EncryptedSharedPreferences only needs local AEAD) — silence those too.
+-dontwarn com.google.api.client.http.**
+-dontwarn com.google.errorprone.annotations.InlineMe
+-dontwarn javax.annotation.concurrent.ThreadSafe
+-dontwarn org.joda.time.**

@@ -47,3 +47,8 @@ graphify-out/
 scratchpad/
 scratch_prefs.xml
 BUILD_PROGRESS.md
+
+# Release signing keystore — never commit
+*.jks
+*.keystore
+*.idsig
