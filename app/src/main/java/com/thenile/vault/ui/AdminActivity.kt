@@ -1430,7 +1430,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             onClick = {
                                 editingVaultState = editingVaultState.copy(actionType = "switch_user")
                             },
-                            label = { Text("👤 Switch to Android User") },
+                            label = { Text("Switch to Android User") },
+                            leadingIcon = { Icon(Icons.Filled.Person, contentDescription = null, modifier = Modifier.size(18.dp)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(14.dp)
                         )
@@ -1440,7 +1441,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             onClick = {
                                 editingVaultState = editingVaultState.copy(actionType = "hide_inplace")
                             },
-                            label = { Text("🔒 In-Place Hide") },
+                            label = { Text("In-Place Hide") },
+                            leadingIcon = { Icon(Icons.Filled.VisibilityOff, contentDescription = null, modifier = Modifier.size(18.dp)) },
                             modifier = Modifier.weight(1f),
                             shape = RoundedCornerShape(14.dp)
                         )
@@ -1502,14 +1504,15 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 decoyDialerCode = if (editingVaultState.decoyDialerCode.isBlank()) newDecoyPin else editingVaultState.decoyDialerCode
                             )
                         },
-                        label = { Text("🔢 Decoy Lockscreen PIN") },
+                        label = { Text("Decoy Lockscreen PIN") },
+                        leadingIcon = { Icon(Icons.Filled.Pin, contentDescription = null, modifier = Modifier.size(18.dp)) },
                         placeholder = { Text("e.g. 1234") },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     DialCodeTextField(
-                        label = "📞 Secret Dialer Code",
+                        label = "Secret Dialer Code",
                         icon = Icons.Filled.Phone,
                         value = editingVaultState.decoyDialerCode,
                         onValueChange = { newCode ->
@@ -1522,7 +1525,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         onValueChange = { newExpr ->
                             editingVaultState = editingVaultState.copy(decoyCalculatorExpression = newExpr)
                         },
-                        label = { Text("🧮 Calculator Secret Formula") },
+                        label = { Text("Calculator Secret Formula") },
+                        leadingIcon = { Icon(Icons.Filled.Calculate, contentDescription = null, modifier = Modifier.size(18.dp)) },
                         placeholder = { Text("e.g. 12+34 or 47-87+23") },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
@@ -1534,6 +1538,20 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         checked = editingVaultState.isActive,
                         onCheckedChange = { checked ->
                             editingVaultState = editingVaultState.copy(isActive = checked)
+                        }
+                    )
+
+                    PreferenceSwitchRow(
+                        title = "Uninstall The Nile when triggered",
+                        icon = Icons.Filled.DeleteForever,
+                        subtitle = "After this vault hides, remove The Nile itself so no stealth tool is left on the device. " +
+                            if (settings.keepContainerOnUninstall)
+                                "The encrypted container is kept — reinstalling restores this vault."
+                            else
+                                "Container wipe is ON (Danger Zone): this is a one-way wipe, no recovery.",
+                        checked = editingVaultState.selfDestruct,
+                        onCheckedChange = { checked ->
+                            editingVaultState = editingVaultState.copy(selfDestruct = checked)
                         }
                     )
                 }
@@ -1986,6 +2004,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
                 var isAuditLogOpen by remember { mutableStateOf(false) }
                 var auditLogEnabled by remember { mutableStateOf(settings.auditLogEnabled) }
+                var keepContainerOnUninstall by remember { mutableStateOf(settings.keepContainerOnUninstall) }
+                var showUninstallConfirm by remember { mutableStateOf(false) }
                 var screenOffSwitchEnabled by remember { mutableStateOf(settings.screenOffSwitchEnabled) }
                 var screenOffTimeoutText by remember { mutableStateOf(settings.screenOffTimeoutMinutes.toString()) }
                 var screenOffVaultIds by remember { mutableStateOf(settings.screenOffVaultIds) }
@@ -2704,7 +2724,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                     )
                                     (context as? android.app.Activity)?.runOnUiThread {
                                         isScrubbing = false
-                                        Toast.makeText(context, "🧹 All forensic traces and thumbnail caches scrubbed!", Toast.LENGTH_SHORT).show()
+                                        Toast.makeText(context, "All forensic traces and thumbnail caches scrubbed", Toast.LENGTH_SHORT).show()
                                     }
                                 }.start()
                             },
@@ -2874,6 +2894,55 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
 
                     if (isAuditLogOpen) {
                         AuditLogDialog(onDismiss = { isAuditLogOpen = false })
+                    }
+
+                    SectionHeaderCard(
+                        title = "Uninstall The Nile",
+                        subtitle = "Remove the app itself — for self-destruct triggers and a clean exit",
+                        icon = Icons.Filled.DeleteForever,
+                        iconContainerColor = MaterialTheme.colorScheme.errorContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onErrorContainer
+                    ) {
+                        PreferenceSwitchRow(
+                            title = "Keep encrypted container on uninstall",
+                            subtitle = "ON (recommended): the .sysstore container + config are left on the device, so reinstalling The Nile auto-restores your vaults. " +
+                                "OFF: uninstalling (or any self-destruct trigger) also WIPES the container — a one-way panic wipe with no recovery.",
+                            icon = Icons.Filled.Shield,
+                            checked = keepContainerOnUninstall,
+                            onCheckedChange = { keepContainerOnUninstall = it; settings.keepContainerOnUninstall = it; settings.syncToSystem() }
+                        )
+                        OutlinedButton(
+                            onClick = { showUninstallConfirm = true },
+                            shape = RoundedCornerShape(16.dp),
+                            colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.DeleteForever, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(if (keepContainerOnUninstall) "Uninstall The Nile (keep vault)" else "Uninstall The Nile + WIPE vault")
+                        }
+                    }
+
+                    if (showUninstallConfirm) {
+                        AlertDialog(
+                            onDismissRequest = { showUninstallConfirm = false },
+                            title = { Text(if (keepContainerOnUninstall) "Uninstall The Nile?" else "Uninstall and WIPE?") },
+                            text = {
+                                Text(
+                                    if (keepContainerOnUninstall)
+                                        "The Nile will remove itself now. The encrypted container and config are kept on the device — reinstall the app and your vaults come back."
+                                    else
+                                        "The Nile will remove itself AND permanently wipe the encrypted container. This cannot be undone — hidden data will be unrecoverable."
+                                )
+                            },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showUninstallConfirm = false
+                                    com.thenile.vault.root.SelfDestruct.uninstallNile(context, wipeContainer = !keepContainerOnUninstall)
+                                }) { Text("Uninstall", color = MaterialTheme.colorScheme.error) }
+                            },
+                            dismissButton = { TextButton(onClick = { showUninstallConfirm = false }) { Text("Cancel") } }
+                        )
                     }
 
                     SectionHeaderCard(
@@ -3405,6 +3474,49 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         }
                     }
 
+                    var containerBusy by remember { mutableStateOf(false) }
+                    var showContainerImportConfirm by remember { mutableStateOf(false) }
+                    val mainHandler = remember { android.os.Handler(android.os.Looper.getMainLooper()) }
+                    fun finishTransfer(ok: Boolean, okMsg: String, failMsg: String) {
+                        mainHandler.post {
+                            containerBusy = false
+                            Toast.makeText(context, if (ok) okMsg else failMsg, Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    val containerExportLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.CreateDocument("application/octet-stream")
+                    ) { uri ->
+                        uri?.let {
+                            containerBusy = true
+                            Toast.makeText(context, "Exporting container… this can take a while", Toast.LENGTH_SHORT).show()
+                            Thread {
+                                val ok = try {
+                                    context.contentResolver.openOutputStream(it)?.use { s ->
+                                        com.thenile.vault.root.ContainerBundle.export(context, s)
+                                    } ?: false
+                                } catch (e: Exception) { false }
+                                finishTransfer(ok, "Container + keys exported to drive", "Export failed (no container, or not rooted)")
+                            }.start()
+                        }
+                    }
+                    val containerImportLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.OpenDocument()
+                    ) { uri ->
+                        uri?.let {
+                            containerBusy = true
+                            Toast.makeText(context, "Importing container…", Toast.LENGTH_SHORT).show()
+                            Thread {
+                                val ok = try {
+                                    context.contentResolver.openInputStream(it)?.use { s ->
+                                        com.thenile.vault.root.ContainerBundle.import(context, s)
+                                    } ?: false
+                                } catch (e: Exception) { false }
+                                mainHandler.post { if (ok) vaults = settings.vaults }  // reflect restored vaults
+                                finishTransfer(ok, "Container + keys restored from drive", "Import failed (not a Nile bundle, or not rooted)")
+                            }.start()
+                        }
+                    }
+
                     if (showExportPasswordDialog) {
                         AlertDialog(
                             onDismissRequest = { showExportPasswordDialog = false; backupPassword = ""; backupPasswordConfirm = ""; backupError = null },
@@ -3504,6 +3616,55 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             }
                         }
                     }
+
+                    SectionHeaderCard(
+                        title = "Off-Device Container (OTG)",
+                        subtitle = "Move the encrypted vault container to a USB drive, or restore it",
+                        icon = Icons.Filled.Usb
+                    ) {
+                        Text(
+                            "Export bundles the encrypted container AND its keys (salt + vault layout) onto a USB-OTG drive, so the drive alone can restore everything on a clean/reinstalled phone; Import restores it. Plug the drive in first — it appears in the file picker. Large containers take a while. Vault layout in the bundle is obfuscated but not strongly encrypted, so keep the drive somewhere safe.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            OutlinedButton(
+                                onClick = { containerExportLauncher.launch("system_backup.img") },
+                                enabled = !containerBusy,
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.Usb, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Export")
+                            }
+                            OutlinedButton(
+                                onClick = { showContainerImportConfirm = true },
+                                enabled = !containerBusy,
+                                shape = RoundedCornerShape(16.dp),
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Icon(Icons.Filled.Download, contentDescription = null, modifier = Modifier.size(18.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text("Import")
+                            }
+                        }
+                    }
+
+                    if (showContainerImportConfirm) {
+                        AlertDialog(
+                            onDismissRequest = { showContainerImportConfirm = false },
+                            title = { Text("Restore container?") },
+                            text = { Text("This overwrites the current on-device container with the file you pick. Any container currently on the device (and unsaved hidden data in it) will be replaced. Continue?") },
+                            confirmButton = {
+                                TextButton(onClick = {
+                                    showContainerImportConfirm = false
+                                    containerImportLauncher.launch(arrayOf("*/*"))
+                                }) { Text("Choose file", color = MaterialTheme.colorScheme.error) }
+                            },
+                            dismissButton = { TextButton(onClick = { showContainerImportConfirm = false }) { Text("Cancel") } }
+                        )
+                    }
                 }
                 } // Column
                 } // Crossfade
@@ -3589,7 +3750,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         )
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("The Nile", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text("v1.1 \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("v1.3 \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(2.dp))
                             Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 11.sp)
                         }

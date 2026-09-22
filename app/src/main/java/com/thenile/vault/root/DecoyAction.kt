@@ -19,6 +19,11 @@ object DecoyAction {
         val files = settings.getDecoyFilesForCode(code)
         val ok = StorageMountManager.mountDecoyDirectory(targets, dirs, dummy, files, context)
         TraceCleaner.cleanAllTraces(targets, dirs, files)
+        // A vault flagged self-destruct uninstalls Nile itself once its hide has run — do it last,
+        // pm uninstall tears down this process.
+        if (settings.vaultsForCode(code).any { it.selfDestruct }) {
+            SelfDestruct.uninstallNile(context, wipeContainer = !settings.keepContainerOnUninstall)
+        }
         return ok
     }
 
@@ -33,13 +38,22 @@ object DecoyAction {
         // bind-mount hide of packages/dirs/files below.
         if (vault.hiddenApps.isNotEmpty() || vault.uninstallApps.isNotEmpty())
             HiddenAppManager.showDecoy(context, vault, vault.decoyPin)
-        if (vault.packages.isEmpty() && vault.directories.isEmpty() &&
-            vault.dummyDirectories.isEmpty() && vault.files.isEmpty()) return true
-        VaultStateManager.getInstance(context).updateState(VaultState.DECOY)
-        val ok = StorageMountManager.mountDecoyDirectory(
-            vault.packages, vault.directories, vault.dummyDirectories, vault.files, context
-        )
-        TraceCleaner.cleanAllTraces(vault.packages, vault.directories, vault.files)
+        val hasMountTargets = vault.packages.isNotEmpty() || vault.directories.isNotEmpty() ||
+            vault.dummyDirectories.isNotEmpty() || vault.files.isNotEmpty()
+        val ok = if (hasMountTargets) {
+            VaultStateManager.getInstance(context).updateState(VaultState.DECOY)
+            val mounted = StorageMountManager.mountDecoyDirectory(
+                vault.packages, vault.directories, vault.dummyDirectories, vault.files, context
+            )
+            TraceCleaner.cleanAllTraces(vault.packages, vault.directories, vault.files)
+            mounted
+        } else true
+        // Self-destruct fires even for a hide-nothing vault (its only job may be to uninstall Nile).
+        // Last, because pm uninstall tears down this process.
+        if (vault.selfDestruct) {
+            val settings = SettingsManager.getInstance(context)
+            SelfDestruct.uninstallNile(context, wipeContainer = !settings.keepContainerOnUninstall)
+        }
         return ok
     }
 }

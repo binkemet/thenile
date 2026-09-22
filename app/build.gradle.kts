@@ -12,7 +12,7 @@ android {
         minSdk = 24
         targetSdk = 36
         versionCode = 2
-        versionName = "1.1"
+        versionName = "1.2"
     }
 
     // Two editions from one codebase:
@@ -129,6 +129,8 @@ dependencies {
 
   // TheNile Dependencies
   implementation("com.github.topjohnwu.libsu:core:5.2.2")
+  // Root-owned file streaming (SuFileInputStream/OutputStream) for OTG container export/import.
+  implementation("com.github.topjohnwu.libsu:io:5.2.2")
   // Xposed API only compiles into the xposed flavor; the aosp flavor has no hook source to build.
   "xposedCompileOnly"("io.github.libxposed:api:102.0.0")
   implementation("androidx.biometric:biometric-ktx:1.2.0-alpha05")

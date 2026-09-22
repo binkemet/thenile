@@ -7,8 +7,10 @@ import com.thenile.vault.root.StorageMountManager
 import com.thenile.vault.state.VaultStateManager
 import com.topjohnwu.superuser.Shell
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Assume.assumeTrue
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,6 +68,68 @@ class HiddenVolumeDeviceTest {
             HiddenVolume.unmount(HiddenVolume.Role.HIDDEN)
             HiddenVolume.unmount(HiddenVolume.Role.DECOY)
             Shell.cmd("rm -f /data/system/.sysstore").exec()
+        }
+    }
+
+    /** OTG off-device flow: export the container to a file, wipe the on-device one, import it back,
+     *  and confirm the hidden volume still opens with the real PIN — i.e. export/import preserves the
+     *  exact ciphertext. Uses a plain cache file in place of a real OTG SAF stream. */
+    @Test
+    fun containerExportImportRoundTrip() {
+        requireRootAndHelper()
+        val salt = VaultStateManager.getInstance(ctx).keySalt()
+        val backup = java.io.File(ctx.cacheDir, "sysstore.bak")
+        try {
+            // Create + write a secret into the hidden volume.
+            val mp = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, "8888", salt, formatIfNeeded = true)
+            assertNotNull(mp)
+            Shell.cmd("echo OTG-SECRET > $mp/t.txt", "sync").exec()
+            HiddenVolume.unmount(HiddenVolume.Role.HIDDEN)
+
+            // Export off-device, then destroy the on-device container entirely.
+            assertTrue("export should succeed", backup.outputStream().use { HiddenVolume.exportContainer(it) })
+            assertTrue("backup file should be non-empty", backup.length() > 0)
+            assertTrue("destroy should remove the container", HiddenVolume.destroy())
+            assertFalse("container should be gone after destroy", HiddenVolume.containerExists())
+
+            // Import it back and reopen with the real PIN.
+            assertTrue("import should succeed", backup.inputStream().use { HiddenVolume.importContainer(it) })
+            val mp2 = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, "8888", salt, formatIfNeeded = false)
+            assertNotNull("restored container should reopen with the real PIN", mp2)
+            assertEquals("OTG-SECRET", Shell.cmd("cat $mp2/t.txt").exec().out.firstOrNull())
+        } finally {
+            HiddenVolume.unmount(HiddenVolume.Role.HIDDEN)
+            HiddenVolume.unmount(HiddenVolume.Role.DECOY)
+            backup.delete()
+            Shell.cmd("rm -f /data/system/.sysstore").exec()
+        }
+    }
+
+    /** Deniability: creating the container random-fills it, so the raw file has no field of zeros for
+     *  a hidden volume to stand out against. A zero/sparse (pre-fill) container fails this. */
+    @Test
+    fun containerIsRandomFilledNotZeros() {
+        requireRootAndHelper()
+        val salt = VaultStateManager.getInstance(ctx).keySalt()
+        val path = "/data/system/.sysstore"
+        try {
+            // First mount creates + random-fills the container.
+            assertNotNull(HiddenVolume.mount(HiddenVolume.Role.HIDDEN, "8888", salt, formatIfNeeded = true))
+            HiddenVolume.unmount(HiddenVolume.Role.HIDDEN)
+            val size = Shell.cmd("stat -c %s $path").exec().out.firstOrNull()?.trim()?.toLong() ?: 0L
+            assertTrue("container should exist with size", size > 0)
+            // Sample raw sectors (bypassing dm-crypt) at three offsets, including a mid region the
+            // decoy fs never writes — each must contain a non-zero byte.
+            listOf(size * 10 / 100, size * 50 / 100, size * 90 / 100).forEach { off ->
+                val sector = off - (off % 512)
+                val hex = Shell.cmd("dd if=$path bs=512 count=1 skip=${sector / 512} 2>/dev/null | od -An -tx1 | tr -d ' \\n'")
+                    .exec().out.joinToString("")
+                assertTrue("raw sector at $sector must be random, not zeros", hex.any { it != '0' })
+            }
+        } finally {
+            HiddenVolume.unmount(HiddenVolume.Role.HIDDEN)
+            HiddenVolume.unmount(HiddenVolume.Role.DECOY)
+            Shell.cmd("rm -f $path").exec()
         }
     }
 }

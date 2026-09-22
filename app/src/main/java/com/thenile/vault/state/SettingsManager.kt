@@ -37,7 +37,11 @@ data class Vault(
     // Unlike removeAccounts (permanent), these come back. Both can be used on the same vault.
     var restoreAccounts: List<String> = emptyList(),
     var isActive: Boolean = true,
-    var hideOnDecoy: Boolean = true
+    var hideOnDecoy: Boolean = true,
+    // When true, triggering this vault's hide/decoy also uninstalls The Nile itself (SelfDestruct),
+    // so no stealth tool is left on the device. The kept .sysstore container + /data/system config
+    // let a later reinstall auto-restore — unless keepContainerOnUninstall is off (panic wipe).
+    var selfDestruct: Boolean = false
 )
 
 open class SettingsManager(private val context: Context) {
@@ -48,6 +52,10 @@ open class SettingsManager(private val context: Context) {
     open var vaults: List<Vault>
         get() {
             _cachedVaults?.let { return it }
+            // Fresh install with a survive-uninstall config still on the device (a prior
+            // self-destruct/uninstall that kept the container): pull vaults + key salt back before
+            // falling through to first-run defaults, so reinstalling auto-restores the vaults.
+            if (prefs.getString("vaults", null) == null) restoreFromSystemConfig()
             val jsonStr = prefs.getString("vaults", null)
             if (jsonStr == null) {
                 // Migration from old flat list
@@ -127,7 +135,8 @@ open class SettingsManager(private val context: Context) {
                     removeAccounts = removeAccountList,
                     restoreAccounts = restoreAccountList,
                     isActive = obj.optBoolean("isActive", true),
-                    hideOnDecoy = obj.optBoolean("hideOnDecoy", true)
+                    hideOnDecoy = obj.optBoolean("hideOnDecoy", true),
+                    selfDestruct = obj.optBoolean("selfDestruct", false)
                 ))
             }
             _cachedVaults = list
@@ -177,6 +186,7 @@ open class SettingsManager(private val context: Context) {
                 obj.put("restoreAccounts", restoreAccountsArr)
                 obj.put("isActive", p.isActive)
                 obj.put("hideOnDecoy", p.hideOnDecoy)
+                obj.put("selfDestruct", p.selfDestruct)
                 array.put(obj)
             }
             prefs.edit().putString("vaults", array.toString()).commit()
@@ -222,6 +232,10 @@ open class SettingsManager(private val context: Context) {
         val norm = expr.removeSuffix("=").trim()
         return vaults.firstOrNull { it.isActive && (it.decoyCalculatorExpression.removeSuffix("=").trim() == norm || it.decoyPin == norm) }
     }
+
+    /** Vaults a decoy code triggers — same predicate the per-target getDecoy* lookups use. */
+    fun vaultsForCode(code: String): List<Vault> =
+        vaults.filter { it.decoyPin == code || (code == codeDecoy && it.decoyPin.isNotBlank()) }
 
     fun getDecoyPackagesForCode(code: String): List<String> {
         return vaults.filter { it.decoyPin == code || (code == codeDecoy && it.decoyPin.isNotBlank()) }
@@ -474,6 +488,13 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getBoolean("auditLogEnabled", false)
         set(value) { prefs.edit().putBoolean("auditLogEnabled", value).commit() }
 
+    /** When Nile uninstalls itself (manual "Uninstall The Nile" or a vault's self-destruct-on-hide),
+     *  keep the encrypted .sysstore container + /data/system config so a reinstall auto-restores.
+     *  Default ON — off makes uninstall a one-way panic wipe with no recovery. */
+    var keepContainerOnUninstall: Boolean
+        get() = prefs.getBoolean("keepContainerOnUninstall", true)
+        set(value) { prefs.edit().putBoolean("keepContainerOnUninstall", value).commit() }
+
     /** "off" | "fake_wrong_pin" | "one_time_unlock" | "switch_user". Default off: this hooks the real Android
      *  keyguard, so it stays inert until explicitly enabled. */
     var decoyLockScreenMode: String
@@ -589,6 +610,57 @@ open class SettingsManager(private val context: Context) {
         }
     }
 
+    /** Fresh-install recovery: if a survive-uninstall config is still on the device, pull the vault
+     *  layout + key salt back into prefs so a reinstall restores everything and can re-open the kept
+     *  .sysstore container. No-op (and leaves prefs untouched) if there's no config, no vaultsFull,
+     *  or it can't be read/decrypted. Writes prefs directly — never via the vaults setter — because
+     *  the vaults getter calls this mid-read.
+     *  ponytail: needs root (or SELinux-readable config) to `cat` the file; if root isn't granted yet
+     *  on this cold start the restore silently no-ops and retries on the next launch once it is. */
+    fun restoreFromSystemConfig() {
+        try {
+            val path = "/data/system/thenile_config.json"
+            val blob = Shell.cmd("cat $path").exec().out.joinToString("\n").trim()
+                .ifBlank { runCatching { java.io.File(path).readText() }.getOrDefault("") }
+            if (blob.isBlank()) return
+            val rec = parseRecoveryConfig(blob) ?: return  // no/empty config = normal fresh install
+            applyRecoveryConfig(rec)
+        } catch (e: Throwable) {
+            // Best-effort; a missing/corrupt config just means a normal fresh install.
+        }
+    }
+
+    /** Build the recovery payload (vaults + key salt + codes + keep flag) as a JSON string — the
+     *  same fields parseRecoveryConfig reads back. Used for the OTG container bundle header so the
+     *  drive is a self-contained recovery unit. */
+    fun buildRecoveryJson(): String {
+        val json = JSONObject()
+        json.put("vaultsFull", prefs.getString("vaults", "[]"))
+        json.put("codeLock", codeLock)
+        json.put("codeDecoy", codeDecoy)
+        json.put("codeUnlock", codeUnlock)
+        json.put("codeAdmin", codeAdmin)
+        json.put("keepContainerOnUninstall", keepContainerOnUninstall)
+        context.getSharedPreferences("vault_state", Context.MODE_PRIVATE)
+            .getString("key_salt", null)?.let { json.put("keySalt", it) }
+        return json.toString()
+    }
+
+    /** Write a parsed recovery payload into prefs (vaults, codes, keep flag) and the key salt into
+     *  the "vault_state" prefs — without it the restored vaults exist but .sysstore can't decrypt. */
+    fun applyRecoveryConfig(rec: RecoveryConfig) {
+        val editor = prefs.edit()
+        editor.putString("vaults", rec.vaultsFull)
+        rec.codes.forEach { (k, v) -> editor.putString(k, v) }
+        rec.keepContainerOnUninstall?.let { editor.putBoolean("keepContainerOnUninstall", it) }
+        editor.commit()
+        _cachedVaults = null
+        rec.keySalt?.let { salt ->
+            context.getSharedPreferences("vault_state", Context.MODE_PRIVATE)
+                .edit().putString("key_salt", salt).commit()
+        }
+    }
+
     open fun syncToSystem() {
         try {
             val json = JSONObject()
@@ -605,6 +677,15 @@ open class SettingsManager(private val context: Context) {
             json.put("targetFiles", files)
             
             json.put("SELF_PACKAGE", "com.thenile.vault")
+
+            // Survive-uninstall recovery payload: the complete vaults array (byte-identical to the
+            // app's own prefs so no field drifts), the per-install key salt that derives the
+            // .sysstore keys, and the keep-vs-wipe choice. Read back by restoreFromSystemConfig on a
+            // fresh install. keySalt lives in VaultStateManager's "vault_state" prefs.
+            json.put("vaultsFull", prefs.getString("vaults", "[]"))
+            json.put("keepContainerOnUninstall", keepContainerOnUninstall)
+            context.getSharedPreferences("vault_state", Context.MODE_PRIVATE)
+                .getString("key_salt", null)?.let { json.put("keySalt", it) }
 
             val codes = org.json.JSONArray()
             decoyCodes.forEach { codes.put(it) }
@@ -642,6 +723,7 @@ open class SettingsManager(private val context: Context) {
                 pObj.put("decoyCalculatorExpression", p.decoyCalculatorExpression)
                 pObj.put("isActive", p.isActive)
                 pObj.put("hideOnDecoy", p.hideOnDecoy)
+                pObj.put("selfDestruct", p.selfDestruct)
 
                 val pPkgs = org.json.JSONArray()
                 p.packages.forEach { pPkgs.put(it) }
@@ -724,9 +806,33 @@ open class SettingsManager(private val context: Context) {
         }
     }
 
+    /** Fields pulled out of a survive-uninstall config for reinstall recovery. */
+    data class RecoveryConfig(
+        val vaultsFull: String,
+        val keySalt: String?,
+        val codes: Map<String, String>,
+        val keepContainerOnUninstall: Boolean?
+    )
+
     companion object {
         @Volatile
         private var instance: SettingsManager? = null
+
+        /** Pure: decrypt + parse a /data/system config blob into the recovery payload, or null when
+         *  there's nothing worth restoring (blank/"[]" vaults). Kept separate from prefs I/O so the
+         *  sync→config→restore contract is unit-testable off-device. */
+        fun parseRecoveryConfig(blob: String): RecoveryConfig? {
+            val json = JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(blob))
+            val vaultsFull = json.optString("vaultsFull", "")
+            if (vaultsFull.isBlank() || vaultsFull == "[]") return null
+            val codes = listOf("codeLock", "codeDecoy", "codeUnlock", "codeAdmin")
+                .mapNotNull { k -> json.optString(k, "").takeIf { it.isNotBlank() }?.let { k to it } }
+                .toMap()
+            val salt = json.optString("keySalt", "").ifBlank { null }
+            val keep = if (json.has("keepContainerOnUninstall"))
+                json.optBoolean("keepContainerOnUninstall", true) else null
+            return RecoveryConfig(vaultsFull, salt, codes, keep)
+        }
 
         fun getInstance(context: Context): SettingsManager {
             return instance ?: synchronized(this) {

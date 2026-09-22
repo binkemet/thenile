@@ -8,18 +8,18 @@
 
 ## Features
 
-- 🔒 **Multi-state vault** (Locked/Unlocked/Decoy)
-- 📱 **Dial code activation** via phone dialer (`*#*#CODE#*#*`)
-- 🎭 **Calculator decoy app disguise**
-- 💥 **Fake crash screen disguise** (long-press bypass)
-- 👤 **Multi-profile support** with per-profile decoy PINs
-- 🔐 **AES-256-GCM encrypted backups** (Rust native crypto)
-- 📦 **App hiding** via LSPosed/Xposed
-- 📁 **Directory hiding** with LUKS containers
-- 🧹 **Trace cleaning** (logs, recent tasks)
-- 🎨 **Material You / Dynamic theming**
-- ⌨️ **Quick Settings tile**, deep links, volume key shortcuts
-- 🙈 **Launcher icon hiding**
+- **Multi-state vault** (Locked/Unlocked/Decoy)
+- **Dial code activation** via phone dialer (`*#*#CODE#*#*`)
+- **Calculator decoy app disguise**
+- **Fake crash screen disguise** (long-press bypass)
+- **Multi-profile support** with per-profile decoy PINs
+- **AES-256-GCM encrypted backups** (Rust native crypto)
+- **App hiding** via LSPosed/Xposed
+- **Directory hiding** with LUKS containers
+- **Trace cleaning** (logs, recent tasks)
+- **Material You / Dynamic theming**
+- **Quick Settings tile**, deep links, volume key shortcuts
+- **Launcher icon hiding**
 
 ---
 
