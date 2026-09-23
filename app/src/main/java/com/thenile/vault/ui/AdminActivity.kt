@@ -1,5 +1,6 @@
 package com.thenile.vault.ui
 
+import com.thenile.vault.BuildConfig
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -3750,7 +3751,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         )
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Text("The Nile", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                            Text("v1.3 \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Text("v${BuildConfig.VERSION_NAME} \u2022 Stealth Vault Engine", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             Spacer(modifier = Modifier.height(2.dp))
                             Text("Denial is not just a river in Egypt", style = MaterialTheme.typography.bodySmall, fontStyle = FontStyle.Italic, color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f), fontSize = 11.sp)
                         }
