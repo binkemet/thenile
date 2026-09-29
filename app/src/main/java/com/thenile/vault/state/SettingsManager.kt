@@ -41,7 +41,11 @@ data class Vault(
     // When true, triggering this vault's hide/decoy also uninstalls The Nile itself (SelfDestruct),
     // so no stealth tool is left on the device. The kept .sysstore container + /data/system config
     // let a later reinstall auto-restore — unless keepContainerOnUninstall is off (panic wipe).
-    var selfDestruct: Boolean = false
+    var selfDestruct: Boolean = false,
+    // Local Admin-UI gate only — NOT encryption key material (that's the shared global
+    // realPassword/decoyPassword). Checked before switching into this vault in Admin when
+    // SettingsManager.requireVaultPasswordOnSwitch is on. Blank = no gate for this vault.
+    var adminPassword: String = ""
 )
 
 open class SettingsManager(private val context: Context) {
@@ -136,7 +140,8 @@ open class SettingsManager(private val context: Context) {
                     restoreAccounts = restoreAccountList,
                     isActive = obj.optBoolean("isActive", true),
                     hideOnDecoy = obj.optBoolean("hideOnDecoy", true),
-                    selfDestruct = obj.optBoolean("selfDestruct", false)
+                    selfDestruct = obj.optBoolean("selfDestruct", false),
+                    adminPassword = obj.optString("adminPassword", "")
                 ))
             }
             _cachedVaults = list
@@ -187,6 +192,7 @@ open class SettingsManager(private val context: Context) {
                 obj.put("isActive", p.isActive)
                 obj.put("hideOnDecoy", p.hideOnDecoy)
                 obj.put("selfDestruct", p.selfDestruct)
+                obj.put("adminPassword", p.adminPassword)
                 array.put(obj)
             }
             prefs.edit().putString("vaults", array.toString()).commit()
@@ -282,6 +288,24 @@ open class SettingsManager(private val context: Context) {
     var decoyPassword: String
         get() = prefs.getString("decoyPassword", "").let { if (it.isNullOrBlank()) codeDecoy else it }
         set(value) { prefs.edit().putString("decoyPassword", value).commit() }
+
+    /** If a vault has its own [Vault.adminPassword] set, require retyping it before switching into
+     *  that vault in Admin — a local UI gate, not encryption (see Vault.adminPassword). Off by
+     *  default. */
+    var requireVaultPasswordOnSwitch: Boolean
+        get() = prefs.getBoolean("requireVaultPasswordOnSwitch", false)
+        set(value) { prefs.edit().putBoolean("requireVaultPasswordOnSwitch", value).commit() }
+
+    /** Generates real/decoy passwords the first time they're needed (i.e. never overwrites a value
+     *  the user already set), so a freshly created vault isn't left relying on the weak
+     *  codeUnlock/codeDecoy dial-code fallback. Call when a vault is created. */
+    fun ensureVaultPasswordsGenerated() {
+        if (prefs.getString("realPassword", "").isNullOrBlank()) realPassword = generateStrongPassword()
+        if (prefs.getString("decoyPassword", "").isNullOrBlank()) decoyPassword = generateStrongPassword()
+    }
+
+    private fun generateStrongPassword(): String =
+        ByteArray(16).also { java.security.SecureRandom().nextBytes(it) }.joinToString("") { "%02x".format(it) }
 
     var adminLockMethod: String
         get() = prefs.getString("adminLockMethod", "biometric") ?: "biometric"

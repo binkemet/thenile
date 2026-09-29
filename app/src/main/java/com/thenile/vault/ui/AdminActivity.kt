@@ -831,6 +831,9 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
 
     var showVaultListModal by remember { mutableStateOf(false) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var vaultSwitchGate by remember { mutableStateOf<Vault?>(null) } // non-null while awaiting its password
+    var vaultSwitchGateInput by remember { mutableStateOf("") }
+    var vaultSwitchGateError by remember { mutableStateOf(false) }
 
     var codeUnlock by remember { mutableStateOf(settings.codeUnlock) }
     var codeLock by remember { mutableStateOf(settings.codeLock) }
@@ -838,6 +841,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
     var codeAdmin by remember { mutableStateOf(settings.codeAdmin) }
     var realPassword by remember { mutableStateOf(settings.realPassword) }
     var decoyPassword by remember { mutableStateOf(settings.decoyPassword) }
+    var requireVaultPasswordOnSwitch by remember { mutableStateOf(settings.requireVaultPasswordOnSwitch) }
     var decoyLockScreenMode by remember { mutableStateOf(settings.decoyLockScreenMode) }
     var decoyUnlockLimit by remember { mutableStateOf(settings.decoyUnlockLimit) }
     var decoyUserId by remember { mutableStateOf(settings.decoyUserId) }
@@ -921,11 +925,26 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
             isActive = true,
             hideOnDecoy = true
         )
+        // Generate BEFORE settings.vaults = vaults below, so the sync to /data/system (triggered by
+        // that assignment) already carries the fresh passwords instead of a stale/blank snapshot.
+        // Never overwrites an already-set password — only fills in the weak dial-code fallback the
+        // first time a vault is ever created, so real hidden data isn't keyed off "9876"/"1234".
+        val beforeReal = settings.realPassword
+        val beforeDecoy = settings.decoyPassword
+        settings.ensureVaultPasswordsGenerated()
+        realPassword = settings.realPassword
+        decoyPassword = settings.decoyPassword
+        val generated = realPassword != beforeReal || decoyPassword != beforeDecoy
+
         vaults = vaults + newProf
         settings.vaults = vaults
         selectedVaultId = newProf.id
         editingVaultState = newProf
         originalVaultState = newProf.copy()
+
+        if (generated) {
+            Toast.makeText(context, "Generated a real/decoy password for this device — see Triggers & Codes > Vault Passwords", Toast.LENGTH_LONG).show()
+        }
     }
 
     var showHideTestWarning by remember { mutableStateOf(!settings.hideTestWarningAck) }
@@ -969,15 +988,63 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
         )
     }
 
+    fun performVaultSwitch(prof: Vault) {
+        selectedVaultId = prof.id
+        editingVaultState = prof.copy()
+        originalVaultState = prof.copy()
+        showVaultListModal = false
+    }
+
+    if (vaultSwitchGate != null) {
+        val target = vaultSwitchGate!!
+        AlertDialog(
+            onDismissRequest = { vaultSwitchGate = null; vaultSwitchGateInput = ""; vaultSwitchGateError = false },
+            title = { Text("Enter Vault Password", fontWeight = FontWeight.Bold) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("This vault (\"${target.name}\") requires its password to switch into.")
+                    OutlinedTextField(
+                        value = vaultSwitchGateInput,
+                        onValueChange = { vaultSwitchGateInput = it; vaultSwitchGateError = false },
+                        label = { Text("Vault Password") },
+                        isError = vaultSwitchGateError,
+                        visualTransformation = PasswordVisualTransformation(),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    if (vaultSwitchGateError) {
+                        Text("Wrong password", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (vaultSwitchGateInput == target.adminPassword) {
+                        performVaultSwitch(target)
+                        vaultSwitchGate = null
+                        vaultSwitchGateInput = ""
+                        vaultSwitchGateError = false
+                    } else {
+                        vaultSwitchGateError = true
+                    }
+                }) { Text("Unlock") }
+            },
+            dismissButton = {
+                TextButton(onClick = { vaultSwitchGate = null; vaultSwitchGateInput = ""; vaultSwitchGateError = false }) { Text("Cancel") }
+            }
+        )
+    }
+
     if (showVaultListModal) {
         VaultListDialog(
             vaults = vaults,
             currentVaultId = selectedVaultId,
             onSelectVault = { prof ->
-                selectedVaultId = prof.id
-                editingVaultState = prof.copy()
-                originalVaultState = prof.copy()
-                showVaultListModal = false
+                if (settings.requireVaultPasswordOnSwitch && prof.adminPassword.isNotBlank() && prof.id != selectedVaultId) {
+                    vaultSwitchGate = prof
+                } else {
+                    performVaultSwitch(prof)
+                }
             },
             onDeleteVault = { prof ->
                 vaults = vaults.filter { it.id != prof.id }
@@ -1541,6 +1608,18 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         placeholder = { Text("e.g. 1234") },
                         shape = RoundedCornerShape(16.dp),
                         modifier = Modifier.fillMaxWidth()
+                    )
+
+                    VaultPasswordTextField(
+                        label = "Vault Password (optional)",
+                        icon = Icons.Filled.Password,
+                        value = editingVaultState.adminPassword,
+                        onValueChange = { editingVaultState = editingVaultState.copy(adminPassword = it) }
+                    )
+                    Text(
+                        "Only used when \"Require Vault Password to Switch\" (Triggers & Codes > Vault Passwords) is on. Blank = no gate for this vault.",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     DialCodeTextField(
@@ -2842,6 +2921,16 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             value = decoyPassword,
                             onValueChange = { decoyPassword = it }
                         )
+
+                        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+
+                        PreferenceSwitchRow(
+                            title = "Require Vault Password to Switch",
+                            subtitle = "In Admin, retype a vault's own password (set per-vault below) before switching into it. A local Admin-only check, not encryption.",
+                            icon = Icons.Filled.Password,
+                            checked = requireVaultPasswordOnSwitch,
+                            onCheckedChange = { requireVaultPasswordOnSwitch = it }
+                        )
                     }
 
                     SectionHeaderCard(
@@ -3851,6 +3940,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.codeAdmin = codeAdmin.trim()
                         settings.realPassword = realPassword.trim()
                         settings.decoyPassword = decoyPassword.trim()
+                        settings.requireVaultPasswordOnSwitch = requireVaultPasswordOnSwitch
                         settings.decoyLockScreenMode = decoyLockScreenMode
                         settings.decoyUnlockLimit = decoyUnlockLimit
                         settings.decoyUserId = decoyUserId
