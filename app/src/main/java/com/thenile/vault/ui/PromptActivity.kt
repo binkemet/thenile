@@ -190,8 +190,10 @@ class PromptActivity : ComponentActivity() {
                 stateManager.updateState(VaultState.LOCKED)
                 com.thenile.vault.root.StorageMountManager.unmountAndLock(targets, dirs, dummyDirs, targetFiles, context = this)
                 // Hidden apps: leave the anodyne data in place while locked, never the real data.
+                val lockProgress: ((Int) -> Unit)? = if (settings.showProgressNotifications)
+                    { pct -> com.thenile.vault.root.ProgressNotifier.update(this, "Hiding vault… $pct%", pct) } else null
                 settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
-                    com.thenile.vault.root.HiddenAppManager.showDecoy(this, it, settings.decoyPassword)
+                    com.thenile.vault.root.HiddenAppManager.showDecoy(this, it, settings.decoyPassword, lockProgress)
                 }
                 targets.forEach { pkg ->
                     com.thenile.vault.root.TraceCleaner.cleanTraces(pkg)
@@ -207,8 +209,10 @@ class PromptActivity : ComponentActivity() {
                 // reveal apps whose data never came online.
                 val result = if (ok) {
                     // Hidden apps: restore the real data (each snapshot decrypts only under this password).
+                    val unlockProgress: ((Int) -> Unit)? = if (settings.showProgressNotifications)
+                        { pct -> com.thenile.vault.root.ProgressNotifier.update(this, "Unlocking vault… $pct%", pct) } else null
                     settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
-                        com.thenile.vault.root.HiddenAppManager.revealReal(this, it, settings.realPassword)
+                        com.thenile.vault.root.HiddenAppManager.revealReal(this, it, settings.realPassword, unlockProgress)
                     }
                     stateManager.updateState(VaultState.UNLOCKED)
                     "Unlocked"

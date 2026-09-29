@@ -58,8 +58,9 @@ object HiddenVolume {
     private fun exists(path: String) = Shell.cmd("test -e '$path'").exec().isSuccess
 
     /** Ensure the container file exists (fixed size, decided once from free space). Returns its size
-     *  in bytes, or null on failure. */
-    private fun ensureContainer(): Long? {
+     *  in bytes, or null on failure. [onFillProgress], if given, is called with 0-100 while a fresh
+     *  container is being random-filled — the only slow (multi-GB) step in this path. */
+    private fun ensureContainer(onFillProgress: ((Int) -> Unit)? = null): Long? {
         if (!exists(CONTAINER)) {
             val availKb = shOut("set -- \$(df -k -P /data | tail -n1); echo \$4")?.toLongOrNull()
             val marginKb = 512L * 1024
@@ -70,7 +71,7 @@ object HiddenVolume {
             // volume's tail is indistinguishable from the decoy's free space — the core deniability
             // requirement (a hidden volume in a field of zeros is an obvious tell). Fail closed: a
             // zero-filled container is not deniable, so don't silently ship one.
-            if (!randomFill()) { sh("rm -f '$CONTAINER'"); Log.e(TAG, "random-fill failed"); return null }
+            if (!randomFill(onFillProgress)) { sh("rm -f '$CONTAINER'"); Log.e(TAG, "random-fill failed"); return null }
         }
         return shOut("stat -c %s '$CONTAINER'")?.toLongOrNull()
     }
@@ -78,9 +79,10 @@ object HiddenVolume {
     /** Overwrite the entire container with random data. Done by writing zeros THROUGH a throwaway
      *  dm-crypt mapping keyed with a random 64-byte key: AES(zeros) is pseudo-random ciphertext, so
      *  the raw file ends up uniformly random at AES-NI speed instead of the /dev/urandom bottleneck.
-     *  ponytail: still a full-device write (GB), a one-time cost on first container creation — the
-     *  price of deniability; a progress UI is the upgrade if it ever feels slow. */
-    private fun randomFill(): Boolean {
+     *  Written in fixed-size chunks (not one dd to the end) so [onFillProgress] can report real
+     *  0-100 progress — the exact total is already known from `blockdev --getsz`, so there's no need
+     *  for the old "run until ENOSPC" approach. */
+    private fun randomFill(onFillProgress: ((Int) -> Unit)? = null): Boolean {
         val loop = shOut("losetup -f") ?: return false
         if (!sh("losetup '$loop' '$CONTAINER'")) return false
         val sectors = shOut("blockdev --getsz '$loop'")?.toLongOrNull()
@@ -92,9 +94,15 @@ object HiddenVolume {
         Shell.cmd("${StorageMountManager.dmcryptBin} remove $name").exec()
         val node = shOut("${StorageMountManager.dmcryptBin} create $name $CIPHER $key '$loop' $sectors")
         if (node == null || !node.startsWith("/dev/")) { sh("losetup -d '$loop'"); return false }
-        // dd runs until the mapping's end (short write / ENOSPC) and exits non-zero — expected, the
-        // fill is complete regardless, so don't gate on its exit code.
-        Shell.cmd("dd if=/dev/zero of='$node' bs=1048576").exec()
+        val totalMb = (sectors * 512) / (1024 * 1024)
+        val chunkMb = 256L
+        var writtenMb = 0L
+        while (writtenMb < totalMb) {
+            val thisChunk = minOf(chunkMb, totalMb - writtenMb)
+            Shell.cmd("dd if=/dev/zero of='$node' bs=1048576 count=$thisChunk seek=$writtenMb 2>/dev/null").exec()
+            writtenMb += thisChunk
+            onFillProgress?.invoke(((writtenMb * 100) / totalMb).toInt().coerceIn(0, 100))
+        }
         Shell.cmd("${StorageMountManager.dmcryptBin} remove $name").exec()
         sh("losetup -d '$loop'")
         // Verify the RAW container (bypassing dm-crypt) actually holds non-zero ciphertext now — read
@@ -107,11 +115,13 @@ object HiddenVolume {
 
     /** Mount [role]'s volume and return its mountpoint, or null. [formatIfNeeded] mkfs+formats when
      *  the region has no filesystem — pass true ONLY on a capture path (correct PIN by construction);
-     *  never on a restore/open path, or a wrong PIN would reformat over real data. */
-    fun mount(role: Role, pin: String, salt: String, formatIfNeeded: Boolean): String? {
+     *  never on a restore/open path, or a wrong PIN would reformat over real data. [onFillProgress],
+     *  if given, reports 0-100 during a fresh container's random-fill — a no-op on every later call
+     *  once the container already exists. */
+    fun mount(role: Role, pin: String, salt: String, formatIfNeeded: Boolean, onFillProgress: ((Int) -> Unit)? = null): String? {
         if (PrivilegeManager.currentTier() != PrivilegeTier.ROOT) { Log.e(TAG, "mount needs root"); return null }
         if (StorageMountManager.dmcryptBin.isEmpty()) { Log.e(TAG, "dmcrypt helper not set"); return null }
-        val size = ensureContainer() ?: return null
+        val size = ensureContainer(onFillProgress) ?: return null
         val mp = mountPoint(role)
         if (isMounted(mp)) return mp
 

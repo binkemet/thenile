@@ -117,11 +117,12 @@ object HiddenAppManager {
 
     // -------- runtime swap --------
 
-    /** Decoy/lock: anodyne data for data-swap apps (all profiles); uninstalled for uninstall apps. */
-    fun showDecoy(context: Context, vault: Vault, decoyPin: String) {
+    /** Decoy/lock: anodyne data for data-swap apps (all profiles); uninstalled for uninstall apps.
+     *  [onFillProgress] reports 0-100 only in the rare case the .sysstore container doesn't exist yet. */
+    fun showDecoy(context: Context, vault: Vault, decoyPin: String, onFillProgress: ((Int) -> Unit)? = null) {
         val s = salt(context)
         if (vault.hiddenApps.isNotEmpty()) {
-            val mp = HiddenVolume.mount(HiddenVolume.Role.DECOY, decoyPin, s, formatIfNeeded = false)
+            val mp = HiddenVolume.mount(HiddenVolume.Role.DECOY, decoyPin, s, formatIfNeeded = false, onFillProgress = onFillProgress)
             if (mp != null) try {
                 for (pkg in vault.hiddenApps) restoreAllUsers(context, pkg, "d", decoyPin, s, mp)
             } finally { HiddenVolume.unmount(HiddenVolume.Role.DECOY) }
@@ -132,11 +133,12 @@ object HiddenAppManager {
         if (AccountVault.remove(USER0, vault.restoreAccounts)) AccountVault.reloadFramework()
     }
 
-    /** Real unlock: real data for data-swap apps (all profiles); reinstall + restore for uninstall apps. */
-    fun revealReal(context: Context, vault: Vault, realPin: String) {
+    /** Real unlock: real data for data-swap apps (all profiles); reinstall + restore for uninstall apps.
+     *  [onFillProgress] reports 0-100 only in the rare case the .sysstore container doesn't exist yet. */
+    fun revealReal(context: Context, vault: Vault, realPin: String, onFillProgress: ((Int) -> Unit)? = null) {
         if (vault.hiddenApps.isEmpty() && vault.uninstallApps.isEmpty() && vault.restoreAccounts.isEmpty()) return
         val s = salt(context)
-        val mp = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, realPin, s, formatIfNeeded = false) ?: return
+        val mp = HiddenVolume.mount(HiddenVolume.Role.HIDDEN, realPin, s, formatIfNeeded = false, onFillProgress = onFillProgress) ?: return
         var accountsRestored = false
         try {
             // Apply the account snapshot SQL while the volume is mounted; the framework reload that

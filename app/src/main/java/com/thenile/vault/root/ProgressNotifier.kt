@@ -38,6 +38,20 @@ object ProgressNotifier {
         runCatching { NotificationManagerCompat.from(context).notify(NOTIF_ID, notif) }
     }
 
+    /** Update to a determinate bar at [percent] (0-100) with [title]. Same notification ID as
+     *  [show], so this replaces it in place rather than stacking a second one. */
+    fun update(context: Context, title: String, percent: Int) {
+        ensureChannel(context)
+        val notif = NotificationCompat.Builder(context, CHANNEL_ID)
+            .setSmallIcon(android.R.drawable.ic_popup_sync)
+            .setContentTitle(title)
+            .setProgress(100, percent.coerceIn(0, 100), false)
+            .setOngoing(true)
+            .setSilent(true)
+            .build()
+        runCatching { NotificationManagerCompat.from(context).notify(NOTIF_ID, notif) }
+    }
+
     fun dismiss(context: Context) {
         runCatching { NotificationManagerCompat.from(context).cancel(NOTIF_ID) }
     }
