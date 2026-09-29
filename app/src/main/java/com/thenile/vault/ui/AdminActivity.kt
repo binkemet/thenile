@@ -1488,9 +1488,22 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         AnimatedVisibility(visible = showHowItWorks) {
                             Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(top = 8.dp)) {
                                 HelpStepRow(step = "1", title = "Choose what to hide", desc = "Add apps, individual files (photos, documents, videos), or entire folders into this vault below.")
-                                HelpStepRow(step = "2", title = "Set your decoy triggers", desc = "Configure Decoy PIN, dial code (*#1234#), or calculator trigger in Settings.")
-                                HelpStepRow(step = "3", title = "Stealth in action", desc = "Entering the decoy code secretly switches to a decoy vault or hides all trace under duress.")
-                                HelpStepRow(step = "4", title = "Switch back anytime", desc = "Dial *#8888# or type your Master PIN on the lockscreen to return to your main vault.")
+                                HelpStepRow(
+                                    step = "2",
+                                    title = "Set your real & decoy passwords",
+                                    desc = "These (Triggers & Codes > Vault Passwords) are the actual secrets — what unlocks your real data, and what you'd hand over if forced. Add real files to the decoy (Backup & Data > Decoy Vault Files) so it looks genuinely used, not empty."
+                                )
+                                HelpStepRow(
+                                    step = "3",
+                                    title = "Set your dial codes",
+                                    desc = "Dial *#$codeDecoy# for the decoy, *#$codeAdmin# for Admin, or use this vault's own Decoy PIN below. These only trigger the switch — they're not your password."
+                                )
+                                HelpStepRow(step = "4", title = "Stealth in action", desc = "Entering a decoy code convincingly swaps in the decoy vault; entering your real password brings your real data back.")
+                                HelpStepRow(
+                                    step = "5",
+                                    title = "Switch back anytime",
+                                    desc = "Dial *#$codeUnlock# or type it on the lockscreen to return to your real vault."
+                                )
                             }
                         }
                     }
