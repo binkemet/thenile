@@ -189,7 +189,7 @@ class PromptActivity : ComponentActivity() {
                 com.thenile.vault.root.StorageMountManager.unmountAndLock(targets, dirs, dummyDirs, targetFiles, context = this)
                 // Hidden apps: leave the anodyne data in place while locked, never the real data.
                 settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
-                    com.thenile.vault.root.HiddenAppManager.showDecoy(this, it, it.decoyPin)
+                    com.thenile.vault.root.HiddenAppManager.showDecoy(this, it, settings.decoyPassword)
                 }
                 targets.forEach { pkg ->
                     com.thenile.vault.root.TraceCleaner.cleanTraces(pkg)
@@ -198,13 +198,13 @@ class PromptActivity : ComponentActivity() {
             }
             settings.codeUnlock, "" -> {
                 val salt = stateManager.keySalt()
-                val ok = com.thenile.vault.root.StorageMountManager.mountRealContainer(targets, dirs, dummyDirs, targetFiles, lastPin, salt, this)
+                val ok = com.thenile.vault.root.StorageMountManager.mountRealContainer(targets, dirs, dummyDirs, targetFiles, settings.realPassword, salt, this)
                 // Only claim UNLOCKED if the container actually mounted, so the hook doesn't
                 // reveal apps whose data never came online.
                 if (ok) {
-                    // Hidden apps: restore the real data (each snapshot decrypts only under this PIN).
+                    // Hidden apps: restore the real data (each snapshot decrypts only under this password).
                     settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
-                        com.thenile.vault.root.HiddenAppManager.revealReal(this, it, lastPin)
+                        com.thenile.vault.root.HiddenAppManager.revealReal(this, it, settings.realPassword)
                     }
                     stateManager.updateState(VaultState.UNLOCKED)
                     "Unlocked"

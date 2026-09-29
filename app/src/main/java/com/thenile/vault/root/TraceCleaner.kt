@@ -58,12 +58,26 @@ class TraceCleaner {
             // 4. Purge Thumbnail & Media Caches (Safe user caches)
             cmdList.add("rm -rf /data/media/0/.thumbnails/* /data/media/0/DCIM/.thumbnails/* /sdcard/.thumbnails/* /sdcard/DCIM/.thumbnails/* 2>/dev/null || true")
             cmdList.add("rm -rf /data/data/com.android.providers.media.module/cache/* /data/data/com.android.providers.media/cache/* 2>/dev/null || true")
-            cmdList.add("rm -rf /data/data/com.google.android.apps.photos/cache/* 2>/dev/null || true")
+            // ponytail: a few common gallery/messaging apps' own media caches — not exhaustive
+            // (every OEM gallery/messenger has a different package name), extend if a specific one matters.
+            for (pkg in listOf("com.google.android.apps.photos", "com.whatsapp", "org.telegram.messenger")) {
+                cmdList.add("rm -rf /data/data/$pkg/cache/* 2>/dev/null || true")
+            }
 
-            // 5. Clear in-memory logcat buffers
+            // 5. Wipe today's UsageStatsManager bucket — "this app was open from X to Y" is a bigger
+            // live-inspection risk than a thumbnail (visible via Digital Wellbeing/Screen Time).
+            // Only the finest-grained "daily" bucket is touched, never weekly/monthly/yearly or the
+            // mappings/version bookkeeping files — those are Android's own internal state and
+            // clearing them risks corrupting the usage-stats subsystem for a gap this app doesn't
+            // even benefit from (aggregated buckets are much less specific evidence anyway).
+            for (base in listOf("/data/system_ce/0/usagestats", "/data/system/usagestats/0")) {
+                cmdList.add("rm -f $base/daily/* 2>/dev/null || true")
+            }
+
+            // 6. Clear in-memory logcat buffers
             cmdList.add("logcat -c 2>/dev/null || true")
 
-            // 6. Flush Linux page cache and drop dirty kernel buffers
+            // 7. Flush Linux page cache and drop dirty kernel buffers
             cmdList.add("sync; echo 3 > /proc/sys/vm/drop_caches")
 
             Shell.cmd(*cmdList.toTypedArray()).exec()

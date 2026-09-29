@@ -150,6 +150,35 @@ fun DialCodeTextField(
     )
 }
 
+@Composable
+fun VaultPasswordTextField(
+    label: String,
+    icon: ImageVector,
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var visible by remember { mutableStateOf(false) }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = { Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary) },
+        visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
+        trailingIcon = {
+            IconButton(onClick = { visible = !visible }) {
+                Icon(
+                    if (visible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                    contentDescription = if (visible) "Hide password" else "Show password"
+                )
+            }
+        },
+        singleLine = true,
+        shape = RoundedCornerShape(16.dp),
+        modifier = modifier.fillMaxWidth()
+    )
+}
+
 // -------------------------------------------------------------------------------------------------
 // KernelSU-Next Inspired Floating Navigation Bar & Expressive UI Components
 // -------------------------------------------------------------------------------------------------
@@ -807,6 +836,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
     var codeLock by remember { mutableStateOf(settings.codeLock) }
     var codeDecoy by remember { mutableStateOf(settings.codeDecoy) }
     var codeAdmin by remember { mutableStateOf(settings.codeAdmin) }
+    var realPassword by remember { mutableStateOf(settings.realPassword) }
+    var decoyPassword by remember { mutableStateOf(settings.decoyPassword) }
     var decoyLockScreenMode by remember { mutableStateOf(settings.decoyLockScreenMode) }
     var decoyUnlockLimit by remember { mutableStateOf(settings.decoyUnlockLimit) }
     var decoyUserId by remember { mutableStateOf(settings.decoyUserId) }
@@ -1676,14 +1707,14 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                         if (isUninstall) {
                                             OutlinedButton(onClick = {
-                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureUninstall(context, pkg, settings.codeUnlock) }
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureUninstall(context, pkg, settings.realPassword) }
                                             }) { Text("Capture & remove") }
                                         } else {
                                             OutlinedButton(onClick = {
-                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureDecoy(context, pkg, editingVaultState.decoyPin) }
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureDecoy(context, pkg, settings.decoyPassword) }
                                             }) { Text("Capture decoy") }
                                             OutlinedButton(onClick = {
-                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureReal(context, pkg, settings.codeUnlock) }
+                                                capture(pkg) { com.thenile.vault.root.HiddenAppManager.captureReal(context, pkg, settings.realPassword) }
                                             }) { Text("Capture real") }
                                         }
                                     }
@@ -1811,7 +1842,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 val snapshotVault = editingVaultState
                                 Toast.makeText(context, "Capturing accounts…", Toast.LENGTH_SHORT).show()
                                 Thread {
-                                    val ok = com.thenile.vault.root.HiddenAppManager.captureAccounts(context, snapshotVault, settings.codeUnlock)
+                                    val ok = com.thenile.vault.root.HiddenAppManager.captureAccounts(context, snapshotVault, settings.realPassword)
                                     mainHandler.post { Toast.makeText(context, if (ok) "Accounts captured" else "Capture failed (see logs)", Toast.LENGTH_SHORT).show() }
                                 }.start()
                             },
@@ -2677,7 +2708,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
 
                     SectionHeaderCard(
                         title = "Anti-Forensics & Trace Scrubbing",
-                        subtitle = "Scrub launch history, recents, MediaStore DBs, and thumbnails",
+                        subtitle = "Scrub launch history, recents, MediaStore DBs, today's usage stats, and thumbnails",
                         icon = Icons.Filled.CleaningServices,
                         iconContainerColor = MaterialTheme.colorScheme.primaryContainer,
                         iconContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -2779,6 +2810,36 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             icon = Icons.Filled.AdminPanelSettings,
                             value = codeAdmin,
                             onValueChange = { codeAdmin = it }
+                        )
+                    }
+
+                    SectionHeaderCard(
+                        title = "Vault Passwords",
+                        subtitle = "The real secrets behind your encryption keys",
+                        icon = Icons.Filled.Key,
+                        iconContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+                        iconContentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                    ) {
+                        Text(
+                            "The dial codes above only trigger the switch — they're not your encryption key. " +
+                                "This is the actual secret: what you type in Admin to manage real content, and " +
+                                "what you'd tell someone who forces you to unlock the decoy.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        VaultPasswordTextField(
+                            label = "Real Password",
+                            icon = Icons.Filled.Key,
+                            value = realPassword,
+                            onValueChange = { realPassword = it }
+                        )
+
+                        VaultPasswordTextField(
+                            label = "Decoy Password",
+                            icon = Icons.Filled.Shield,
+                            value = decoyPassword,
+                            onValueChange = { decoyPassword = it }
                         )
                     }
 
@@ -3666,6 +3727,96 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                             dismissButton = { TextButton(onClick = { showContainerImportConfirm = false }) { Text("Cancel") } }
                         )
                     }
+
+                    var decoyFiles by remember { mutableStateOf<List<Pair<String, Long>>>(emptyList()) }
+                    var decoyFilesBusy by remember { mutableStateOf(false) }
+                    fun refreshDecoyFiles() {
+                        decoyFilesBusy = true
+                        Thread {
+                            val list = com.thenile.vault.root.DecoyFileStore.listFiles(context, settings.decoyPassword)
+                            mainHandler.post { decoyFiles = list; decoyFilesBusy = false }
+                        }.start()
+                    }
+                    LaunchedEffect(Unit) { refreshDecoyFiles() }
+
+                    val decoyFilesPickerLauncher = rememberLauncherForActivityResult(
+                        ActivityResultContracts.OpenMultipleDocuments()
+                    ) { uris ->
+                        if (uris.isNotEmpty()) {
+                            decoyFilesBusy = true
+                            Thread {
+                                val picked = uris.mapNotNull { uri ->
+                                    val name = context.contentResolver.query(uri, null, null, null, null)?.use { c ->
+                                        val i = c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)
+                                        if (c.moveToFirst() && i >= 0) c.getString(i) else null
+                                    } ?: uri.lastPathSegment ?: "file"
+                                    context.contentResolver.openInputStream(uri)?.let { name to it }
+                                }
+                                val count = com.thenile.vault.root.DecoyFileStore.importFiles(context, settings.decoyPassword, picked)
+                                mainHandler.post {
+                                    Toast.makeText(context, "Added $count file(s) to the decoy vault", Toast.LENGTH_SHORT).show()
+                                }
+                                refreshDecoyFiles()
+                            }.start()
+                        }
+                    }
+
+                    SectionHeaderCard(
+                        title = "Decoy Vault Files",
+                        subtitle = "What someone sees if they extract and open your decoy",
+                        icon = Icons.Filled.Folder
+                    ) {
+                        Text(
+                            "Add real, unremarkable files (old photos, PDFs, documents) to the decoy container so it looks genuinely used, not empty or purpose-built.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        OutlinedButton(
+                            onClick = { decoyFilesPickerLauncher.launch(arrayOf("*/*")) },
+                            enabled = !decoyFilesBusy,
+                            shape = RoundedCornerShape(16.dp),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Icon(Icons.Filled.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(if (decoyFilesBusy) "Working…" else "Add Files")
+                        }
+
+                        if (decoyFiles.isEmpty() && !decoyFilesBusy) {
+                            Text(
+                                "No files yet.",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+
+                        decoyFiles.forEach { (name, size) ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(name, style = MaterialTheme.typography.bodyMedium, maxLines = 1)
+                                    Text(
+                                        "${size / 1024} KB",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                                IconButton(onClick = {
+                                    decoyFilesBusy = true
+                                    Thread {
+                                        com.thenile.vault.root.DecoyFileStore.deleteFile(context, settings.decoyPassword, name)
+                                        refreshDecoyFiles()
+                                    }.start()
+                                }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = "Delete", tint = MaterialTheme.colorScheme.error)
+                                }
+                            }
+                        }
+                    }
                 }
                 } // Column
                 } // Crossfade
@@ -3680,6 +3831,8 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.codeLock = codeLock.trim()
                         settings.codeDecoy = codeDecoy.trim()
                         settings.codeAdmin = codeAdmin.trim()
+                        settings.realPassword = realPassword.trim()
+                        settings.decoyPassword = decoyPassword.trim()
                         settings.decoyLockScreenMode = decoyLockScreenMode
                         settings.decoyUnlockLimit = decoyUnlockLimit
                         settings.decoyUserId = decoyUserId

@@ -269,7 +269,20 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getString("codeUnlock", "9876") ?: "9876"
         set(value) { prefs.edit().putString("codeUnlock", value).commit() }
 
-        
+    /** The actual secret behind the real container's encryption key — separate from [codeUnlock],
+     *  which is just the dial-pad/lock-screen trigger code. Falls back to [codeUnlock] until the
+     *  user sets a real password in Admin, so nothing breaks before that step. */
+    var realPassword: String
+        get() = prefs.getString("realPassword", "").let { if (it.isNullOrBlank()) codeUnlock else it }
+        set(value) { prefs.edit().putString("realPassword", value).commit() }
+
+    /** The actual secret behind the decoy HiddenVolume's encryption key — separate from
+     *  [codeDecoy]/per-vault decoyPin, which are just trigger codes. Falls back to [codeDecoy]
+     *  until set. This is what the user hands over under duress. */
+    var decoyPassword: String
+        get() = prefs.getString("decoyPassword", "").let { if (it.isNullOrBlank()) codeDecoy else it }
+        set(value) { prefs.edit().putString("decoyPassword", value).commit() }
+
     var adminLockMethod: String
         get() = prefs.getString("adminLockMethod", "biometric") ?: "biometric"
         set(value) { prefs.edit().putString("adminLockMethod", value).commit() }
@@ -640,6 +653,8 @@ open class SettingsManager(private val context: Context) {
         json.put("codeDecoy", codeDecoy)
         json.put("codeUnlock", codeUnlock)
         json.put("codeAdmin", codeAdmin)
+        json.put("realPassword", realPassword)
+        json.put("decoyPassword", decoyPassword)
         json.put("keepContainerOnUninstall", keepContainerOnUninstall)
         context.getSharedPreferences("vault_state", Context.MODE_PRIVATE)
             .getString("key_salt", null)?.let { json.put("keySalt", it) }
@@ -698,6 +713,8 @@ open class SettingsManager(private val context: Context) {
             json.put("codeDecoy", codeDecoy)
             json.put("codeUnlock", codeUnlock)
             json.put("codeAdmin", codeAdmin)
+            json.put("realPassword", realPassword)
+            json.put("decoyPassword", decoyPassword)
 
             json.put("decoyLockScreenMode", decoyLockScreenMode)
             json.put("decoyUnlockLimit", decoyUnlockLimit)
@@ -825,7 +842,7 @@ open class SettingsManager(private val context: Context) {
             val json = JSONObject(com.thenile.vault.root.ConfigCrypto.decrypt(blob))
             val vaultsFull = json.optString("vaultsFull", "")
             if (vaultsFull.isBlank() || vaultsFull == "[]") return null
-            val codes = listOf("codeLock", "codeDecoy", "codeUnlock", "codeAdmin")
+            val codes = listOf("codeLock", "codeDecoy", "codeUnlock", "codeAdmin", "realPassword", "decoyPassword")
                 .mapNotNull { k -> json.optString(k, "").takeIf { it.isNotBlank() }?.let { k to it } }
                 .toMap()
             val salt = json.optString("keySalt", "").ifBlank { null }
