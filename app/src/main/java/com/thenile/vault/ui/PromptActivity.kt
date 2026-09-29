@@ -185,6 +185,8 @@ class PromptActivity : ComponentActivity() {
 
         return when (code) {
             settings.codeLock -> {
+                // Opt-in only, never on the decoy path — see ProgressNotifier/showProgressNotifications.
+                if (settings.showProgressNotifications) com.thenile.vault.root.ProgressNotifier.show(this, "Hiding vault…")
                 stateManager.updateState(VaultState.LOCKED)
                 com.thenile.vault.root.StorageMountManager.unmountAndLock(targets, dirs, dummyDirs, targetFiles, context = this)
                 // Hidden apps: leave the anodyne data in place while locked, never the real data.
@@ -194,14 +196,16 @@ class PromptActivity : ComponentActivity() {
                 targets.forEach { pkg ->
                     com.thenile.vault.root.TraceCleaner.cleanTraces(pkg)
                 }
+                if (settings.showProgressNotifications) com.thenile.vault.root.ProgressNotifier.dismiss(this)
                 "Locked"
             }
             settings.codeUnlock, "" -> {
+                if (settings.showProgressNotifications) com.thenile.vault.root.ProgressNotifier.show(this, "Unlocking vault…")
                 val salt = stateManager.keySalt()
                 val ok = com.thenile.vault.root.StorageMountManager.mountRealContainer(targets, dirs, dummyDirs, targetFiles, settings.realPassword, salt, this)
                 // Only claim UNLOCKED if the container actually mounted, so the hook doesn't
                 // reveal apps whose data never came online.
-                if (ok) {
+                val result = if (ok) {
                     // Hidden apps: restore the real data (each snapshot decrypts only under this password).
                     settings.vaults.filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }.forEach {
                         com.thenile.vault.root.HiddenAppManager.revealReal(this, it, settings.realPassword)
@@ -211,6 +215,8 @@ class PromptActivity : ComponentActivity() {
                 } else {
                     "Unlock FAILED — container not mounted (see logs)"
                 }
+                if (settings.showProgressNotifications) com.thenile.vault.root.ProgressNotifier.dismiss(this)
+                result
             }
             settings.codeAdmin -> {
                 val intent = android.content.Intent(this, AdminActivity::class.java)

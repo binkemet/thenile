@@ -21,6 +21,8 @@
          alert still fire when Nile isn't open — without it the geofence only works in-app. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <!-- Optional, opt-in hide/unlock progress notification (off by default) — see ProgressNotifier. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:allowBackup="false"

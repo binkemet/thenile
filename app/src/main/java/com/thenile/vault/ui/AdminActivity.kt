@@ -2012,6 +2012,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 var enableCalculatorDecoy by remember { mutableStateOf(settings.enableCalculatorDecoy) }
                 var calculatorTriggerExpression by remember { mutableStateOf(settings.calculatorTriggerExpression) }
                 var enableFakeCrash by remember { mutableStateOf(settings.enableFakeCrash) }
+                var showProgressNotifications by remember { mutableStateOf(settings.showProgressNotifications) }
                 var deadManSwitchEnabled by remember { mutableStateOf(settings.deadManSwitchEnabled) }
                 var deadManSwitchHoursText by remember { mutableStateOf(settings.deadManSwitchHours.toString()) }
                 var deadManSwitchVaultIds by remember { mutableStateOf(settings.deadManSwitchVaultIds) }
@@ -2903,6 +2904,23 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                                 Text("Enable Nile Accessibility Service")
                             }
                         }
+
+                        val requestNotifPermission = rememberLauncherForActivityResult(
+                            ActivityResultContracts.RequestPermission()
+                        ) { }
+
+                        PreferenceSwitchRow(
+                            title = "Show Hide/Unlock Progress",
+                            subtitle = "Opt-in notification while hiding or unlocking. Off by default — never shown during a decoy trigger either way.",
+                            icon = Icons.Filled.Notifications,
+                            checked = showProgressNotifications,
+                            onCheckedChange = {
+                                showProgressNotifications = it
+                                if (it && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+                                    requestNotifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+                                }
+                            }
+                        )
                     }
                 }
 
@@ -3848,6 +3866,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                         settings.enableCalculatorDecoy = enableCalculatorDecoy
                         settings.calculatorTriggerExpression = calculatorTriggerExpression.trim()
                         settings.enableFakeCrash = enableFakeCrash
+                        settings.showProgressNotifications = showProgressNotifications
                         settings.deadManSwitchEnabled = deadManSwitchEnabled
                         settings.deadManSwitchHours = deadManSwitchHoursText.toIntOrNull()?.coerceAtLeast(1) ?: 72
                         settings.deadManSwitchVaultIds = deadManSwitchVaultIds

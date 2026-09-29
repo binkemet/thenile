@@ -373,6 +373,14 @@ open class SettingsManager(private val context: Context) {
         get() = prefs.getBoolean("enableFakeCrash", false)
         set(value) { prefs.edit().putBoolean("enableFakeCrash", value).commit() }
 
+    /** Off by default: a progress notification during hide/unlock is itself a tell that something
+     *  covert is happening, which cuts against the whole point of a stealth vault. Opt-in for users
+     *  who want the feedback anyway (e.g. slow first-run container creation). Never shown on the
+     *  decoy path regardless of this setting — see PromptActivity/DecoyAction. */
+    var showProgressNotifications: Boolean
+        get() = prefs.getBoolean("showProgressNotifications", false)
+        set(value) { prefs.edit().putBoolean("showProgressNotifications", value).commit() }
+
     /** Dead man's switch: if the REAL vault hasn't been unlocked in [deadManSwitchHours], the
      *  selected vaults ([deadManSwitchVaultIds]) get hidden automatically — see DeadManSwitch.kt. */
     var deadManSwitchEnabled: Boolean
