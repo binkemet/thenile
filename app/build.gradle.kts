@@ -11,8 +11,8 @@ android {
         applicationId = "com.thenile.vault"
         minSdk = 24
         targetSdk = 36
-        versionCode = 2
-        versionName = "1.2"
+        versionCode = 3
+        versionName = "1.3"
     }
 
     // Two editions from one codebase:
