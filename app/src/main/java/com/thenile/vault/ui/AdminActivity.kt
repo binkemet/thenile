@@ -824,6 +824,7 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
     var vaultSwitchGate by remember { mutableStateOf<Vault?>(null) } // non-null while awaiting its password
     var vaultSwitchGateInput by remember { mutableStateOf("") }
     var vaultSwitchGateError by remember { mutableStateOf(false) }
+    var showUnsavedSettingsDialog by remember { mutableStateOf(false) }
 
     var codeUnlock by remember { mutableStateOf(settings.codeUnlock) }
     var codeLock by remember { mutableStateOf(settings.codeLock) }
@@ -1255,6 +1256,190 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 }) { Text("Cancel") }
             }
         )
+    }
+
+    // Hoisted out of the Settings-tab-only branch below: these are edited on the Settings tab but
+    // must survive switching to the Vaults tab and back (a plain if/else fully disposes the losing
+    // branch's `remember` state, which was silently resetting every one of these on tab switch —
+    // found while adding the unsaved-changes exit guard further down).
+    var adminLockMethod by remember { mutableStateOf(settings.adminLockMethod) }
+    var adminCustomPin by remember { mutableStateOf(settings.adminCustomPin) }
+    var hideAppIcon by remember { mutableStateOf(settings.hideAppIcon) }
+    var enableTile by remember { mutableStateOf(settings.enableTile) }
+    var enableDeepLink by remember { mutableStateOf(settings.enableDeepLink) }
+    var enableVolumeKeys by remember { mutableStateOf(settings.enableVolumeKeys) }
+    var enableCalculatorDecoy by remember { mutableStateOf(settings.enableCalculatorDecoy) }
+    var calculatorTriggerExpression by remember { mutableStateOf(settings.calculatorTriggerExpression) }
+    var enableFakeCrash by remember { mutableStateOf(settings.enableFakeCrash) }
+    var showProgressNotifications by remember { mutableStateOf(settings.showProgressNotifications) }
+    var deadManSwitchEnabled by remember { mutableStateOf(settings.deadManSwitchEnabled) }
+    var deadManSwitchHoursText by remember { mutableStateOf(settings.deadManSwitchHours.toString()) }
+    var deadManSwitchVaultIds by remember { mutableStateOf(settings.deadManSwitchVaultIds) }
+    var wrongPinSwitchEnabled by remember { mutableStateOf(settings.wrongPinSwitchEnabled) }
+    var wrongPinSwitchLimitText by remember { mutableStateOf(settings.wrongPinSwitchLimit.toString()) }
+    var wrongPinSwitchVaultIds by remember { mutableStateOf(settings.wrongPinSwitchVaultIds) }
+    var usbSwitchEnabled by remember { mutableStateOf(settings.usbSwitchEnabled) }
+    var usbSwitchVaultIds by remember { mutableStateOf(settings.usbSwitchVaultIds) }
+    fun minuteToHhMm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
+    fun hhMmToMinuteOrNull(s: String): Int? {
+        val parts = s.split(":")
+        val h = parts.getOrNull(0)?.toIntOrNull()
+        val mi = parts.getOrNull(1)?.toIntOrNull()
+        return if (h != null && mi != null && h in 0..23 && mi in 0..59) h * 60 + mi else null
+    }
+    var scheduledLockEnabled by remember { mutableStateOf(settings.scheduledLockEnabled) }
+    var scheduledLockStartText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockStartMinute)) }
+    var scheduledLockEndText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockEndMinute)) }
+    var scheduledLockVaultIds by remember { mutableStateOf(settings.scheduledLockVaultIds) }
+    var tamperSwitchEnabled by remember { mutableStateOf(settings.tamperSwitchEnabled) }
+    var tamperSwitchVaultIds by remember { mutableStateOf(settings.tamperSwitchVaultIds) }
+    var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
+    var auditLogEnabled by remember { mutableStateOf(settings.auditLogEnabled) }
+    var keepContainerOnUninstall by remember { mutableStateOf(settings.keepContainerOnUninstall) }
+    var screenOffSwitchEnabled by remember { mutableStateOf(settings.screenOffSwitchEnabled) }
+    var screenOffTimeoutText by remember { mutableStateOf(settings.screenOffTimeoutMinutes.toString()) }
+    var screenOffVaultIds by remember { mutableStateOf(settings.screenOffVaultIds) }
+    var geofenceSwitchEnabled by remember { mutableStateOf(settings.geofenceSwitchEnabled) }
+    var geofenceHasLocation by remember { mutableStateOf(settings.geofenceHasLocation) }
+    var geofenceRadiusText by remember { mutableStateOf(settings.geofenceRadiusMeters.toString()) }
+    var geofenceVaultIds by remember { mutableStateOf(settings.geofenceVaultIds) }
+
+    fun saveAllSettings() {
+        val updatedVaults = vaults.map { if (it.id == editingVaultState.id) editingVaultState else it }
+        vaults = updatedVaults
+        settings.vaults = updatedVaults
+        settings.codeUnlock = codeUnlock.trim()
+        settings.codeLock = codeLock.trim()
+        settings.codeDecoy = codeDecoy.trim()
+        settings.codeAdmin = codeAdmin.trim()
+        settings.realPassword = realPassword.trim()
+        settings.decoyPassword = decoyPassword.trim()
+        settings.requireVaultPasswordOnSwitch = requireVaultPasswordOnSwitch
+        settings.decoyLockScreenMode = decoyLockScreenMode
+        settings.decoyUnlockLimit = decoyUnlockLimit
+        settings.decoyUserId = decoyUserId
+        settings.suppressUserSwitchAnimation = suppressUserSwitchAnimation
+        settings.hideUserSwitcherInQuickSettings = hideUserSwitcherInQuickSettings
+        settings.hideUserSwitcherInSettings = hideUserSwitcherInSettings
+        settings.adminLockMethod = adminLockMethod
+        settings.adminCustomPin = adminCustomPin.trim()
+        settings.hideAppIcon = hideAppIcon
+        settings.enableTile = enableTile
+        settings.enableDeepLink = enableDeepLink
+        settings.enableVolumeKeys = enableVolumeKeys
+        settings.enableCalculatorDecoy = enableCalculatorDecoy
+        settings.calculatorTriggerExpression = calculatorTriggerExpression.trim()
+        settings.enableFakeCrash = enableFakeCrash
+        settings.showProgressNotifications = showProgressNotifications
+        settings.deadManSwitchEnabled = deadManSwitchEnabled
+        settings.deadManSwitchHours = deadManSwitchHoursText.toIntOrNull()?.coerceAtLeast(1) ?: 72
+        settings.deadManSwitchVaultIds = deadManSwitchVaultIds
+        com.thenile.vault.root.DeadManSwitch.reschedule(context)
+        settings.wrongPinSwitchEnabled = wrongPinSwitchEnabled
+        settings.wrongPinSwitchLimit = wrongPinSwitchLimitText.toIntOrNull()?.coerceAtLeast(1) ?: 5
+        settings.wrongPinSwitchVaultIds = wrongPinSwitchVaultIds
+        settings.usbSwitchEnabled = usbSwitchEnabled
+        settings.usbSwitchVaultIds = usbSwitchVaultIds
+        settings.scheduledLockEnabled = scheduledLockEnabled
+        settings.scheduledLockStartMinute = hhMmToMinuteOrNull(scheduledLockStartText) ?: settings.scheduledLockStartMinute
+        settings.scheduledLockEndMinute = hhMmToMinuteOrNull(scheduledLockEndText) ?: settings.scheduledLockEndMinute
+        settings.scheduledLockVaultIds = scheduledLockVaultIds
+        com.thenile.vault.root.ScheduledLockSwitch.reschedule(context)
+        settings.tamperSwitchEnabled = tamperSwitchEnabled
+        settings.tamperSwitchVaultIds = tamperSwitchVaultIds
+        settings.blockScreenshots = blockScreenshots
+        applySecureFlag(context)
+        settings.auditLogEnabled = auditLogEnabled
+        if (!auditLogEnabled) com.thenile.vault.root.AuditLog.clear(context)
+        settings.screenOffSwitchEnabled = screenOffSwitchEnabled
+        settings.screenOffTimeoutMinutes = screenOffTimeoutText.toIntOrNull()?.coerceAtLeast(1) ?: 5
+        settings.screenOffVaultIds = screenOffVaultIds
+        settings.geofenceSwitchEnabled = geofenceSwitchEnabled
+        settings.geofenceRadiusMeters = geofenceRadiusText.toIntOrNull()?.coerceAtLeast(50) ?: 200
+        settings.geofenceVaultIds = geofenceVaultIds
+        com.thenile.vault.root.GeofenceSwitch.reschedule(context)
+        Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
+    }
+
+    // Everything saveAllSettings() persists, paired up as (live-edited-value, last-saved-value) —
+    // used only to warn before losing edits on exit. scheduledLockStart/EndText are left out: an
+    // in-progress, not-yet-valid HH:MM edit would otherwise always read as "dirty" even when it
+    // matches what's saved.
+    fun hasUnsavedSettingsChanges(): Boolean {
+        val pairs = listOf<Pair<Any?, Any?>>(
+            codeUnlock.trim() to settings.codeUnlock,
+            codeLock.trim() to settings.codeLock,
+            codeDecoy.trim() to settings.codeDecoy,
+            codeAdmin.trim() to settings.codeAdmin,
+            realPassword.trim() to settings.realPassword,
+            decoyPassword.trim() to settings.decoyPassword,
+            requireVaultPasswordOnSwitch to settings.requireVaultPasswordOnSwitch,
+            decoyLockScreenMode to settings.decoyLockScreenMode,
+            decoyUnlockLimit to settings.decoyUnlockLimit,
+            decoyUserId to settings.decoyUserId,
+            suppressUserSwitchAnimation to settings.suppressUserSwitchAnimation,
+            hideUserSwitcherInQuickSettings to settings.hideUserSwitcherInQuickSettings,
+            hideUserSwitcherInSettings to settings.hideUserSwitcherInSettings,
+            adminLockMethod to settings.adminLockMethod,
+            adminCustomPin.trim() to settings.adminCustomPin,
+            hideAppIcon to settings.hideAppIcon,
+            enableTile to settings.enableTile,
+            enableDeepLink to settings.enableDeepLink,
+            enableVolumeKeys to settings.enableVolumeKeys,
+            enableCalculatorDecoy to settings.enableCalculatorDecoy,
+            calculatorTriggerExpression.trim() to settings.calculatorTriggerExpression,
+            enableFakeCrash to settings.enableFakeCrash,
+            showProgressNotifications to settings.showProgressNotifications,
+            deadManSwitchEnabled to settings.deadManSwitchEnabled,
+            (deadManSwitchHoursText.toIntOrNull()?.coerceAtLeast(1) ?: 72) to settings.deadManSwitchHours,
+            deadManSwitchVaultIds to settings.deadManSwitchVaultIds,
+            wrongPinSwitchEnabled to settings.wrongPinSwitchEnabled,
+            (wrongPinSwitchLimitText.toIntOrNull()?.coerceAtLeast(1) ?: 5) to settings.wrongPinSwitchLimit,
+            wrongPinSwitchVaultIds to settings.wrongPinSwitchVaultIds,
+            usbSwitchEnabled to settings.usbSwitchEnabled,
+            usbSwitchVaultIds to settings.usbSwitchVaultIds,
+            scheduledLockEnabled to settings.scheduledLockEnabled,
+            scheduledLockVaultIds to settings.scheduledLockVaultIds,
+            tamperSwitchEnabled to settings.tamperSwitchEnabled,
+            tamperSwitchVaultIds to settings.tamperSwitchVaultIds,
+            blockScreenshots to settings.blockScreenshots,
+            auditLogEnabled to settings.auditLogEnabled,
+            screenOffSwitchEnabled to settings.screenOffSwitchEnabled,
+            (screenOffTimeoutText.toIntOrNull()?.coerceAtLeast(1) ?: 5) to settings.screenOffTimeoutMinutes,
+            screenOffVaultIds to settings.screenOffVaultIds,
+            geofenceSwitchEnabled to settings.geofenceSwitchEnabled,
+            (geofenceRadiusText.toIntOrNull()?.coerceAtLeast(50) ?: 200) to settings.geofenceRadiusMeters,
+            geofenceVaultIds to settings.geofenceVaultIds
+        )
+        return pairs.any { (live, saved) -> live != saved }
+    }
+
+    if (showUnsavedSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showUnsavedSettingsDialog = false },
+            title = { Text("Unsaved Settings", fontWeight = FontWeight.Bold) },
+            text = { Text("You have settings changes that haven't been saved. Save them before leaving?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    saveAllSettings()
+                    showUnsavedSettingsDialog = false
+                    activity.finish()
+                }) { Text("Save & Exit") }
+            },
+            dismissButton = {
+                Row {
+                    TextButton(onClick = {
+                        showUnsavedSettingsDialog = false
+                        activity.finish()
+                    }) { Text("Discard & Exit", color = MaterialTheme.colorScheme.error) }
+                    TextButton(onClick = { showUnsavedSettingsDialog = false }) { Text("Cancel") }
+                }
+            }
+        )
+    }
+
+    BackHandler(enabled = currentTab == 0 && hasUnsavedSettingsChanges()) {
+        showUnsavedSettingsDialog = true
     }
 
     AnimatedContent(
@@ -2085,49 +2270,11 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 // SETTINGS TAB
                 // =================================================================================
 
-                var adminLockMethod by remember { mutableStateOf(settings.adminLockMethod) }
-                var adminCustomPin by remember { mutableStateOf(settings.adminCustomPin) }
-                var hideAppIcon by remember { mutableStateOf(settings.hideAppIcon) }
-                var enableTile by remember { mutableStateOf(settings.enableTile) }
-                var enableDeepLink by remember { mutableStateOf(settings.enableDeepLink) }
-                var enableVolumeKeys by remember { mutableStateOf(settings.enableVolumeKeys) }
-                var enableCalculatorDecoy by remember { mutableStateOf(settings.enableCalculatorDecoy) }
-                var calculatorTriggerExpression by remember { mutableStateOf(settings.calculatorTriggerExpression) }
-                var enableFakeCrash by remember { mutableStateOf(settings.enableFakeCrash) }
-                var showProgressNotifications by remember { mutableStateOf(settings.showProgressNotifications) }
-                var deadManSwitchEnabled by remember { mutableStateOf(settings.deadManSwitchEnabled) }
-                var deadManSwitchHoursText by remember { mutableStateOf(settings.deadManSwitchHours.toString()) }
-                var deadManSwitchVaultIds by remember { mutableStateOf(settings.deadManSwitchVaultIds) }
-                var wrongPinSwitchEnabled by remember { mutableStateOf(settings.wrongPinSwitchEnabled) }
-                var wrongPinSwitchLimitText by remember { mutableStateOf(settings.wrongPinSwitchLimit.toString()) }
-                var wrongPinSwitchVaultIds by remember { mutableStateOf(settings.wrongPinSwitchVaultIds) }
-                var usbSwitchEnabled by remember { mutableStateOf(settings.usbSwitchEnabled) }
-                var usbSwitchVaultIds by remember { mutableStateOf(settings.usbSwitchVaultIds) }
-                fun minuteToHhMm(m: Int) = "%02d:%02d".format(m / 60, m % 60)
-                fun hhMmToMinuteOrNull(s: String): Int? {
-                    val parts = s.split(":")
-                    val h = parts.getOrNull(0)?.toIntOrNull()
-                    val mi = parts.getOrNull(1)?.toIntOrNull()
-                    return if (h != null && mi != null && h in 0..23 && mi in 0..59) h * 60 + mi else null
-                }
-                var scheduledLockEnabled by remember { mutableStateOf(settings.scheduledLockEnabled) }
-                var scheduledLockStartText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockStartMinute)) }
-                var scheduledLockEndText by remember { mutableStateOf(minuteToHhMm(settings.scheduledLockEndMinute)) }
-                var scheduledLockVaultIds by remember { mutableStateOf(settings.scheduledLockVaultIds) }
-                var tamperSwitchEnabled by remember { mutableStateOf(settings.tamperSwitchEnabled) }
-                var tamperSwitchVaultIds by remember { mutableStateOf(settings.tamperSwitchVaultIds) }
-                var blockScreenshots by remember { mutableStateOf(settings.blockScreenshots) }
+                // Editable settings vars now declared in the shared scope above (outside the
+                // targetTab if/else) — see the hoisting note there. isAuditLogOpen/showUninstallConfirm
+                // stay local: pure transient dialog-open flags, fine to reset on tab switch.
                 var isAuditLogOpen by remember { mutableStateOf(false) }
-                var auditLogEnabled by remember { mutableStateOf(settings.auditLogEnabled) }
-                var keepContainerOnUninstall by remember { mutableStateOf(settings.keepContainerOnUninstall) }
                 var showUninstallConfirm by remember { mutableStateOf(false) }
-                var screenOffSwitchEnabled by remember { mutableStateOf(settings.screenOffSwitchEnabled) }
-                var screenOffTimeoutText by remember { mutableStateOf(settings.screenOffTimeoutMinutes.toString()) }
-                var screenOffVaultIds by remember { mutableStateOf(settings.screenOffVaultIds) }
-                var geofenceSwitchEnabled by remember { mutableStateOf(settings.geofenceSwitchEnabled) }
-                var geofenceHasLocation by remember { mutableStateOf(settings.geofenceHasLocation) }
-                var geofenceRadiusText by remember { mutableStateOf(settings.geofenceRadiusMeters.toString()) }
-                var geofenceVaultIds by remember { mutableStateOf(settings.geofenceVaultIds) }
 
                 var androidUsers by remember { mutableStateOf<List<AndroidUser>>(emptyList()) }
                 var showCreateUserDialog by remember { mutableStateOf(false) }
@@ -3931,64 +4078,11 @@ fun AdminScreen(activity: FragmentActivity, settings: SettingsManager, currentTa
                 } // Column
                 } // Crossfade
 
-                // 6. Save Settings & Apply Button
+                // 6. Save Settings & Apply Button (saveAllSettings/hasUnsavedSettingsChanges are
+                // declared in the shared scope above — see the hoisting note there — so they, and the
+                // exit guard, keep working regardless of which tab is currently showing)
                 Button(
-                    onClick = {
-                        val updatedVaults = vaults.map { if (it.id == editingVaultState.id) editingVaultState else it }
-                        vaults = updatedVaults
-                        settings.vaults = updatedVaults
-                        settings.codeUnlock = codeUnlock.trim()
-                        settings.codeLock = codeLock.trim()
-                        settings.codeDecoy = codeDecoy.trim()
-                        settings.codeAdmin = codeAdmin.trim()
-                        settings.realPassword = realPassword.trim()
-                        settings.decoyPassword = decoyPassword.trim()
-                        settings.requireVaultPasswordOnSwitch = requireVaultPasswordOnSwitch
-                        settings.decoyLockScreenMode = decoyLockScreenMode
-                        settings.decoyUnlockLimit = decoyUnlockLimit
-                        settings.decoyUserId = decoyUserId
-                        settings.suppressUserSwitchAnimation = suppressUserSwitchAnimation
-                        settings.hideUserSwitcherInQuickSettings = hideUserSwitcherInQuickSettings
-                        settings.hideUserSwitcherInSettings = hideUserSwitcherInSettings
-                        settings.adminLockMethod = adminLockMethod
-                        settings.adminCustomPin = adminCustomPin.trim()
-                        settings.hideAppIcon = hideAppIcon
-                        settings.enableTile = enableTile
-                        settings.enableDeepLink = enableDeepLink
-                        settings.enableVolumeKeys = enableVolumeKeys
-                        settings.enableCalculatorDecoy = enableCalculatorDecoy
-                        settings.calculatorTriggerExpression = calculatorTriggerExpression.trim()
-                        settings.enableFakeCrash = enableFakeCrash
-                        settings.showProgressNotifications = showProgressNotifications
-                        settings.deadManSwitchEnabled = deadManSwitchEnabled
-                        settings.deadManSwitchHours = deadManSwitchHoursText.toIntOrNull()?.coerceAtLeast(1) ?: 72
-                        settings.deadManSwitchVaultIds = deadManSwitchVaultIds
-                        com.thenile.vault.root.DeadManSwitch.reschedule(context)
-                        settings.wrongPinSwitchEnabled = wrongPinSwitchEnabled
-                        settings.wrongPinSwitchLimit = wrongPinSwitchLimitText.toIntOrNull()?.coerceAtLeast(1) ?: 5
-                        settings.wrongPinSwitchVaultIds = wrongPinSwitchVaultIds
-                        settings.usbSwitchEnabled = usbSwitchEnabled
-                        settings.usbSwitchVaultIds = usbSwitchVaultIds
-                        settings.scheduledLockEnabled = scheduledLockEnabled
-                        settings.scheduledLockStartMinute = hhMmToMinuteOrNull(scheduledLockStartText) ?: settings.scheduledLockStartMinute
-                        settings.scheduledLockEndMinute = hhMmToMinuteOrNull(scheduledLockEndText) ?: settings.scheduledLockEndMinute
-                        settings.scheduledLockVaultIds = scheduledLockVaultIds
-                        com.thenile.vault.root.ScheduledLockSwitch.reschedule(context)
-                        settings.tamperSwitchEnabled = tamperSwitchEnabled
-                        settings.tamperSwitchVaultIds = tamperSwitchVaultIds
-                        settings.blockScreenshots = blockScreenshots
-                        applySecureFlag(context)
-                        settings.auditLogEnabled = auditLogEnabled
-                        if (!auditLogEnabled) com.thenile.vault.root.AuditLog.clear(context)
-                        settings.screenOffSwitchEnabled = screenOffSwitchEnabled
-                        settings.screenOffTimeoutMinutes = screenOffTimeoutText.toIntOrNull()?.coerceAtLeast(1) ?: 5
-                        settings.screenOffVaultIds = screenOffVaultIds
-                        settings.geofenceSwitchEnabled = geofenceSwitchEnabled
-                        settings.geofenceRadiusMeters = geofenceRadiusText.toIntOrNull()?.coerceAtLeast(50) ?: 200
-                        settings.geofenceVaultIds = geofenceVaultIds
-                        com.thenile.vault.root.GeofenceSwitch.reschedule(context)
-                        Toast.makeText(context, "Settings saved successfully", Toast.LENGTH_SHORT).show()
-                    },
+                    onClick = { saveAllSettings() },
                     modifier = Modifier.fillMaxWidth().height(52.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
