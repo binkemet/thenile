@@ -260,26 +260,16 @@ fun FloatingNavigationBar(
                             tint = contentColor,
                             modifier = Modifier.size(20.dp)
                         )
-                        AnimatedVisibility(
-                            visible = isSelected,
-                            enter = fadeIn(tween(180)) + expandHorizontally(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            ),
-                            exit = fadeOut(tween(120)) + shrinkHorizontally(animationSpec = tween(120))
-                        ) {
-                            Row {
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text(
-                                    text = label,
-                                    color = contentColor,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = FontWeight.Bold
-                                )
-                            }
-                        }
+                        // Always visible, not just on the selected tab — with only 2 tabs there's
+                        // no crowding, and an icon-only unselected tab was a real source of "which
+                        // button is this" confusion (found by hitting it firsthand while testing).
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = label,
+                            color = contentColor,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                        )
                     }
                 }
             }
