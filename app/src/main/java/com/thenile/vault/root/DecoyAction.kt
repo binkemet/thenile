@@ -19,6 +19,10 @@ object DecoyAction {
         val files = settings.getDecoyFilesForCode(code)
         val ok = StorageMountManager.mountDecoyDirectory(targets, dirs, dummy, files, context)
         TraceCleaner.cleanAllTraces(targets, dirs, files)
+        // Data-swap / uninstall apps must show their anodyne state on the decoy PIN too. Keyed with
+        // decoyPassword — the same key the "Capture decoy" button and the lock code use.
+        settings.vaultsForCode(code).filter { it.hiddenApps.isNotEmpty() || it.uninstallApps.isNotEmpty() }
+            .forEach { HiddenAppManager.showDecoy(context, it, settings.decoyPassword) }
         // A vault flagged self-destruct uninstalls Nile itself once its hide has run — do it last,
         // pm uninstall tears down this process.
         if (settings.vaultsForCode(code).any { it.selfDestruct }) {
@@ -37,7 +41,7 @@ object DecoyAction {
         // hiddenApps use copy-based snapshot swapping (restore the anodyne data), separate from the
         // bind-mount hide of packages/dirs/files below.
         if (vault.hiddenApps.isNotEmpty() || vault.uninstallApps.isNotEmpty())
-            HiddenAppManager.showDecoy(context, vault, vault.decoyPin)
+            HiddenAppManager.showDecoy(context, vault, SettingsManager.getInstance(context).decoyPassword)
         val hasMountTargets = vault.packages.isNotEmpty() || vault.directories.isNotEmpty() ||
             vault.dummyDirectories.isNotEmpty() || vault.files.isNotEmpty()
         val ok = if (hasMountTargets) {
