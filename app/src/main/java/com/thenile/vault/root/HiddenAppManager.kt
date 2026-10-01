@@ -26,7 +26,8 @@ object HiddenAppManager {
 
     private fun tag(pkg: String) = Integer.toHexString(pkg.hashCode())
     private fun salt(context: Context) = VaultStateManager.getInstance(context).keySalt()
-    private fun scratch(context: Context) = context.cacheDir.path
+    // filesDir, not cacheDir: the container leaves little free space, so the system purges caches mid-restore.
+    private fun scratch(context: Context) = context.filesDir.path
 
     // App data is per-user, so each profile gets its own snapshot — restoring one user's data into
     // another would corrupt it. Snapshot files are keyed by user: "<taghex>_u<userId>.<ext>". The

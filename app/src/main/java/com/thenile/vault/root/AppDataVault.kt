@@ -57,7 +57,7 @@ object AppDataVault {
      *  only create files where that uid has write permission. encDest/encSrc are caller-chosen and
      *  routinely point somewhere only root can write (e.g. a HiddenVolume mount point, freshly
      *  mkfs'd root:root 755 — the app can read there but not create a new file). So every native
-     *  encrypt/decrypt call is staged through [scratchDir] (an app-writable dir, e.g. cacheDir),
+     *  encrypt/decrypt call is staged through [scratchDir] (an app-writable dir, e.g. filesDir),
      *  with PrivilegedShell (root, bypasses all of that) doing the actual placement/fetch on either
      *  side. Confirmed on-device: encryptFileNative straight to a HiddenVolume mount point silently
      *  fails for exactly this reason. */
